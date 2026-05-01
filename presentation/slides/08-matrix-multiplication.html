@@ -1,0 +1,226 @@
+<section data-id="matrix-multiplication" data-title="Matrix Multiplication">
+  <div class="slide-content">
+    <h2><span class="highlight">Matrix Multiplication</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.6rem;">Remember the dot product? Matmul is just doing that for <span class="highlight">every row-column pair</span>.</p>
+
+    <svg viewBox="0 0 900 480" style="width: 100%; max-width: 880px; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+      <style>
+        .mm-box {
+          fill: var(--color-bg-subtle, #111827);
+          stroke: var(--color-border, #1e293b);
+          stroke-width: 1.5;
+          rx: 6;
+        }
+        .mm-num {
+          fill: var(--color-text, #e2e8f0);
+          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+          font-size: 20px;
+          text-anchor: middle;
+          dominant-baseline: central;
+        }
+        .mm-op {
+          fill: var(--color-text-muted, #94a3b8);
+          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+          font-size: 24px;
+          text-anchor: middle;
+          dominant-baseline: central;
+        }
+        .mm-label {
+          fill: var(--color-text-muted, #94a3b8);
+          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+          font-size: 13px;
+          text-anchor: middle;
+          dominant-baseline: central;
+        }
+        .mm-dim {
+          fill: var(--color-text-muted, #94a3b8);
+          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+          font-size: 12px;
+          text-anchor: middle;
+          dominant-baseline: central;
+          font-style: italic;
+        }
+        .mm-highlight-row {
+          fill: rgba(56, 189, 248, 0.10);
+          stroke: var(--color-accent, #38bdf8);
+          stroke-width: 1.5;
+          rx: 4;
+        }
+        .mm-highlight-col {
+          fill: rgba(56, 189, 248, 0.10);
+          stroke: var(--color-accent, #38bdf8);
+          stroke-width: 1.5;
+          rx: 4;
+        }
+        .mm-result-box {
+          fill: rgba(56, 189, 248, 0.12);
+          stroke: var(--color-accent, #38bdf8);
+          stroke-width: 2;
+          rx: 6;
+        }
+        .mm-result-num {
+          fill: var(--color-accent, #38bdf8);
+          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+          font-size: 20px;
+          text-anchor: middle;
+          dominant-baseline: central;
+          font-weight: bold;
+        }
+        .mm-bracket {
+          fill: none;
+          stroke: var(--color-text-muted, #94a3b8);
+          stroke-width: 2;
+          stroke-linecap: round;
+        }
+        .mm-arrow {
+          stroke: var(--color-accent, #38bdf8);
+          stroke-width: 1.5;
+          opacity: 0.5;
+          fill: none;
+          stroke-dasharray: 4 3;
+        }
+        .mm-formula {
+          fill: var(--color-text-muted, #94a3b8);
+          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+          font-size: 14px;
+          text-anchor: middle;
+          dominant-baseline: central;
+        }
+        @keyframes mm-glow {
+          0%, 100% { stroke-opacity: 1; }
+          50% { stroke-opacity: 0.5; }
+        }
+        .mm-pulse { animation: mm-glow 2.5s ease-in-out infinite; }
+      </style>
+
+      <!-- Matrix A: 2x3 -->
+      <text class="mm-label" x="130" y="20">A</text>
+      <text class="mm-dim" x="130" y="36">2 × 3</text>
+
+      <!-- Left bracket A -->
+      <path class="mm-bracket" d="M 52,50 Q 42,50 42,60 L 42,178 Q 42,188 52,188"/>
+      <!-- Right bracket A -->
+      <path class="mm-bracket" d="M 218,50 Q 228,50 228,60 L 228,178 Q 228,188 218,188"/>
+
+      <!-- Row 1 -->
+      <rect class="mm-box" x="55" y="55" width="50" height="40"/>
+      <text class="mm-num" x="80" y="75">1</text>
+      <rect class="mm-box" x="110" y="55" width="50" height="40"/>
+      <text class="mm-num" x="135" y="75">2</text>
+      <rect class="mm-box" x="165" y="55" width="50" height="40"/>
+      <text class="mm-num" x="190" y="75">3</text>
+
+      <!-- Row 2 -->
+      <rect class="mm-box" x="55" y="105" width="50" height="40"/>
+      <text class="mm-num" x="80" y="125">4</text>
+      <rect class="mm-box" x="110" y="105" width="50" height="40"/>
+      <text class="mm-num" x="135" y="125">5</text>
+      <rect class="mm-box" x="165" y="105" width="50" height="40"/>
+      <text class="mm-num" x="190" y="125">6</text>
+
+      <!-- Multiply sign -->
+      <text class="mm-op" x="265" y="100">&times;</text>
+
+      <!-- Matrix B: 3x2 -->
+      <text class="mm-label" x="370" y="20">B</text>
+      <text class="mm-dim" x="370" y="36">3 × 2</text>
+
+      <!-- Left bracket B -->
+      <path class="mm-bracket" d="M 302,50 Q 292,50 292,60 L 292,228 Q 292,238 302,238"/>
+      <!-- Right bracket B -->
+      <path class="mm-bracket" d="M 438,50 Q 448,50 448,60 L 448,228 Q 448,238 438,238"/>
+
+      <!-- Col 1 -->
+      <rect class="mm-box" x="305" y="55" width="50" height="40"/>
+      <text class="mm-num" x="330" y="75">7</text>
+      <rect class="mm-box" x="305" y="105" width="50" height="40"/>
+      <text class="mm-num" x="330" y="125">9</text>
+      <rect class="mm-box" x="305" y="155" width="50" height="40"/>
+      <text class="mm-num" x="330" y="175">11</text>
+
+      <!-- Col 2 -->
+      <rect class="mm-box" x="385" y="55" width="50" height="40"/>
+      <text class="mm-num" x="410" y="75">8</text>
+      <rect class="mm-box" x="385" y="105" width="50" height="40"/>
+      <text class="mm-num" x="410" y="125">10</text>
+      <rect class="mm-box" x="385" y="155" width="50" height="40"/>
+      <text class="mm-num" x="410" y="175">12</text>
+
+      <!-- Equals sign -->
+      <text class="mm-op" x="500" y="100">=</text>
+
+      <!-- Result Matrix: 2x2 -->
+      <text class="mm-label" x="600" y="20">C</text>
+      <text class="mm-dim" x="600" y="36">2 × 2</text>
+
+      <!-- Left bracket C -->
+      <path class="mm-bracket" d="M 542,50 Q 532,50 532,60 L 532,178 Q 532,188 542,188"/>
+      <!-- Right bracket C -->
+      <path class="mm-bracket" d="M 658,50 Q 668,50 668,60 L 668,178 Q 668,188 658,188"/>
+
+      <!-- Step 0: row 1 · col 1 → C[0,0] = 58 -->
+      <g class="fragment current-visible" data-fragment-index="0">
+        <rect class="mm-highlight-row" x="53" y="53" width="164" height="44"/>
+        <rect class="mm-highlight-col" x="303" y="53" width="54" height="144"/>
+        <path class="mm-arrow" d="M 217,75 C 260,75 260,55 305,55"/>
+        <path class="mm-arrow" d="M 330,195 C 330,210 520,210 555,75"/>
+        <text class="mm-formula" x="450" y="268">row 1 · col 1</text>
+        <text class="mm-formula" x="450" y="288">1×7 + 2×9 + 3×11 = 58</text>
+      </g>
+      <g class="fragment" data-fragment-index="0">
+        <rect class="mm-result-box" x="545" y="55" width="50" height="40"/>
+        <text class="mm-result-num" x="570" y="75">58</text>
+      </g>
+
+      <!-- Step 1: row 1 · col 2 → C[0,1] = 64 -->
+      <g class="fragment current-visible" data-fragment-index="1">
+        <rect class="mm-highlight-row" x="53" y="53" width="164" height="44"/>
+        <rect class="mm-highlight-col" x="383" y="53" width="54" height="144"/>
+        <path class="mm-arrow" d="M 217,75 C 260,75 280,55 385,55"/>
+        <path class="mm-arrow" d="M 410,195 C 410,210 600,210 625,75"/>
+        <text class="mm-formula" x="450" y="268">row 1 · col 2</text>
+        <text class="mm-formula" x="450" y="288">1×8 + 2×10 + 3×12 = 64</text>
+      </g>
+      <g class="fragment" data-fragment-index="1">
+        <rect class="mm-result-box" x="615" y="55" width="50" height="40"/>
+        <text class="mm-result-num" x="640" y="75">64</text>
+      </g>
+
+      <!-- Step 2: row 2 · col 1 → C[1,0] = 139 -->
+      <g class="fragment current-visible" data-fragment-index="2">
+        <rect class="mm-highlight-row" x="53" y="103" width="164" height="44"/>
+        <rect class="mm-highlight-col" x="303" y="53" width="54" height="144"/>
+        <path class="mm-arrow" d="M 217,125 C 260,125 260,55 305,55"/>
+        <path class="mm-arrow" d="M 330,195 C 330,220 520,220 555,125"/>
+        <text class="mm-formula" x="450" y="268">row 2 · col 1</text>
+        <text class="mm-formula" x="450" y="288">4×7 + 5×9 + 6×11 = 139</text>
+      </g>
+      <g class="fragment" data-fragment-index="2">
+        <rect class="mm-result-box" x="545" y="105" width="50" height="40"/>
+        <text class="mm-result-num" x="570" y="125">139</text>
+      </g>
+
+      <!-- Step 3: row 2 · col 2 → C[1,1] = 154 -->
+      <g class="fragment current-visible" data-fragment-index="3">
+        <rect class="mm-highlight-row" x="53" y="103" width="164" height="44"/>
+        <rect class="mm-highlight-col" x="383" y="53" width="54" height="144"/>
+        <path class="mm-arrow" d="M 217,125 C 260,125 280,55 385,55"/>
+        <path class="mm-arrow" d="M 410,195 C 410,220 600,220 625,125"/>
+        <text class="mm-formula" x="450" y="268">row 2 · col 2</text>
+        <text class="mm-formula" x="450" y="288">4×8 + 5×10 + 6×12 = 154</text>
+      </g>
+      <g class="fragment" data-fragment-index="3">
+        <rect class="mm-result-box" x="615" y="105" width="50" height="40"/>
+        <text class="mm-result-num" x="640" y="125">154</text>
+      </g>
+
+      <!-- Fragment 5: Key insight -->
+      <g class="fragment">
+        <rect x="120" y="410" width="660" height="50" rx="10" fill="rgba(56, 189, 248, 0.08)" stroke="var(--color-accent, #38bdf8)" stroke-width="1.5"/>
+        <text style="fill: var(--color-accent, #38bdf8); font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace; font-size: 16px; text-anchor: middle; dominant-baseline: central;" x="450" y="435">
+          4 cells in result = 4 dot products. That's all matmul is!
+        </text>
+      </g>
+    </svg>
+  </div>
+</section>

@@ -1,0 +1,37 @@
+<section data-id="architecture-simple" data-title="De Simpelste Transformer">
+  <div class="slide-content">
+    <h2>De simpelste <span class="highlight">transformer</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 1.5rem;">1 laag, geen franje — de kern van elk LLM</p>
+
+    <div class="pipeline">
+      <div class="stage fragment">
+        <strong>Input Tokens</strong>
+        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">[15496, 995, ...]</span>
+      </div>
+      <div class="arrow fragment"></div>
+      <div class="stage fragment">
+        <strong>RMSNorm</strong>
+        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">Normaliseer activaties</span>
+      </div>
+      <div class="arrow fragment"></div>
+      <div class="stage fragment" style="border-color: var(--color-accent);">
+        <strong style="color: var(--color-accent);">Self-Attention</strong>
+        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">Q, K, V + Causal Mask</span>
+      </div>
+      <div class="arrow fragment"></div>
+      <div class="stage fragment">
+        <strong>Feed Forward</strong>
+        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">SwiGLU activatie</span>
+      </div>
+      <div class="arrow fragment"></div>
+      <div class="stage fragment">
+        <strong>Output</strong>
+        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">Logits &rarr; next token</span>
+      </div>
+    </div>
+
+    <p class="fragment" style="text-align: center; margin-top: 1.5rem; color: var(--color-text-muted); font-size: 0.85em;">
+      Echte modellen herhalen de middelste stappen <span class="highlight">32&times;</span> of meer — maar de structuur is identiek.
+    </p>
+  </div>
+</section>

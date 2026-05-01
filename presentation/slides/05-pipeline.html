@@ -1,0 +1,28 @@
+<section data-id="pipeline" data-title="The Inference Pipeline">
+  <div class="slide-content">
+    <h2>The Inference <span class="highlight">Pipeline</span></h2>
+
+    <div style="margin-top: 1.5rem;">
+      <div class="fragment" style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem;">
+        <span class="highlight" style="font-size: 1.4em; font-weight: 700; min-width: 1.5em;">1</span>
+        <div><strong>Tokenize</strong> — Convert input text into token IDs the model understands</div>
+      </div>
+      <div class="fragment" style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem;">
+        <span class="highlight" style="font-size: 1.4em; font-weight: 700; min-width: 1.5em;">2</span>
+        <div><strong>Load context</strong> — Feed all tokens into the model in one batch (prefill)</div>
+      </div>
+      <div class="fragment" style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem;">
+        <span class="highlight" style="font-size: 1.4em; font-weight: 700; min-width: 1.5em;">3</span>
+        <div><strong>Forward pass</strong> — Model computes probabilities for the next token</div>
+      </div>
+      <div class="fragment" style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem;">
+        <span class="highlight" style="font-size: 1.4em; font-weight: 700; min-width: 1.5em;">4</span>
+        <div><strong>Sample</strong> — Pick the next token from the probability distribution</div>
+      </div>
+      <div class="fragment" style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem;">
+        <span class="highlight" style="font-size: 1.4em; font-weight: 700; min-width: 1.5em;">5</span>
+        <div><strong>Decode &amp; repeat</strong> — Append token, go to step 3 until done</div>
+      </div>
+    </div>
+  </div>
+</section>

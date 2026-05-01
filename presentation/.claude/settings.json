@@ -1,0 +1,23 @@
+{
+    "env": {
+        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+        "MAX_THINKING_TOKENS": "128000",
+        "CLAUDE_CODE_ALWAYS_ENABLE_EFFORT": "1",
+        "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+        "CLAUDE_CODE_EFFORT_LEVEL": "high"
+    },
+    "model": "claude-opus-4-6",
+    "modelOverrides": {
+        "claude-opus-4-7": "claude-opus-4-6"
+    },
+    "sandbox": {
+        "enabled": true,
+        "autoAllowBashIfSandboxed": true,
+        "filesystem": {
+            "allowWrite": [
+                "~/.claude/teams",
+                "/tmp"
+            ]
+        }
+    }
+}

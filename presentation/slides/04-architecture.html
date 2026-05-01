@@ -1,0 +1,36 @@
+<section data-id="architecture" data-title="Architecture Overview">
+  <div class="slide-content center">
+    <h2>Architecture Overview</h2>
+
+    <div class="pipeline" style="margin-top: 2rem;">
+      <div class="stage fragment">
+        <span class="stage-label">Input</span>
+        <span class="stage-name">"Hello, world"</span>
+      </div>
+      <div class="arrow fragment">→</div>
+      <div class="stage fragment">
+        <span class="stage-label">Step 1</span>
+        <span class="stage-name">Tokenizer</span>
+      </div>
+      <div class="arrow fragment">→</div>
+      <div class="stage fragment">
+        <span class="stage-label">Step 2</span>
+        <span class="stage-name">Model</span>
+      </div>
+      <div class="arrow fragment">→</div>
+      <div class="stage fragment">
+        <span class="stage-label">Step 3</span>
+        <span class="stage-name">Sampler</span>
+      </div>
+      <div class="arrow fragment">→</div>
+      <div class="stage fragment">
+        <span class="stage-label">Output</span>
+        <span class="stage-name">Next Token</span>
+      </div>
+    </div>
+
+    <p class="fragment" style="margin-top: 2rem; color: var(--color-text-muted);">
+      Repeat until the model outputs a stop token or hits the max length.
+    </p>
+  </div>
+</section>

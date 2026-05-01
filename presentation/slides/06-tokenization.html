@@ -1,0 +1,27 @@
+<section data-id="tokenization" data-title="Tokenization">
+  <div class="slide-content">
+    <h2>Tokenization</h2>
+
+    <p class="fragment">Models don't read text — they read <span class="highlight">numbers</span>.</p>
+
+    <div class="code-block fragment" style="margin: 1.5rem auto;">
+      <div class="code-header">Tokenizer Example</div>
+      <pre><code>"Hello world"  →  [15496, 995]
+"Hello"        →  [15496]
+" world"       →  [995]</code></pre>
+    </div>
+
+    <div class="two-column fragment" style="margin-top: 1.5rem;">
+      <div>
+        <h3>How BPE Works</h3>
+        <p>Start with individual characters. Find the most common pair. Merge it into one token. Repeat thousands of times.</p>
+        <p style="color: var(--color-text-muted); font-size: 0.85em;">Like text compression, but for neural networks.</p>
+      </div>
+      <div>
+        <h3>Why It Matters</h3>
+        <p>Token count affects <span class="highlight">speed</span>, <span class="highlight">cost</span>, and <span class="highlight">context window</span>. Fewer tokens = faster inference.</p>
+        <p style="color: var(--color-text-muted); font-size: 0.85em;">~4 characters per token on average for English.</p>
+      </div>
+    </div>
+  </div>
+</section>
