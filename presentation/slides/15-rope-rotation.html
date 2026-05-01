@@ -2,7 +2,7 @@
   <div class="slide-content">
     <h2><span class="highlight">2D Rotation</span></h2>
 
-    <svg viewBox="0 0 700 460" style="width: 100%; max-width: 750px; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+    <svg id="rot-svg" viewBox="0 0 700 460" style="width: 100%; max-width: 750px; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
       <style>
         .rot-axis { stroke: var(--color-border, #1e293b); stroke-width: 1.5; }
         .rot-circle { fill: none; stroke: var(--color-border, #1e293b); stroke-width: 1; stroke-dasharray: 4 3; }
@@ -13,6 +13,8 @@
         .rot-small { font-family: "SF Mono", "Cascadia Code", monospace; font-size: 12px; text-anchor: middle; dominant-baseline: central; }
         .rot-proj { stroke-width: 2; stroke-dasharray: 5 4; }
         .rot-brace { stroke-width: 2.5; stroke-linecap: round; fill: none; }
+        #rot-drag-dot { cursor: grab; r: 10; }
+        #rot-drag-hit { cursor: grab; fill: transparent; r: 24; pointer-events: all; }
       </style>
 
       <!-- Axes -->
@@ -24,46 +26,43 @@
       <!-- Unit circle -->
       <circle class="rot-circle" cx="250" cy="250" r="180"/>
 
-      <!-- Original vector: 25° → cos(25)=0.906, sin(25)=0.423 -->
-      <!-- Point: (250+180*0.906, 250-180*0.423) = (413, 174) -->
+      <!-- Original vector: 25° -->
       <line class="rot-vec" x1="250" y1="250" x2="413" y2="174" stroke="var(--color-text-muted, #94a3b8)"/>
       <circle class="rot-dot" cx="413" cy="174" fill="var(--color-text-muted, #94a3b8)"/>
       <text class="rot-label" style="fill: var(--color-text-muted);" x="440" y="162">(x, y)</text>
 
-      <!-- cos projection: x-axis span from origin to point's x -->
+      <!-- cos/sin projections for original -->
       <line class="rot-proj" x1="413" y1="174" x2="413" y2="250" stroke="var(--color-text-muted, #94a3b8)" opacity="0.5"/>
-      <!-- sin projection: y-axis span from origin to point's y -->
       <line class="rot-proj" x1="413" y1="174" x2="250" y2="174" stroke="var(--color-text-muted, #94a3b8)" opacity="0.5"/>
 
       <!-- cos label on x-axis -->
-      <line class="rot-brace" x1="250" y1="262" x2="413" y2="262" stroke="var(--color-text-muted, #94a3b8)" opacity="0.6"/>
-      <text class="rot-small" style="fill: var(--color-text-muted);" x="332" y="280">x = r·cos(α)</text>
+      <line id="rot-cos-brace" class="rot-brace" x1="250" y1="262" x2="413" y2="262" stroke="var(--color-accent, #38bdf8)" opacity="0.6"/>
+      <text id="rot-cos-label" class="rot-small" style="fill: var(--color-accent);" x="332" y="280">cos(α+θ)</text>
 
       <!-- sin label on y-axis -->
-      <line class="rot-brace" x1="238" y1="250" x2="238" y2="174" stroke="var(--color-text-muted, #94a3b8)" opacity="0.6"/>
-      <text class="rot-small" style="fill: var(--color-text-muted);" x="195" y="212" text-anchor="end">y = r·sin(α)</text>
+      <line id="rot-sin-brace" class="rot-brace" x1="238" y1="250" x2="238" y2="174" stroke="var(--color-accent, #38bdf8)" opacity="0.6"/>
+      <text id="rot-sin-label" class="rot-small" style="fill: var(--color-accent);" x="195" y="212" text-anchor="end">sin(α+θ)</text>
 
-      <!-- Original angle α -->
+      <!-- Original angle α arc -->
       <path class="rot-arc" d="M 300,250 A 50,50 0 0,0 295,229" stroke="var(--color-text-muted, #94a3b8)" stroke-width="1.5"/>
       <text class="rot-label" style="fill: var(--color-text-muted); font-size: 15px;" x="312" y="232">α</text>
 
-      <!-- Fragment 1: Rotated vector — rotate by θ=40° → total 65° -->
-      <!-- cos(65)=0.423, sin(65)=0.906 → (250+180*0.423, 250-180*0.906) = (326, 87) -->
-      <g class="fragment">
-        <line class="rot-vec" x1="250" y1="250" x2="326" y2="87" stroke="var(--color-accent, #38bdf8)"/>
-        <circle class="rot-dot" cx="326" cy="87" fill="var(--color-accent, #38bdf8)"/>
-        <text class="rot-label" style="fill: var(--color-accent);" x="354" y="74">(x', y')</text>
+      <!-- Draggable rotated vector (always visible) -->
+      <line id="rot-drag-line" class="rot-vec" x1="250" y1="250" x2="326" y2="87" stroke="var(--color-accent, #38bdf8)"/>
 
-        <!-- Projections for rotated point -->
-        <line class="rot-proj" x1="326" y1="87" x2="326" y2="250" stroke="var(--color-accent, #38bdf8)" opacity="0.3"/>
-        <line class="rot-proj" x1="326" y1="87" x2="250" y2="87" stroke="var(--color-accent, #38bdf8)" opacity="0.3"/>
+      <!-- Projections for rotated point -->
+      <line id="rot-drag-proj-x" class="rot-proj" x1="326" y1="87" x2="326" y2="250" stroke="var(--color-accent, #38bdf8)" opacity="0.3"/>
+      <line id="rot-drag-proj-y" class="rot-proj" x1="326" y1="87" x2="250" y2="87" stroke="var(--color-accent, #38bdf8)" opacity="0.3"/>
 
-        <!-- Rotation arc θ between the two vectors (r=70 from center 250,250) -->
-        <!-- Start: 25° → (313, 220), End: 65° → (280, 187) -->
-        <path class="rot-arc" d="M 313,220 A 70,70 0 0,0 280,187" stroke="var(--color-accent, #38bdf8)"/>
-        <!-- Label at midpoint angle 45°, r=90 -->
-        <text class="rot-label" style="fill: var(--color-accent); font-size: 18px;" x="314" y="192">θ</text>
-      </g>
+      <!-- θ arc -->
+      <path id="rot-drag-arc" class="rot-arc" d="M 313,220 A 70,70 0 0,0 280,187" stroke="var(--color-accent, #38bdf8)"/>
+      <text id="rot-drag-theta" class="rot-label" style="fill: var(--color-accent); font-size: 16px;" x="314" y="192">θ = 40°</text>
+
+      <text id="rot-drag-label" class="rot-label" style="fill: var(--color-accent);" x="354" y="74">(x', y')</text>
+
+      <!-- Visible dot + larger invisible hit target -->
+      <circle id="rot-drag-dot" cx="326" cy="87" fill="var(--color-accent, #38bdf8)"/>
+      <circle id="rot-drag-hit" cx="326" cy="87"/>
 
       <!-- Fragment 2: Rotation formula box -->
       <g class="fragment">
