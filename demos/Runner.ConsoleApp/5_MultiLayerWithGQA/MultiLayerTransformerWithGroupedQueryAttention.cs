@@ -42,16 +42,18 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
         {
             var residual = embeddings;
 
-            // normalize 
+            // normalize
             Matrix normalizedEmbeddings = RMSNorm(embeddings);
 
             // project each token into Q, K, V
-            // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
-            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection);
-            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection);
+            // Q is sequenceLength x hiddenDim (all query heads concatenated)
+            // K and V are sequenceLength x keyValueDim (fewer heads than Q — this is the GQA optimization)
+            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, Weights.HeadDimension);
+            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, Weights.HeadDimension);
             var values = normalizedEmbeddings * layer.ValueProjection;
 
-            var attentionOutput = SingleHeadSelfAttention(Weights.HiddenDimension, sequenceLength, queries, keys, values);
+            // grouped query attention: multiple query heads share the same K/V head
+            var attentionOutput = GroupedQueryAttention(sequenceLength, queries, keys, values);
 
             var projectedAttention = attentionOutput * layer.OutputProjection;
 
@@ -67,89 +69,109 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
             // brings the dimension back down to hidden dimension so it can be added to the residual and passed to the next layer
             Matrix feedForwardOutput = gated * layer.DownProjection;
 
-            embeddings = residual + feedForwardOutput;      
+            embeddings = residual + feedForwardOutput;
         }
 
         embeddings = RMSNorm(embeddings);
         var logits = embeddings * Weights.OutputEmbedding;
-        return logits;  
+        return logits;
     }
 
     // Rotary Position Embedding: encode position by rotating consecutive dimension pairs
-    // by an angle proportional to sequence position, so attention naturally captures relative distance
-    private static Matrix ApplyRoPETo(Matrix matrix)
+    // by an angle proportional to sequence position, so attention naturally captures relative distance.
+    // For multi-head attention, rotation happens independently within each head's chunk of dimensions —
+    // the theta formula uses headDimension, not the full concatenated width.
+    private static Matrix ApplyRoPETo(Matrix matrix, int headDimension)
     {
-        float sequenceLength = matrix.Rows;
-        float dimension = matrix.Columns;
+        int sequenceLength = matrix.Rows;
+        int totalDimension = matrix.Columns;
 
         Matrix result = new(matrix.Rows, matrix.Columns);
-        //for each of the vectors in the matrix (i.e. the amount of tokens)        
         for (int position = 0; position < sequenceLength; position++)
         {
-            //rotate the pairs
-            for (int j = 0; j < dimension; j += 2)
+            // rotate pairs within each head independently
+            for (int headStart = 0; headStart < totalDimension; headStart += headDimension)
             {
-                var x1 = matrix[position][j];
-                var x2 = matrix[position][j + 1];
+                for (int j = 0; j < headDimension; j += 2)
+                {
+                    var x1 = matrix[position][headStart + j];
+                    var x2 = matrix[position][headStart + j + 1];
 
-                //"low" dimensions rotate fast -> 0 / dimension = small exponent -> 10000^small = close to 1 -> 1/1 = large theta -> fast rotation
-                //"high" dimensions rotate slower -> j / dimension = large exponent -> 10000^large = huge number -> 1/huge = tiny theta -> slow rotation
-                var theta = 1.0F / MathF.Pow(10000.0F, j / dimension);
+                    //"low" dimensions rotate fast -> 0 / dimension = small exponent -> 10000^small = close to 1 -> 1/1 = large theta -> fast rotation
+                    //"high" dimensions rotate slower -> j / dimension = large exponent -> 10000^large = huge number -> 1/huge = tiny theta -> slow rotation
+                    var theta = 1.0F / MathF.Pow(10000.0F, (float)j / headDimension);
 
-                //change the angle for the pair based on the position in the sequence
-                var angle = position * theta;
-                var cos = MathF.Cos(angle);
-                var sin = MathF.Sin(angle);
+                    //change the angle for the pair based on the position in the sequence
+                    var angle = position * theta;
+                    var cos = MathF.Cos(angle);
+                    var sin = MathF.Sin(angle);
 
-                result[position][j] = x1 * cos - x2 * sin;
-                result[position][j + 1] = x1 * sin + x2 * cos;
+                    result[position][headStart + j] = x1 * cos - x2 * sin;
+                    result[position][headStart + j + 1] = x1 * sin + x2 * cos;
+                }
             }
         }
         return result;
     }
 
-    private Matrix SingleHeadSelfAttention(int headDimension, int sequenceLength, Matrix queries, Matrix keys, Matrix values)
+    // Grouped Query Attention: each KV head is shared by a group of query heads.
+    // With 32 query heads and 4 KV heads, every 8 query heads attend against the same key/value head.
+    // This saves memory and compute on K/V projections while keeping Q expressive.
+    private Matrix GroupedQueryAttention(int sequenceLength, Matrix queries, Matrix keys, Matrix values)
     {
-        float scale = MathF.Sqrt(headDimension);
+        int nQueryHeads = Weights.NumberdOfQueryHeads;
+        int nKVHeads = Weights.NumberOfKeyValueHeads;
+        int headDim = Weights.HeadDimension;
+        int groupSize = nQueryHeads / nKVHeads;
+        float scale = MathF.Sqrt(headDim);
 
-        Matrix attentionOutput = new(sequenceLength, headDimension);
+        Matrix output = new(sequenceLength, Weights.HiddenDimension);
 
-        //for each token, compute the attention scores against all other tokens
-        for (int i = 0; i < sequenceLength; i++)
+        for (int qh = 0; qh < nQueryHeads; qh++)
         {
-            var scores = new float[sequenceLength];
+            // which KV head does this query head attend to?
+            // query heads 0..7 share KV head 0, query heads 8..15 share KV head 1, etc.
+            int kvHead = qh / groupSize;
 
-            for (var j = 0; j < sequenceLength; j++)
+            int qOffset = qh * headDim;
+            int kvOffset = kvHead * headDim;
+
+            for (int i = 0; i < sequenceLength; i++)
             {
-                if (j > i)
+                var scores = new float[sequenceLength];
+
+                for (int j = 0; j < sequenceLength; j++)
                 {
-                    // causal masking: prevent attending to future tokens by setting their scores to a very large negative number
-                    // in language generation, you should never look to the future!
-                    // causality only looks backwards
-                    scores[j] = float.NegativeInfinity;
-                    continue;
+                    if (j > i)
+                    {
+                        // causal masking: prevent attending to future tokens
+                        scores[j] = float.NegativeInfinity;
+                        continue;
+                    }
+
+                    // dot product between this query head and the shared key head
+                    float dot = 0;
+                    for (int d = 0; d < headDim; d++)
+                        dot += queries[i, qOffset + d] * keys[j, kvOffset + d];
+
+                    scores[j] = dot / scale;
                 }
-                // attention = query • key / sqrt(headDim)
-                // dot product is a indication of how much 2 vectors are aligned
-                // scaling to prevent large outputs (AxX + BxY + CxZ) can grow extremely large
-                // in short how much does the vector representation of the question (query) align with the vector representation of the context (key)
-                scores[j] = queries[i] * keys[j] / scale;
+
+                var attentionWeights = Softmax(scores);
+
+                // weighted sum of value vectors for this head
+                for (int d = 0; d < headDim; d++)
+                {
+                    float sum = 0;
+                    for (int j = 0; j < sequenceLength; j++)
+                        sum += attentionWeights[j] * values[j, kvOffset + d];
+
+                    output[i, qOffset + d] = sum;
+                }
             }
-
-            // make the sum of the score equal to 1 so that we can interpret them as probabilities. (1 == 100% attention, 0 == 0% attention)
-            // we dont care about the actual numbers, just the relative differences between them.
-            var attentionWeights = Softmax(scores);
-
-            Vector attended = new(headDimension);
-            // now for each token in the sequence we have a score that indicates how important it is to the current token.
-            for (int j = 0; j < sequenceLength; j++)
-            {
-                attended = attended + (attentionWeights[j] * values[j]);
-            }
-
-            attentionOutput[i] = attended;
         }
-        return attentionOutput;
+
+        return output;
     }
 
     public static Matrix SigmoidLinearUnit(Matrix input)

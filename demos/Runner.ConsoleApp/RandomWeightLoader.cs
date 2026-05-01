@@ -1,3 +1,4 @@
+using Runner.ConsoleApp.Math;
 using Runner.ConsoleApp.RandomOneLayer;
 
 namespace Runner.ConsoleApp;
@@ -21,6 +22,46 @@ public class RandomWeightLoader
 
 
         return weights;
+    }
+
+    public static ModelWeights LoadWeights(int vocabularySize, int hiddenDimension, int numberOfQueryHeads, int numberOfKeyValueHeads, int gateDimension, int numberOfLayers)
+    {
+        var random = new Random();
+        int headDimension = hiddenDimension / numberOfQueryHeads;
+        int keyValueDimension = numberOfKeyValueHeads * headDimension;
+
+        var layers = new LayerWeights[numberOfLayers];
+        for (int i = 0; i < numberOfLayers; i++)
+        {
+            layers[i] = new LayerWeights
+            {
+                AttentionNormWeight = GenerateRandomVector(hiddenDimension, random),
+                QueryProjection = GenerateRandomMatrix(hiddenDimension, hiddenDimension, random),
+                KeyProjection = GenerateRandomMatrix(hiddenDimension, keyValueDimension, random),
+                ValueProjection = GenerateRandomMatrix(hiddenDimension, keyValueDimension, random),
+                OutputProjection = GenerateRandomMatrix(hiddenDimension, hiddenDimension, random),
+                GateProjection = GenerateRandomMatrix(hiddenDimension, gateDimension, random),
+                UpProjection = GenerateRandomMatrix(hiddenDimension, gateDimension, random),
+                DownProjection = GenerateRandomMatrix(gateDimension, hiddenDimension, random),
+            };
+        }
+
+        return new ModelWeights
+        {
+            NumberdOfQueryHeads = numberOfQueryHeads,
+            NumberOfKeyValueHeads = numberOfKeyValueHeads,
+            EmbeddedTokens = GenerateRandomMatrix(vocabularySize, hiddenDimension, random),
+            Layers = layers,
+            OutputEmbedding = GenerateRandomMatrix(hiddenDimension, vocabularySize, random),
+        };
+    }
+
+    private static Vector GenerateRandomVector(int length, Random random)
+    {
+        var data = new float[length];
+        for (int i = 0; i < length; i++)
+            data[i] = (float)(random.NextDouble() * 2 - 1);
+        return new Vector(data, length);
     }
 
     private static Matrix GenerateRandomMatrix(int rows, int columns, Random random)
