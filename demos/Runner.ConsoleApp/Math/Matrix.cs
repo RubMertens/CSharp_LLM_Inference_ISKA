@@ -66,4 +66,40 @@ public class Matrix
         return result;
     }
 
+    public static Matrix operator +(Matrix a, Matrix b)
+    {
+        if (a.Rows != b.Rows || a.Columns != b.Columns)
+            throw new InvalidOperationException("Incompatible matrix dimensions for addition.");
+
+        Matrix result = new Matrix(a.Rows, a.Columns);
+        for (var i = 0; i < a.Rows; i++)
+        {
+            for (var j = 0; j < a.Columns; j++)
+            {
+                result.Data[i][j] = a.Data[i][j] + b.Data[i][j];
+            }
+        }
+        return result;
+    }
+
+    public Matrix ElementwiseMultiply(Matrix other)
+    {
+        return ElementwiseMultiply(this, other);
+    }
+    public static Matrix ElementwiseMultiply(Matrix a, Matrix b)
+    {
+        if (a.Rows != b.Rows || a.Columns != b.Columns)
+            throw new InvalidOperationException("Incompatible matrix dimensions for element-wise multiplication.");
+
+        Matrix result = new Matrix(a.Rows, a.Columns);
+        for (var i = 0; i < a.Rows; i++)
+        {
+            for (var j = 0; j < a.Columns; j++)
+            {
+                result.Data[i][j] = a.Data[i][j] * b.Data[i][j];
+            }
+        }
+        return result;
+    }
+
 }

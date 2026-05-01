@@ -12,7 +12,7 @@ var inputIds = tokenizer.Tokenize(prompt);
 Console.WriteLine($"Input IDs: [{string.Join(", ", inputIds)}]");
 
 
-ModelWeights weights = RandomWeightLoader.LoadWeights(tokenizer.VocabularySize, 32);
+SingleLayerModelWeights weights = RandomWeightLoader.LoadWeights(tokenizer.VocabularySize, 32);
 
 var runner = new Transformer(weights);
 

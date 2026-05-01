@@ -1,10 +1,11 @@
 using Runner.ConsoleApp.Math;
+using Runner.ConsoleApp.RandomOneLayer;
 
-namespace Runner.ConsoleApp.RandomOneLayer;
+namespace Runner.ConsoleApp._3_MultiLayer;
 
 
 
-public class Transformer(SingleLayerModelWeights Weights)
+public class MultiLayerTransformer(ModelWeights Weights)
 {
 
     public int PredictNextTokenGreedy(int[] tokens)
@@ -16,7 +17,8 @@ public class Transformer(SingleLayerModelWeights Weights)
         return bestIndex;
     }
 
-    public Matrix Forward(int[] tokens)
+
+    private Matrix Embed(int[] tokens)
     {
         var sequenceLength = tokens.Length;
         //translate the tokens to a sequence of embeddings
@@ -25,31 +27,76 @@ public class Transformer(SingleLayerModelWeights Weights)
         {
             embeddings[row] = Weights.EmbeddedTokens[tokens[row]];
         }
+        return embeddings;
+    }
 
-        // normalize 
-        Matrix normalizedEmbeddings = new(sequenceLength, Weights.HiddenDimension);
-        for (int row = 0; row < sequenceLength; row++)
+
+
+
+    public Matrix Forward(int[] tokens)
+    {
+        var sequenceLength = tokens.Length;
+        //translate the tokens to a sequence of embeddings
+
+        Matrix embeddings = Embed(tokens);
+
+
+        foreach (var layer in Weights.Layers)
         {
-            normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row]);
+            var residual = embeddings;
+
+            // normalize 
+            Matrix normalizedEmbeddings = RMSNorm(embeddings);
+
+            // project each token into Q, K, V
+            // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
+            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection);
+            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection);
+            var values = normalizedEmbeddings * layer.ValueProjection;
+
+            var attentionOutput = SingleHeadSelfAttention(Weights.HiddenDimension, sequenceLength, queries, keys, values);
+
+            var projectedAttention = attentionOutput * layer.OutputProjection;
+
+            embeddings = residual + projectedAttention;
         }
 
-        // project each token into Q, K, V
-        // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
-        var queries = normalizedEmbeddings * Weights.QueryProjection;
-        var keys = normalizedEmbeddings * Weights.KeyProjection;
-        var values = normalizedEmbeddings * Weights.ValueProjection;
+        embeddings = RMSNorm(embeddings);
+        var logits = embeddings * Weights.OutputEmbedding;
+        return logits;  
+    }
 
-        var attentionOutput = SingleHeadSelfAttention(Weights.HiddenDimension, sequenceLength, queries, keys, values);
+    // Rotary Position Embedding: encode position by rotating consecutive dimension pairs
+    // by an angle proportional to sequence position, so attention naturally captures relative distance
+    private static Matrix ApplyRoPETo(Matrix matrix)
+    {
+        float sequenceLength = matrix.Rows;
+        float dimension = matrix.Columns;
 
-        var projectedAttention = attentionOutput * Weights.OutputProjection;
-
-        Matrix hidden = new(sequenceLength, Weights.HiddenDimension);
-        for (int row = 0; row < sequenceLength; row++)
+        Matrix result = new(matrix.Rows, matrix.Columns);
+        //for each of the vectors in the matrix (i.e. the amount of tokens)        
+        for (int position = 0; position < sequenceLength; position++)
         {
-            hidden[row] = embeddings[row] + projectedAttention[row];
+            //rotate the pairs
+            for (int j = 0; j < dimension; j += 2)
+            {
+                var x1 = matrix[position][j];
+                var x2 = matrix[position][j + 1];
+
+                //"low" dimensions rotate fast -> 0 / dimension = small exponent -> 10000^small = close to 1 -> 1/1 = large theta -> fast rotation
+                //"high" dimensions rotate slower -> j / dimension = large exponent -> 10000^large = huge number -> 1/huge = tiny theta -> slow rotation
+                var theta = 1.0F / MathF.Pow(10000.0F, j / dimension);
+
+                //change the angle for the pair based on the position in the sequence
+                var angle = position * theta;
+                var cos = MathF.Cos(angle);
+                var sin = MathF.Sin(angle);
+
+                result[position][j] = x1 * cos - x2 * sin;
+                result[position][j + 1] = x1 * sin + x2 * cos;
+            }
         }
-        var logits = hidden * Weights.OutputEmbedding;
-        return logits;
+        return result;
     }
 
     private Matrix SingleHeadSelfAttention(int headDimension, int sequenceLength, Matrix queries, Matrix keys, Matrix values)
@@ -95,6 +142,17 @@ public class Transformer(SingleLayerModelWeights Weights)
         }
         return attentionOutput;
     }
+
+    public static Matrix RMSNorm(Matrix input)
+    {
+        Matrix result = new(input.Rows, input.Columns);
+        for (int row = 0; row < input.Rows; row++)
+        {
+            result[row] = RootMeanSquareNormalisation(input[row]);
+        }
+        return result;
+    }
+
     //aka RMSnorm
     public static Vector RootMeanSquareNormalisation(Vector input)
     {

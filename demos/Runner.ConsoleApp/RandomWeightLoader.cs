@@ -4,12 +4,12 @@ namespace Runner.ConsoleApp;
 
 public class RandomWeightLoader
 {
-    public static ModelWeights LoadWeights(int vocabularySize, int hiddenDimension)
+    public static SingleLayerModelWeights LoadWeights(int vocabularySize, int hiddenDimension)
     {
         // Simulate loading weights from a file by generating random weights
         var random = new Random();
 
-        var weights = new ModelWeights
+        var weights = new SingleLayerModelWeights
         {
             EmbeddedTokens = GenerateRandomMatrix(vocabularySize, hiddenDimension, random),
             QueryProjection = GenerateRandomMatrix(hiddenDimension, hiddenDimension, random),

@@ -56,6 +56,9 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 [sourceFiles]
 1_SingleLayer/Transformer.cs
 2_WithRope/TransformerWithRope.cs
+3_MultiLayer/MultiLayerTransformer.cs
+4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs
+5_MultiLayerWithGQA/MultiLayerTransformerWithGroupedQueryAttention.cs
 DemoTokenizer.cs
 Math/
  Matrix.cs
@@ -67,6 +70,7 @@ obj/Debug/net10.0/
  Runner.ConsoleApp.GlobalUsings.g.cs
 Program.cs
 RandomWeightLoader.cs
+SingleLayerModelWeights.cs
 
 [metadataReferences]
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.1/ref/net10.0/
