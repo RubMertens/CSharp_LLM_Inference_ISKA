@@ -73,6 +73,26 @@
       sinLabel.textContent = `sin(${Math.round(angle * 180 / Math.PI)}°)`;
     }
 
+    // Distance line between original and rotated point
+    const origX = CX + R * Math.cos(ALPHA);
+    const origY = CY - R * Math.sin(ALPHA);
+    const distLine = el('rot-dist-line');
+    if (distLine) { distLine.setAttribute('x2', px); distLine.setAttribute('y2', py); }
+    const mx = (origX + px) / 2 + 12;
+    const my = (origY + py) / 2;
+    const dl1 = el('rot-dist-label1');
+    if (dl1) {
+      dl1.setAttribute('x', mx);
+      dl1.setAttribute('y', my - 10);
+      dl1.textContent = `x' = x·cos(${deg}°) − y·sin(${deg}°)`;
+    }
+    const dl2 = el('rot-dist-label2');
+    if (dl2) {
+      dl2.setAttribute('x', mx);
+      dl2.setAttribute('y', my + 8);
+      dl2.textContent = `y' = x·sin(${deg}°) + y·cos(${deg}°)`;
+    }
+
     const arc = el('rot-drag-arc');
     if (arc) {
       if (theta > 0.03) {

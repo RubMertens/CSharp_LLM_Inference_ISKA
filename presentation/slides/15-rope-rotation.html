@@ -60,6 +60,11 @@
 
       <text id="rot-drag-label" class="rot-label" style="fill: var(--color-accent);" x="354" y="74">(x', y')</text>
 
+      <!-- Distance line between original and rotated point -->
+      <line id="rot-dist-line" x1="413" y1="174" x2="326" y2="87" stroke="#818cf8" stroke-width="2" stroke-dasharray="6 4" opacity="0.7"/>
+      <text id="rot-dist-label1" class="rot-small" style="fill: #818cf8;" x="380" y="112">x' = x·cos(40°) − y·sin(40°)</text>
+      <text id="rot-dist-label2" class="rot-small" style="fill: #818cf8;" x="380" y="130">y' = x·sin(40°) + y·cos(40°)</text>
+
       <!-- Visible dot + larger invisible hit target -->
       <circle id="rot-drag-dot" cx="326" cy="87" fill="var(--color-accent, #38bdf8)"/>
       <circle id="rot-drag-hit" cx="326" cy="87"/>
