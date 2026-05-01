@@ -3,7 +3,7 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-
+*.lscache
 
 # dotenv files
 .env

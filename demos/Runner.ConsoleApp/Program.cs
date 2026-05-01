@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Runner.ConsoleApp;
+using Runner.ConsoleApp.RandomOneLayer;
 
 Console.WriteLine("Hello, World!");
 
@@ -11,7 +12,7 @@ var inputIds = tokenizer.Tokenize(prompt);
 Console.WriteLine($"Input IDs: [{string.Join(", ", inputIds)}]");
 
 
-var weights = RandomWeightLoader.LoadWeights(tokenizer.VocabularySize, 32);
+ModelWeights weights = RandomWeightLoader.LoadWeights(tokenizer.VocabularySize, 32);
 
 var runner = new Transformer(weights);
 

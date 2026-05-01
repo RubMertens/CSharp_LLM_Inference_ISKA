@@ -92,14 +92,18 @@ class PresentationEngine {
   #revealNextFragment() {
     const slide = this.#container.querySelector('.slide.active');
     if (!slide) return false;
-    const hidden = [...slide.querySelectorAll('.fragment.fragment-hidden')];
+
+    // Only persistent fragments drive progression — current-visible get re-hidden each step
+    const hidden = [...slide.querySelectorAll('.fragment.fragment-hidden:not(.current-visible)')];
     if (hidden.length === 0) return false;
 
     const nextIndex = this.#lowestFragmentIndex(hidden);
 
+    // Reveal all fragments at nextIndex (including current-visible ones)
+    const allHidden = [...slide.querySelectorAll('.fragment.fragment-hidden')];
     const toReveal = nextIndex === null
       ? [hidden[0]]
-      : hidden.filter(f => f.dataset.fragmentIndex === nextIndex);
+      : allHidden.filter(f => f.dataset.fragmentIndex === nextIndex);
 
     // Hide current-visible fragments from previous indices
     slide.querySelectorAll('.fragment.fragment-visible.current-visible').forEach(f => {
