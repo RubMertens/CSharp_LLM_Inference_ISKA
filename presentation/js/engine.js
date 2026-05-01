@@ -58,6 +58,16 @@ class PresentationEngine {
         f.classList.remove('fragment-hidden');
         f.classList.add('fragment-visible');
       });
+      const cv = [...el.querySelectorAll('.fragment.current-visible')];
+      if (cv.length > 0) {
+        const highest = this.#highestFragmentIndex(cv);
+        cv.forEach(f => {
+          if (f.dataset.fragmentIndex !== highest) {
+            f.classList.remove('fragment-visible');
+            f.classList.add('fragment-hidden');
+          }
+        });
+      }
     } else {
       el.querySelectorAll('.fragment').forEach(f => f.classList.add('fragment-hidden'));
     }
@@ -125,16 +135,22 @@ class PresentationEngine {
     const visible = [...slide.querySelectorAll('.fragment.fragment-visible')];
     if (visible.length === 0) return false;
 
-    const highestIndex = this.#highestFragmentIndex(visible);
-
-    const toHide = highestIndex === null
-      ? [visible[visible.length - 1]]
-      : visible.filter(f => f.dataset.fragmentIndex === highestIndex);
-
-    toHide.forEach(f => {
-      f.classList.remove('fragment-visible');
-      f.classList.add('fragment-hidden');
-    });
+    // Unindexed fragments were revealed last, so hide them first
+    const unindexed = visible.filter(f => !f.dataset.fragmentIndex);
+    if (unindexed.length > 0) {
+      const last = unindexed[unindexed.length - 1];
+      last.classList.remove('fragment-visible');
+      last.classList.add('fragment-hidden');
+    } else {
+      const highestIndex = this.#highestFragmentIndex(visible);
+      const toHide = highestIndex === null
+        ? [visible[visible.length - 1]]
+        : visible.filter(f => f.dataset.fragmentIndex === highestIndex);
+      toHide.forEach(f => {
+        f.classList.remove('fragment-visible');
+        f.classList.add('fragment-hidden');
+      });
+    }
 
     // Re-show current-visible fragments at the new highest visible index
     const stillVisible = [...slide.querySelectorAll('.fragment.fragment-visible')];

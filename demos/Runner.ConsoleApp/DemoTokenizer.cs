@@ -1,4 +1,4 @@
-namespace Runner.ConsoleApp.RandomOneLayer;
+namespace Runner.ConsoleApp;
 
 public class DemoTokenizer
 {

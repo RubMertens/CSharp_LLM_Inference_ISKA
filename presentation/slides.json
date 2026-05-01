@@ -11,6 +11,7 @@
   "slides/10-tokenizer-demo.html",
   "slides/11-qkv-attention.html",
   "slides/12-causal-masking.html",
+  "slides/15-rope-rotation.html",
   "slides/13-positional-embedding.html",
   "slides/14-swiglu.html",
   "slides/16-scale.html",

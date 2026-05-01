@@ -1,8 +1,13 @@
+using System.Drawing;
+using Microsoft.VisualBasic;
 using Runner.ConsoleApp.Math;
+using Runner.ConsoleApp.RandomOneLayer;
 
-namespace Runner.ConsoleApp.RandomOneLayer;
+namespace Runner.ConsoleApp._2_WithRope;
 
-public class Transformer(ModelWeights Weights)
+
+
+public class TransformerWithRope(ModelWeights Weights)
 {
 
     public int PredictNextTokenGreedy(int[] tokens)
@@ -18,14 +23,14 @@ public class Transformer(ModelWeights Weights)
     {
         var sequenceLength = tokens.Length;
         //translate the tokens to a sequence of embeddings
-        var embeddings = new Matrix(sequenceLength, Weights.HiddenDimension);
+        Matrix embeddings = new(sequenceLength, Weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
             embeddings[row] = Weights.EmbeddedTokens[tokens[row]];
         }
 
         // normalize 
-        var normalizedEmbeddings = new Matrix(sequenceLength, Weights.HiddenDimension);
+        Matrix normalizedEmbeddings = new(sequenceLength, Weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
             normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row]);
@@ -37,11 +42,14 @@ public class Transformer(ModelWeights Weights)
         var keys = normalizedEmbeddings * Weights.KeyProjection;
         var values = normalizedEmbeddings * Weights.ValueProjection;
 
+        queries = ApplyRoPETo(queries);
+        keys = ApplyRoPETo(keys);
+
         var attentionOutput = SingleHeadSelfAttention(Weights.HiddenDimension, sequenceLength, queries, keys, values);
 
         var projectedAttention = attentionOutput * Weights.OutputProjection;
 
-        var hidden = new Matrix(sequenceLength, Weights.HiddenDimension);
+        Matrix hidden = new(sequenceLength, Weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
             hidden[row] = embeddings[row] + projectedAttention[row];
@@ -50,11 +58,44 @@ public class Transformer(ModelWeights Weights)
         return logits;
     }
 
+    // Rotary Position Embedding: encode position by rotating consecutive dimension pairs
+    // by an angle proportional to sequence position, so attention naturally captures relative distance
+    private static Matrix ApplyRoPETo(Matrix matrix)
+    {
+        float sequenceLength = matrix.Rows;
+        float dimension = matrix.Columns;
+
+        Matrix result = new(matrix.Rows, matrix.Columns);
+        //for each of the vectors in the matrix (i.e. the amount of tokens)        
+        for (int position = 0; position < sequenceLength; position++)
+        {
+            //rotate the pairs
+            for (int j = 0; j < dimension; j+=2)
+            {
+                var x1 = matrix[position][j];
+                var x2 = matrix[position][j+1];
+
+                //"low" dimensions rotate fast -> 0 / dimension = small exponent -> 10000^small = close to 1 -> 1/1 = large theta -> fast rotation
+                //"high" dimensions rotate slower -> j / dimension = large exponent -> 10000^large = huge number -> 1/huge = tiny theta -> slow rotation
+                var theta = 1.0F / MathF.Pow(10000.0F, j / dimension);
+                
+                //change the angle for the pair based on the position in the sequence
+                var angle = position * theta;
+                var cos = MathF.Cos(angle);
+                var sin = MathF.Sin(angle);
+
+                result[position][j] = x1 * cos - x2 * sin;
+                result[position][j+1] = x1 * sin + x2 * cos;
+            }
+        }
+        return result;
+    }
+
     private Matrix SingleHeadSelfAttention(int headDimension, int sequenceLength, Matrix queries, Matrix keys, Matrix values)
     {
         float scale = MathF.Sqrt(headDimension);
 
-        var attentionOutput = new Matrix(sequenceLength, headDimension);
+        Matrix attentionOutput = new(sequenceLength, headDimension);
 
         //for each token, compute the attention scores against all other tokens
         for (int i = 0; i < sequenceLength; i++)
@@ -67,11 +108,11 @@ public class Transformer(ModelWeights Weights)
                 {
                     // causal masking: prevent attending to future tokens by setting their scores to a very large negative number
                     // in language generation, you should never look to the future!
-                    //causality only looks backwards
+                    // causality only looks backwards
                     scores[j] = float.NegativeInfinity;
                     continue;
                 }
-                // attention = query dot key / sqrt(headDim)
+                // attention = query • key / sqrt(headDim)
                 // dot product is a indication of how much 2 vectors are aligned
                 // scaling to prevent large outputs (AxX + BxY + CxZ) can grow extremely large
                 // in short how much does the vector representation of the question (query) align with the vector representation of the context (key)
@@ -82,7 +123,7 @@ public class Transformer(ModelWeights Weights)
             // we dont care about the actual numbers, just the relative differences between them.
             var attentionWeights = Softmax(scores);
 
-            var attended = new Vector(headDimension);
+            Vector attended = new(headDimension);
             // now for each token in the sequence we have a score that indicates how important it is to the current token.
             for (int j = 0; j < sequenceLength; j++)
             {
@@ -93,16 +134,20 @@ public class Transformer(ModelWeights Weights)
         }
         return attentionOutput;
     }
+    //aka RMSnorm
     public static Vector RootMeanSquareNormalisation(Vector input)
     {
         float sumSquares = 0;
         for (int i = 0; i < input.Length; i++)
+        {
             sumSquares += input[i] * input[i];
+        }
 
         const float divideByZeroProtection = 1e-5f;
-        float rootMeanSquare = MathF.Sqrt(sumSquares / input.Length + divideByZeroProtection);
+        float mean = sumSquares / input.Length;
+        float rootMeanSquare = MathF.Sqrt(mean + divideByZeroProtection);
 
-        var result = new Vector(input.Length);
+        Vector result = new(input.Length);
         for (var i = 0; i < input.Length; i++)
             result[i] = input[i] / rootMeanSquare;
 
@@ -114,6 +159,7 @@ public class Transformer(ModelWeights Weights)
         float max = input.Max();
         var exp = input.Select(x => MathF.Exp(x - max)).ToArray();
         float sum = exp.Sum();
+
         return exp.Select(x => x / sum).ToArray();
     }
 }
