@@ -7,6 +7,9 @@ public class SingleLayerModelWeights
     public int VocabularySize => EmbeddedTokens.Rows;
     public int HiddenDimension => EmbeddedTokens.Columns;
 
+    public required Vector AttentionNormWeight { get; set; }
+    public required Vector FeedForwardNormWeight { get; set; }
+
     /// <summary>
     /// rows = vocab size, cols = hidden dimension
     /// </summary>
@@ -33,4 +36,5 @@ public class SingleLayerModelWeights
     /// hiddenDim x vocabSize — projects hidden state to logits
     /// </summary>
     public required Matrix OutputEmbedding { get; set; }
+
 }

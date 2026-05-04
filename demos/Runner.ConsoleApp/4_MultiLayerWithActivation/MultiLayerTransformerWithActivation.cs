@@ -43,7 +43,7 @@ public class MultiLayerTransformerWithActivation(ModelWeights Weights)
             var residual = embeddings;
 
             // normalize 
-            Matrix normalizedEmbeddings = RMSNorm(embeddings);
+            Matrix normalizedEmbeddings = RMSNorm(embeddings, layer.AttentionNormWeight);
 
             // project each token into Q, K, V
             // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
@@ -57,7 +57,7 @@ public class MultiLayerTransformerWithActivation(ModelWeights Weights)
 
             embeddings = residual + projectedAttention;
             residual = embeddings;
-            normalizedEmbeddings = RMSNorm(embeddings);
+            normalizedEmbeddings = RMSNorm(embeddings, layer.FeedForwardNormWeight);
 
             //gate and up projction are larger than hidden dimension, to allow for more complex interactions in the feedforward network
             Matrix gate= normalizedEmbeddings * layer.GateProjection;
@@ -70,7 +70,7 @@ public class MultiLayerTransformerWithActivation(ModelWeights Weights)
             embeddings = residual + feedForwardOutput;      
         }
 
-        embeddings = RMSNorm(embeddings);
+        embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
         var logits = embeddings * Weights.OutputEmbedding;
         return logits;  
     }
@@ -168,18 +168,18 @@ public class MultiLayerTransformerWithActivation(ModelWeights Weights)
         return result;
     }
 
-    public static Matrix RMSNorm(Matrix input)
+    public static Matrix RMSNorm(Matrix input , Vector normWeight)
     {
         Matrix result = new(input.Rows, input.Columns);
         for (int row = 0; row < input.Rows; row++)
         {
-            result[row] = RootMeanSquareNormalisation(input[row]);
+            result[row] = RootMeanSquareNormalisation(input[row], normWeight);
         }
         return result;
     }
 
     //aka RMSnorm
-    public static Vector RootMeanSquareNormalisation(Vector input)
+    public static Vector RootMeanSquareNormalisation(Vector input, Vector normWeight)
     {
         float sumSquares = 0;
         for (int i = 0; i < input.Length; i++)
@@ -193,7 +193,7 @@ public class MultiLayerTransformerWithActivation(ModelWeights Weights)
 
         Vector result = new(input.Length);
         for (var i = 0; i < input.Length; i++)
-            result[i] = input[i] / rootMeanSquare;
+            result[i] = input[i] / rootMeanSquare * normWeight[i];
 
         return result;
     }

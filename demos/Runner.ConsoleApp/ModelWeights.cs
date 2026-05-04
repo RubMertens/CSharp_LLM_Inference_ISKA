@@ -23,6 +23,11 @@ public class ModelWeights
     /// hiddenDim x vocabSize
     /// </summary>
     public required Matrix OutputEmbedding { get; set; }
+
+    /// <summary>
+    /// hiddenDim
+    /// </summary>
+    public required Vector FinalNormWeight { get; set; }
 }
 
 public class LayerWeights
@@ -31,6 +36,11 @@ public class LayerWeights
     /// hiddenDim
     /// </summary>
     public required Vector AttentionNormWeight { get; set; }
+
+    /// <summary>
+    /// hiddenDim
+    /// </summary>
+    public required Vector FeedForwardNormWeight { get; set; }
 
     /// <summary>
     /// hiddenDim x hiddenDim

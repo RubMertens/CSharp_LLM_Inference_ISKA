@@ -1,5 +1,8 @@
+using System.Diagnostics;
+
 namespace Runner.ConsoleApp.Math;
 
+[DebuggerDisplay("Vector: {Length}")]
 public class Vector
 {
     public float[] Data { get; }
@@ -56,6 +59,8 @@ public class Vector
         }
         return result;
     }
+
+    public float Dot(Vector other) => this * other;
 
     public static Vector operator *(float scalar, Vector a) => a * scalar;
 

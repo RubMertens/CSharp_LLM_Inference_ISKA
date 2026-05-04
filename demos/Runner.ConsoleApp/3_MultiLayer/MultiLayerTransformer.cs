@@ -46,7 +46,7 @@ public class MultiLayerTransformer(ModelWeights Weights)
             var residual = embeddings;
 
             // normalize 
-            Matrix normalizedEmbeddings = RMSNorm(embeddings);
+            Matrix normalizedEmbeddings = RMSNorm(embeddings, layer.AttentionNormWeight);
 
             // project each token into Q, K, V
             // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
@@ -61,7 +61,7 @@ public class MultiLayerTransformer(ModelWeights Weights)
             embeddings = residual + projectedAttention;
         }
 
-        embeddings = RMSNorm(embeddings);
+        embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
         var logits = embeddings * Weights.OutputEmbedding;
         return logits;  
     }
@@ -143,24 +143,20 @@ public class MultiLayerTransformer(ModelWeights Weights)
         return attentionOutput;
     }
 
-    public static Matrix RMSNorm(Matrix input)
+    public static Matrix RMSNorm(Matrix input, Vector normWeight)
     {
         Matrix result = new(input.Rows, input.Columns);
         for (int row = 0; row < input.Rows; row++)
         {
-            result[row] = RootMeanSquareNormalisation(input[row]);
+            result[row] = RootMeanSquareNormalisation(input[row], normWeight);
         }
         return result;
     }
 
-    //aka RMSnorm
-    public static Vector RootMeanSquareNormalisation(Vector input)
+ //aka RMSnorm
+    public static Vector RootMeanSquareNormalisation(Vector input, Vector normWeight)
     {
-        float sumSquares = 0;
-        for (int i = 0; i < input.Length; i++)
-        {
-            sumSquares += input[i] * input[i];
-        }
+        float sumSquares = input.Data.Sum(x => x * x);
 
         const float divideByZeroProtection = 1e-5f;
         float mean = sumSquares / input.Length;
@@ -168,7 +164,9 @@ public class MultiLayerTransformer(ModelWeights Weights)
 
         Vector result = new(input.Length);
         for (var i = 0; i < input.Length; i++)
-            result[i] = input[i] / rootMeanSquare;
+        {
+            result[i] = input[i] / rootMeanSquare * normWeight[i];
+        }
 
         return result;
     }

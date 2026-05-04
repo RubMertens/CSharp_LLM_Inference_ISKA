@@ -43,7 +43,7 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
             var residual = embeddings;
 
             // normalize
-            Matrix normalizedEmbeddings = RMSNorm(embeddings);
+            Matrix normalizedEmbeddings = RMSNorm(embeddings, layer.AttentionNormWeight);
 
             // project each token into Q, K, V
             // Q is sequenceLength x hiddenDim (all query heads concatenated)
@@ -59,10 +59,10 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
 
             embeddings = residual + projectedAttention;
             residual = embeddings;
-            normalizedEmbeddings = RMSNorm(embeddings);
+            normalizedEmbeddings = RMSNorm(embeddings, layer.FeedForwardNormWeight);
 
             //gate and up projction are larger than hidden dimension, to allow for more complex interactions in the feedforward network
-            Matrix gate= normalizedEmbeddings * layer.GateProjection;
+            Matrix gate = normalizedEmbeddings * layer.GateProjection;
             Matrix up = normalizedEmbeddings * layer.UpProjection;
             Matrix activated = SigmoidLinearUnit(gate);
             Matrix gated = activated.ElementwiseMultiply(up);
@@ -72,7 +72,7 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
             embeddings = residual + feedForwardOutput;
         }
 
-        embeddings = RMSNorm(embeddings);
+        embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
         var logits = embeddings * Weights.OutputEmbedding;
         return logits;
     }
@@ -119,26 +119,28 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
     // This saves memory and compute on K/V projections while keeping Q expressive.
     private Matrix GroupedQueryAttention(int sequenceLength, Matrix queries, Matrix keys, Matrix values)
     {
-        int nQueryHeads = Weights.NumberdOfQueryHeads;
-        int nKVHeads = Weights.NumberOfKeyValueHeads;
-        int headDim = Weights.HeadDimension;
-        int groupSize = nQueryHeads / nKVHeads;
-        float scale = MathF.Sqrt(headDim);
+        int numberOfQueryHeads = Weights.NumberdOfQueryHeads;
+        int numberOfKeyValueHeads = Weights.NumberOfKeyValueHeads;
+        int headDimension = Weights.HeadDimension;
+
+        int groupSize = numberOfQueryHeads / numberOfKeyValueHeads;
+
+        float scale = MathF.Sqrt(headDimension);
 
         Matrix output = new(sequenceLength, Weights.HiddenDimension);
 
-        for (int qh = 0; qh < nQueryHeads; qh++)
+        for (int queryHead = 0; queryHead < numberOfQueryHeads; queryHead++)
         {
             // which KV head does this query head attend to?
             // query heads 0..7 share KV head 0, query heads 8..15 share KV head 1, etc.
-            int kvHead = qh / groupSize;
+            int keyValueHead = queryHead / groupSize;
 
-            int qOffset = qh * headDim;
-            int kvOffset = kvHead * headDim;
+            int queryOffset = queryHead * headDimension;
+            int keyValueOffset = keyValueHead * headDimension;
 
             for (int i = 0; i < sequenceLength; i++)
             {
-                var scores = new float[sequenceLength];
+                Vector scores = new(sequenceLength);
 
                 for (int j = 0; j < sequenceLength; j++)
                 {
@@ -151,8 +153,10 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
 
                     // dot product between this query head and the shared key head
                     float dot = 0;
-                    for (int d = 0; d < headDim; d++)
-                        dot += queries[i, qOffset + d] * keys[j, kvOffset + d];
+                    for (int d = 0; d < headDimension; d++)
+                    {
+                        dot += queries[i, queryOffset + d] * keys[j, keyValueOffset + d];
+                    }
 
                     scores[j] = dot / scale;
                 }
@@ -160,13 +164,15 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
                 var attentionWeights = Softmax(scores);
 
                 // weighted sum of value vectors for this head
-                for (int d = 0; d < headDim; d++)
+                for (int d = 0; d < headDimension; d++)
                 {
                     float sum = 0;
                     for (int j = 0; j < sequenceLength; j++)
-                        sum += attentionWeights[j] * values[j, kvOffset + d];
+                    {
+                        sum += attentionWeights[j] * values[j, keyValueOffset + d];
+                    }
 
-                    output[i, qOffset + d] = sum;
+                    output[i, queryOffset + d] = sum;
                 }
             }
         }
@@ -182,7 +188,7 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
         {
             for (int i = 0; i < input.Columns; i++)
             {
-                float x =  input[row][i];
+                float x = input[row][i];
                 float sigmoid = 1 / (1 + MathF.Exp(-x));
                 result[row][i] = x * sigmoid;
             }
@@ -190,18 +196,18 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
         return result;
     }
 
-    public static Matrix RMSNorm(Matrix input)
+    public static Matrix RMSNorm(Matrix input, Vector normWeight)
     {
         Matrix result = new(input.Rows, input.Columns);
         for (int row = 0; row < input.Rows; row++)
         {
-            result[row] = RootMeanSquareNormalisation(input[row]);
+            result[row] = RootMeanSquareNormalisation(input[row], normWeight);
         }
         return result;
     }
 
     //aka RMSnorm
-    public static Vector RootMeanSquareNormalisation(Vector input)
+    public static Vector RootMeanSquareNormalisation(Vector input, Vector normWeight)
     {
         float sumSquares = 0;
         for (int i = 0; i < input.Length; i++)
@@ -215,17 +221,19 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
 
         Vector result = new(input.Length);
         for (var i = 0; i < input.Length; i++)
-            result[i] = input[i] / rootMeanSquare;
+        {
+            result[i] = input[i] / rootMeanSquare * normWeight[i];
 
+        }
         return result;
     }
 
-    public static float[] Softmax(float[] input)
+    public static Vector Softmax(Vector input)
     {
-        float max = input.Max();
-        var exp = input.Select(x => MathF.Exp(x - max)).ToArray();
+        float max = input.Data.Max();
+        var exp = input.Data.Select(x => MathF.Exp(x - max)).ToArray();
         float sum = exp.Sum();
 
-        return exp.Select(x => x / sum).ToArray();
+        return new(exp.Select(x => x / sum).ToArray(), input.Length);
     }
 }

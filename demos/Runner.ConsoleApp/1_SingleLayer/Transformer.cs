@@ -30,7 +30,7 @@ public class Transformer(SingleLayerModelWeights Weights)
         Matrix normalizedEmbeddings = new(sequenceLength, Weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
-            normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row]);
+            normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row], Weights.AttentionNormWeight);
         }
 
         // project each token into Q, K, V
@@ -96,13 +96,9 @@ public class Transformer(SingleLayerModelWeights Weights)
         return attentionOutput;
     }
     //aka RMSnorm
-    public static Vector RootMeanSquareNormalisation(Vector input)
+    public static Vector RootMeanSquareNormalisation(Vector input, Vector normWeight)
     {
-        float sumSquares = 0;
-        for (int i = 0; i < input.Length; i++)
-        {
-            sumSquares += input[i] * input[i];
-        }
+        float sumSquares = input.Data.Sum(x => x * x);
 
         const float divideByZeroProtection = 1e-5f;
         float mean = sumSquares / input.Length;
@@ -110,7 +106,9 @@ public class Transformer(SingleLayerModelWeights Weights)
 
         Vector result = new(input.Length);
         for (var i = 0; i < input.Length; i++)
-            result[i] = input[i] / rootMeanSquare;
+        {
+            result[i] = input[i] / rootMeanSquare * normWeight[i];
+        }
 
         return result;
     }

@@ -36,6 +36,7 @@ public class RandomWeightLoader
             layers[i] = new LayerWeights
             {
                 AttentionNormWeight = GenerateRandomVector(hiddenDimension, random),
+                FeedForwardNormWeight = GenerateRandomVector(hiddenDimension, random),
                 QueryProjection = GenerateRandomMatrix(hiddenDimension, hiddenDimension, random),
                 KeyProjection = GenerateRandomMatrix(hiddenDimension, keyValueDimension, random),
                 ValueProjection = GenerateRandomMatrix(hiddenDimension, keyValueDimension, random),
@@ -53,6 +54,7 @@ public class RandomWeightLoader
             EmbeddedTokens = GenerateRandomMatrix(vocabularySize, hiddenDimension, random),
             Layers = layers,
             OutputEmbedding = GenerateRandomMatrix(hiddenDimension, vocabularySize, random),
+            FinalNormWeight = GenerateRandomVector(hiddenDimension, random)
         };
     }
 

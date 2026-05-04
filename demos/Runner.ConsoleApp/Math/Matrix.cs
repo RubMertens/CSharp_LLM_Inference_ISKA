@@ -1,6 +1,8 @@
+using System.Diagnostics;
+
 namespace Runner.ConsoleApp.Math;
 
-
+[DebuggerDisplay("Matrix: {Rows}x{Columns}")]
 public class Matrix
 {
     public float[][] Data { get; }
@@ -101,5 +103,4 @@ public class Matrix
         }
         return result;
     }
-
 }
