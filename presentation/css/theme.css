@@ -50,9 +50,9 @@ html, body {
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: var(--slide-padding);
+  padding: clamp(2rem, 4vh, 3.5rem) var(--slide-padding) var(--slide-padding);
   background:
     radial-gradient(ellipse at 20% 50%, rgba(56, 189, 248, 0.03) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.04) 0%, transparent 50%),
@@ -227,6 +227,11 @@ pre code {
   border-radius: 8px;
   font-size: 0.8em;
   line-height: 1.7;
+}
+
+.slide:has(.slide-title) {
+  justify-content: center;
+  padding-top: var(--slide-padding);
 }
 
 .slide-title {

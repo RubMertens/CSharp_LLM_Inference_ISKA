@@ -59,25 +59,25 @@ public class Transformer(SingleLayerModelWeights Weights)
         Matrix attentionOutput = new(sequenceLength, headDimension);
 
         //for each token, compute the attention scores against all other tokens
-        for (int i = 0; i < sequenceLength; i++)
+        for (int lookingFrom = 0; lookingFrom < sequenceLength; lookingFrom++)
         {
             var scores = new float[sequenceLength];
 
-            for (var j = 0; j < sequenceLength; j++)
+            for (var lookingTo = 0; lookingTo < sequenceLength; lookingTo++)
             {
-                if (j > i)
+                if (lookingTo > lookingFrom)
                 {
                     // causal masking: prevent attending to future tokens by setting their scores to a very large negative number
                     // in language generation, you should never look to the future!
                     // causality only looks backwards
-                    scores[j] = float.NegativeInfinity;
+                    scores[lookingTo] = float.NegativeInfinity;
                     continue;
                 }
                 // attention = query • key / sqrt(headDim)
                 // dot product is a indication of how much 2 vectors are aligned
                 // scaling to prevent large outputs (AxX + BxY + CxZ) can grow extremely large
                 // in short how much does the vector representation of the question (query) align with the vector representation of the context (key)
-                scores[j] = queries[i] * keys[j] / scale;
+                scores[lookingTo] = queries[lookingFrom] * keys[lookingTo] / scale;
             }
 
             // make the sum of the score equal to 1 so that we can interpret them as probabilities. (1 == 100% attention, 0 == 0% attention)
@@ -91,7 +91,7 @@ public class Transformer(SingleLayerModelWeights Weights)
                 attended = attended + (attentionWeights[j] * values[j]);
             }
 
-            attentionOutput[i] = attended;
+            attentionOutput[lookingFrom] = attended;
         }
         return attentionOutput;
     }

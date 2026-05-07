@@ -1,0 +1,80 @@
+<section data-id="swiglu-visual" data-title="SwiGLU — Visual">
+  <div class="slide-content">
+    <h2>The <span class="highlight">Gating</span> Effect</h2>
+
+    <svg id="silu-svg" class="svg-diagram" viewBox="0 0 1200 600" style="width: 100%; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- ── Zero line (spans both charts) ──────────── -->
+      <line x1="70" y1="320" x2="430" y2="320" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+      <text class="svg-text-sm" style="fill: var(--color-text-muted); text-anchor: end;" x="65" y="320">0</text>
+
+      <!-- ── Input section ─────────────────────────── -->
+      <text class="svg-label" style="font-size:18px" x="250" y="35">input signal</text>
+
+      <!-- Input bars (bidirectional from zero line) -->
+      <rect id="silu-ib0" x="95" y="320" width="65" height="105" rx="4"
+            style="fill: rgba(56,189,248,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="silu-ib1" x="185" y="180" width="65" height="140" rx="4"
+            style="fill: rgba(56,189,248,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="silu-ib2" x="275" y="320" width="65" height="35" rx="4"
+            style="fill: rgba(56,189,248,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="silu-ib3" x="365" y="250" width="65" height="70" rx="4"
+            style="fill: rgba(56,189,248,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+
+      <!-- Input value labels -->
+      <text id="silu-iv0" class="svg-num" style="font-size:20px" x="127" y="440">-3</text>
+      <text id="silu-iv1" class="svg-num" style="font-size:20px" x="217" y="168">4</text>
+      <text id="silu-iv2" class="svg-num" style="font-size:20px" x="307" y="370">-1</text>
+      <text id="silu-iv3" class="svg-num" style="font-size:20px" x="397" y="238">2</text>
+
+      <!-- Drag hint -->
+      <text class="svg-muted" style="font-size:13px" x="250" y="560">↕ drag to change</text>
+
+      <!-- Invisible drag targets -->
+      <rect id="silu-hit0" x="80" y="100" width="95" height="440" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="silu-hit1" x="170" y="100" width="95" height="440" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="silu-hit2" x="260" y="100" width="95" height="440" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="silu-hit3" x="350" y="100" width="95" height="440" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+
+      <!-- ── Fragment 1: Arrow + output ────────────── -->
+      <g class="fragment">
+        <!-- Arrow -->
+        <line class="svg-connector" x1="470" y1="320" x2="650" y2="320" style="stroke-width: 2; opacity: 0.5;"/>
+        <polygon class="fill-accent" style="opacity:0.4" points="644,312 660,320 644,328"/>
+        <text class="svg-muted" style="font-size:16px" x="560" y="300">Swish gate</text>
+        <text class="svg-muted" style="font-size:13px" x="560" y="345">x · sigmoid(x)</text>
+
+        <!-- Output zero line -->
+        <line x1="680" y1="320" x2="1040" y2="320" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+        <text class="svg-text-sm" style="fill: var(--color-text-muted); text-anchor: end;" x="675" y="320">0</text>
+
+        <!-- Output section label -->
+        <text class="svg-label" style="font-size:18px" x="860" y="35">after gating</text>
+
+        <!-- Output bars -->
+        <rect id="silu-ob0" x="700" y="320" width="65" height="5" rx="4"
+              style="fill: rgba(56,189,248,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="silu-ob1" x="790" y="182" width="65" height="138" rx="4"
+              style="fill: rgba(56,189,248,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="silu-ob2" x="880" y="320" width="65" height="10" rx="4"
+              style="fill: rgba(56,189,248,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="silu-ob3" x="970" y="258" width="65" height="62" rx="4"
+              style="fill: rgba(56,189,248,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+
+        <!-- Output value labels -->
+        <text id="silu-ov0" class="svg-num fill-accent" style="font-size:20px" x="732" y="342">-0.14</text>
+        <text id="silu-ov1" class="svg-num fill-accent" style="font-size:20px" x="822" y="170">3.93</text>
+        <text id="silu-ov2" class="svg-num fill-accent" style="font-size:20px" x="912" y="348">-0.27</text>
+        <text id="silu-ov3" class="svg-num fill-accent" style="font-size:20px" x="1002" y="246">1.76</text>
+      </g>
+
+      <!-- ── Fragment 2: Insight ───────────────────── -->
+      <g class="fragment">
+        <rect x="680" y="490" width="340" height="60" rx="8"
+              style="fill: rgba(56,189,248,0.06); stroke: var(--color-accent); stroke-width: 1; opacity: 0.6;"/>
+        <text class="svg-text-sm" style="font-size:14px; fill: var(--color-accent);" x="850" y="515">positive → passes through</text>
+        <text class="svg-text-sm" style="font-size:14px; fill: var(--color-accent);" x="850" y="537">negative → crushed to zero</text>
+      </g>
+    </svg>
+  </div>
+</section>

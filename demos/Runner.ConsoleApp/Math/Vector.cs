@@ -69,4 +69,15 @@ public class Vector
         get => Data[index];
         set => Data[index] = value;
     }
+
+    public Vector this[Range range]
+    {
+        get
+        {
+            var (offset, length) = range.GetOffsetAndLength(Length);
+            Vector result = new(length);
+            Array.Copy(Data, offset, result.Data, 0, length);
+            return result;
+        }
+    }
 }

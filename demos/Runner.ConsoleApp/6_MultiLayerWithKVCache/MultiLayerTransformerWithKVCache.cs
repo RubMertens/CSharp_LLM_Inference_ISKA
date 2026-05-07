@@ -8,7 +8,7 @@ using Runner.ConsoleApp.RandomOneLayer;
 
 namespace Runner.ConsoleApp._3_MultiLayer;
 
-public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights)
+public class MultiLayerTransformerWithKVCache   (ModelWeights Weights)
 {
     public int PredictNextTokenGreedy(int[] tokens)
     {

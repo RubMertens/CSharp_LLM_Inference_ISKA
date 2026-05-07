@@ -1,0 +1,142 @@
+<section data-id="rmsnorm" data-title="RMSNorm">
+  <div class="slide-content">
+    <h2><span class="highlight">RMSNorm</span> — Learned Normalization</h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.8rem;">Stabilize each layer by normalizing vector magnitude, then rescale with learned weights</p>
+
+    <svg id="rms-svg" class="svg-diagram" viewBox="0 0 880 420" style="width: 100%; max-width: 850px; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Column label: x -->
+      <text class="svg-label" style="font-size:15px" x="80" y="22">x</text>
+
+      <!-- Input vector x — values are interactive (drag up/down) -->
+      <rect class="svg-box" x="35" y="40" width="90" height="55"/>
+      <text id="rms-x0" class="svg-num" style="font-size:24px; cursor: ns-resize;" x="80" y="68">2</text>
+
+      <rect class="svg-box" x="35" y="110" width="90" height="55"/>
+      <text id="rms-x1" class="svg-num" style="font-size:24px; cursor: ns-resize;" x="80" y="138">3</text>
+
+      <rect class="svg-box" x="35" y="180" width="90" height="55"/>
+      <text id="rms-x2" class="svg-num" style="font-size:24px; cursor: ns-resize;" x="80" y="208">1</text>
+
+      <rect class="svg-box" x="35" y="250" width="90" height="55"/>
+      <text id="rms-x3" class="svg-num" style="font-size:24px; cursor: ns-resize;" x="80" y="278">4</text>
+
+      <!-- Invisible drag hit targets (larger than text) -->
+      <rect id="rms-hit0" x="35" y="40" width="90" height="55" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="rms-hit1" x="35" y="110" width="90" height="55" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="rms-hit2" x="35" y="180" width="90" height="55" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="rms-hit3" x="35" y="250" width="90" height="55" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+
+      <!-- Fragment 1: Square each element + compute RMS -->
+      <g class="fragment">
+        <!-- Square symbols -->
+        <text class="svg-op" style="font-size:18px" x="158" y="68">x²</text>
+        <text class="svg-op" style="font-size:18px" x="158" y="138">x²</text>
+        <text class="svg-op" style="font-size:18px" x="158" y="208">x²</text>
+        <text class="svg-op" style="font-size:18px" x="158" y="278">x²</text>
+
+        <!-- x² values -->
+        <text class="svg-label" style="font-size:15px" x="240" y="22">x²</text>
+
+        <rect class="svg-accent-box" x="195" y="40" width="90" height="55"/>
+        <text id="rms-sq0" class="svg-num" style="font-size:22px" x="240" y="68">4</text>
+
+        <rect class="svg-accent-box" x="195" y="110" width="90" height="55"/>
+        <text id="rms-sq1" class="svg-num" style="font-size:22px" x="240" y="138">9</text>
+
+        <rect class="svg-accent-box" x="195" y="180" width="90" height="55"/>
+        <text id="rms-sq2" class="svg-num" style="font-size:22px" x="240" y="208">1</text>
+
+        <rect class="svg-accent-box" x="195" y="250" width="90" height="55"/>
+        <text id="rms-sq3" class="svg-num" style="font-size:22px" x="240" y="278">16</text>
+
+        <!-- Bracket connecting x² values -->
+        <line class="svg-connector" x1="285" y1="68" x2="330" y2="68"/>
+        <line class="svg-connector" x1="285" y1="138" x2="330" y2="138"/>
+        <line class="svg-connector" x1="285" y1="208" x2="330" y2="208"/>
+        <line class="svg-connector" x1="285" y1="278" x2="330" y2="278"/>
+
+        <path class="svg-connector" d="M 330,68 C 350,68 350,68 350,100 L 350,246 C 350,278 350,278 330,278"/>
+
+        <!-- Plus signs -->
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="366" y="103">+</text>
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="366" y="173">+</text>
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="366" y="243">+</text>
+
+        <!-- Arrow to sum -->
+        <line class="svg-connector" x1="350" y1="173" x2="395" y2="173"/>
+        <polygon class="fill-accent" style="opacity:0.4" points="393,166 409,173 393,180"/>
+
+        <!-- Sum / mean / scale pipeline -->
+        <rect x="415" y="133" width="70" height="80" rx="8"
+              style="fill: var(--color-bg-subtle); stroke: var(--color-border); stroke-width: 1.5;"/>
+        <text id="rms-sum" class="svg-muted" style="font-size:12px" x="450" y="153">Σ = 30</text>
+        <text id="rms-mean" class="svg-muted" style="font-size:12px" x="450" y="173">÷4 = 7.5</text>
+        <text id="rms-rms" class="svg-muted" style="font-size:12px" x="450" y="193">√ = 2.74</text>
+
+        <!-- Arrow to scale result -->
+        <line class="svg-connector" x1="485" y1="173" x2="510" y2="173"/>
+
+        <!-- Scale value box -->
+        <rect class="svg-result-box svg-pulse" x="515" y="148" width="80" height="50"/>
+        <text id="rms-scale" class="svg-num fill-accent" style="font-size:20px;font-weight:bold" x="555" y="168">0.37</text>
+        <text class="svg-muted" style="font-size:11px" x="555" y="130">1 / rms</text>
+      </g>
+
+      <!-- Fragment 2: Apply scale × weight = output -->
+      <g class="fragment">
+        <!-- "× scale × weight" label -->
+        <text class="svg-label" style="font-size:13px" x="660" y="22">scale × x</text>
+        <text class="svg-label" style="font-size:13px" x="753" y="22">× weight</text>
+        <text class="svg-label" style="font-size:13px" x="835" y="22">output</text>
+
+        <!-- Row 0 -->
+        <rect class="svg-accent-box" x="620" y="40" width="80" height="55"/>
+        <text id="rms-sx0" class="svg-num" style="font-size:20px" x="660" y="68">0.73</text>
+        <text class="svg-op" style="font-size:18px" x="718" y="68">×</text>
+        <text id="rms-w0" class="svg-muted" style="font-size:18px" x="753" y="68">1.0</text>
+        <text class="svg-op" style="font-size:18px" x="790" y="68">=</text>
+        <rect class="svg-result-box" x="805" y="45" width="65" height="45"/>
+        <text id="rms-out0" class="svg-num fill-accent" style="font-size:20px;font-weight:bold" x="837" y="68">0.73</text>
+
+        <!-- Row 1 -->
+        <rect class="svg-accent-box" x="620" y="110" width="80" height="55"/>
+        <text id="rms-sx1" class="svg-num" style="font-size:20px" x="660" y="138">1.10</text>
+        <text class="svg-op" style="font-size:18px" x="718" y="138">×</text>
+        <text id="rms-w1" class="svg-muted" style="font-size:18px" x="753" y="138">0.5</text>
+        <text class="svg-op" style="font-size:18px" x="790" y="138">=</text>
+        <rect class="svg-result-box" x="805" y="115" width="65" height="45"/>
+        <text id="rms-out1" class="svg-num fill-accent" style="font-size:20px;font-weight:bold" x="837" y="138">0.55</text>
+
+        <!-- Row 2 -->
+        <rect class="svg-accent-box" x="620" y="180" width="80" height="55"/>
+        <text id="rms-sx2" class="svg-num" style="font-size:20px" x="660" y="208">0.37</text>
+        <text class="svg-op" style="font-size:18px" x="718" y="208">×</text>
+        <text id="rms-w2" class="svg-muted" style="font-size:18px" x="753" y="208">2.0</text>
+        <text class="svg-op" style="font-size:18px" x="790" y="208">=</text>
+        <rect class="svg-result-box" x="805" y="185" width="65" height="45"/>
+        <text id="rms-out2" class="svg-num fill-accent" style="font-size:20px;font-weight:bold" x="837" y="208">0.73</text>
+
+        <!-- Row 3 -->
+        <rect class="svg-accent-box" x="620" y="250" width="80" height="55"/>
+        <text id="rms-sx3" class="svg-num" style="font-size:20px" x="660" y="278">1.46</text>
+        <text class="svg-op" style="font-size:18px" x="718" y="278">×</text>
+        <text id="rms-w3" class="svg-muted" style="font-size:18px" x="753" y="278">1.0</text>
+        <text class="svg-op" style="font-size:18px" x="790" y="278">=</text>
+        <rect class="svg-result-box" x="805" y="255" width="65" height="45"/>
+        <text id="rms-out3" class="svg-num fill-accent" style="font-size:20px;font-weight:bold" x="837" y="278">1.46</text>
+      </g>
+
+      <!-- Fragment 3: Code formula -->
+      <g class="fragment">
+        <text class="svg-formula" style="font-size:14px" x="440" y="360">
+          ss = Σ(x²) / n → scale = 1/√ss
+        </text>
+        <text class="svg-formula" style="font-size:14px" x="440" y="385">
+          output[j] = weight[j] × scale × x[j]
+        </text>
+        <text class="svg-muted" style="font-size:11px" x="440" y="410">↕ drag the input values to explore</text>
+      </g>
+    </svg>
+  </div>
+</section>
