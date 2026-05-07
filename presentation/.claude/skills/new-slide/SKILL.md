@@ -3,6 +3,8 @@ name: new-slide
 description: Create a new presentation slide HTML file and register it in the manifest
 ---
 
+**REQUIRED BACKGROUND:** Before creating a slide, load the engine-capabilities skill via `ToolSearch` (query: `select:engine-capabilities`) for full reference on slide format, CSS classes, fragment system, and engine features.
+
 # New Slide
 
 Create a new slide for the presentation. The user provides a topic/title as arguments.

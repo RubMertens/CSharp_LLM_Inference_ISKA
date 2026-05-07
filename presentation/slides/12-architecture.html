@@ -1,7 +1,7 @@
-<section data-id="architecture-simple" data-title="De Simpelste Transformer">
+<section data-id="architecture-simple" data-title="The Simplest Transformer">
   <div class="slide-content">
-    <h2>De simpelste <span class="highlight">transformer</span></h2>
-    <p style="color: var(--color-text-muted); margin-bottom: 1.5rem;">1 laag, geen franje — de kern van elk LLM</p>
+    <h2>The simplest <span class="highlight">transformer</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 1.5rem;">1 layer, no frills — the core of every LLM</p>
 
     <div class="pipeline">
       <div class="stage fragment">
@@ -11,7 +11,7 @@
       <div class="arrow fragment"></div>
       <div class="stage fragment">
         <strong>RMSNorm</strong>
-        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">Normaliseer activaties</span>
+        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">Normalize activations</span>
       </div>
       <div class="arrow fragment"></div>
       <div class="stage fragment" style="border-color: var(--color-accent);">
@@ -21,7 +21,7 @@
       <div class="arrow fragment"></div>
       <div class="stage fragment">
         <strong>Feed Forward</strong>
-        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">SwiGLU activatie</span>
+        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">SwiGLU activation</span>
       </div>
       <div class="arrow fragment"></div>
       <div class="stage fragment">
@@ -31,7 +31,7 @@
     </div>
 
     <p class="fragment" style="text-align: center; margin-top: 1.5rem; color: var(--color-text-muted); font-size: 0.85em;">
-      Echte modellen herhalen de middelste stappen <span class="highlight">32&times;</span> of meer — maar de structuur is identiek.
+      Real models repeat the middle steps <span class="highlight">32&times;</span> or more — but the structure is identical.
     </p>
   </div>
 </section>

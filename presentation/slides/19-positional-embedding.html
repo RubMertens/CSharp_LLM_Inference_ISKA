@@ -1,0 +1,69 @@
+<section data-id="positional-embedding" data-title="Positional Embedding">
+  <div class="slide-content">
+    <h2>Positional <span class="highlight">Embedding</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 1rem;">Transformers have no built-in sense of word order</p>
+
+    <div class="card" style="padding: 1.2rem; margin-bottom: 1.2rem;">
+      <p style="text-align: center; font-size: 0.95em; margin-bottom: 0.5rem;">Without position info, these are <span class="highlight">identical</span> to the model:</p>
+      <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+        <code style="font-size: 0.9em; color: var(--color-accent);">"the cat sat on the mat"</code>
+        <code style="font-size: 0.9em; color: var(--color-text-muted);">"mat the on sat cat the"</code>
+      </div>
+    </div>
+
+    <div class="fragment">
+      <svg viewBox="0 0 800 200" class="svg-diagram" style="max-width: 760px;" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- Labels -->
+        <text class="svg-text-xs svg-muted" x="400" y="15">Token embedding</text>
+        <text class="svg-text-xs svg-muted" x="400" y="95">Position signal</text>
+        <text class="svg-text-xs svg-muted" x="400" y="175">Combined</text>
+
+        <!-- Token boxes row -->
+        <rect class="svg-box" x="30" y="25" width="100" height="40"/><text class="svg-text" x="80" y="45">The</text>
+        <rect class="svg-box" x="155" y="25" width="100" height="40"/><text class="svg-text" x="205" y="45">cat</text>
+        <rect class="svg-box" x="280" y="25" width="100" height="40"/><text class="svg-text" x="330" y="45">sat</text>
+        <rect class="svg-box" x="405" y="25" width="100" height="40"/><text class="svg-text" x="455" y="45">on</text>
+        <rect class="svg-box" x="530" y="25" width="100" height="40"/><text class="svg-text" x="580" y="45">the</text>
+        <rect class="svg-box" x="655" y="25" width="100" height="40"/><text class="svg-text" x="705" y="45">mat</text>
+
+        <!-- Plus signs -->
+        <text class="svg-op" x="80" y="82">+</text>
+        <text class="svg-op" x="205" y="82">+</text>
+        <text class="svg-op" x="330" y="82">+</text>
+        <text class="svg-op" x="455" y="82">+</text>
+        <text class="svg-op" x="580" y="82">+</text>
+        <text class="svg-op" x="705" y="82">+</text>
+
+        <!-- Position boxes -->
+        <rect class="svg-accent-box" x="30" y="100" width="100" height="40"/><text class="svg-text fill-accent" x="80" y="120">pos 0</text>
+        <rect class="svg-accent-box" x="155" y="100" width="100" height="40"/><text class="svg-text fill-accent" x="205" y="120">pos 1</text>
+        <rect class="svg-accent-box" x="280" y="100" width="100" height="40"/><text class="svg-text fill-accent" x="330" y="120">pos 2</text>
+        <rect class="svg-accent-box" x="405" y="100" width="100" height="40"/><text class="svg-text fill-accent" x="455" y="120">pos 3</text>
+        <rect class="svg-accent-box" x="530" y="100" width="100" height="40"/><text class="svg-text fill-accent" x="580" y="120">pos 4</text>
+        <rect class="svg-accent-box" x="655" y="100" width="100" height="40"/><text class="svg-text fill-accent" x="705" y="120">pos 5</text>
+
+        <!-- Equals signs -->
+        <text class="svg-op" x="80" y="155">=</text>
+        <text class="svg-op" x="205" y="155">=</text>
+        <text class="svg-op" x="330" y="155">=</text>
+        <text class="svg-op" x="455" y="155">=</text>
+        <text class="svg-op" x="580" y="155">=</text>
+        <text class="svg-op" x="705" y="155">=</text>
+
+        <!-- Result boxes -->
+        <rect class="svg-result-box" x="30" y="165" width="100" height="40"/><text class="svg-text" x="80" y="185">The₀</text>
+        <rect class="svg-result-box" x="155" y="165" width="100" height="40"/><text class="svg-text" x="205" y="185">cat₁</text>
+        <rect class="svg-result-box" x="280" y="165" width="100" height="40"/><text class="svg-text" x="330" y="185">sat₂</text>
+        <rect class="svg-result-box" x="405" y="165" width="100" height="40"/><text class="svg-text" x="455" y="185">on₃</text>
+        <rect class="svg-result-box" x="530" y="165" width="100" height="40"/><text class="svg-text" x="580" y="185">the₄</text>
+        <rect class="svg-result-box" x="655" y="165" width="100" height="40"/><text class="svg-text" x="705" y="185">mat₅</text>
+      </svg>
+    </div>
+
+    <div class="fragment card" style="margin-top: 1rem;">
+      <h3 style="font-size: 0.95em; margin-bottom: 0.4rem;">🔄 Modern approach: <span class="highlight">RoPE</span> (Rotary Position Embeddings)</h3>
+      <p style="font-size: 0.85em; color: var(--color-text-muted);">Encodes position by <em>rotating</em> the embedding vector — nearby tokens get similar rotations, distant tokens get different ones. Used in LLaMA, Mistral, Qwen, and most modern models.</p>
+    </div>
+  </div>
+</section>

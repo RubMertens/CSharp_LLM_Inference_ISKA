@@ -3,179 +3,97 @@
     <h2>The <span class="highlight">Dot Product</span></h2>
     <p style="color: var(--color-text-muted); margin-bottom: 0.8rem;">The core operation behind every neural network — multiply matching pairs, then add them up</p>
 
-    <svg viewBox="0 0 860 370" style="width: 100%; max-width: 820px; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
-      <style>
-        .dp-box {
-          fill: var(--color-bg-subtle, #111827);
-          stroke: var(--color-border, #1e293b);
-          stroke-width: 1.5;
-          rx: 8;
-        }
-        .dp-num {
-          fill: var(--color-text, #e2e8f0);
-          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
-          font-size: 24px;
-          text-anchor: middle;
-          dominant-baseline: central;
-        }
-        .dp-op {
-          fill: var(--color-text-muted, #94a3b8);
-          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
-          font-size: 22px;
-          text-anchor: middle;
-          dominant-baseline: central;
-        }
-        .dp-label {
-          fill: var(--color-accent, #38bdf8);
-          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
-          font-size: 15px;
-          text-anchor: middle;
-          font-weight: bold;
-          letter-spacing: 0.05em;
-        }
-        .dp-prod-box {
-          fill: rgba(56, 189, 248, 0.08);
-          stroke: var(--color-accent, #38bdf8);
-          stroke-width: 1.5;
-          rx: 8;
-        }
-        .dp-result-box {
-          fill: rgba(56, 189, 248, 0.12);
-          stroke: var(--color-accent, #38bdf8);
-          stroke-width: 2.5;
-          rx: 10;
-        }
-        .dp-result-num {
-          fill: var(--color-accent, #38bdf8);
-          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
-          font-size: 30px;
-          text-anchor: middle;
-          dominant-baseline: central;
-          font-weight: bold;
-        }
-        .dp-connector {
-          stroke: var(--color-accent, #38bdf8);
-          stroke-width: 1.5;
-          opacity: 0.4;
-          fill: none;
-        }
-        .dp-plus {
-          fill: var(--color-accent, #38bdf8);
-          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
-          font-size: 16px;
-          text-anchor: middle;
-          dominant-baseline: central;
-          opacity: 0.6;
-        }
-        .dp-arrow {
-          fill: var(--color-accent, #38bdf8);
-          opacity: 0.4;
-        }
-        .dp-sum-label {
-          fill: var(--color-text-muted, #94a3b8);
-          font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
-          font-size: 13px;
-          text-anchor: middle;
-          dominant-baseline: central;
-        }
-
-        /* Pulse animation for the result */
-        @keyframes dp-glow {
-          0%, 100% { stroke-opacity: 1; }
-          50% { stroke-opacity: 0.5; }
-        }
-        .dp-pulse { animation: dp-glow 2.5s ease-in-out infinite; }
-      </style>
+    <svg class="svg-diagram" viewBox="0 0 860 370" style="width: 100%; max-width: 820px; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
 
       <!-- Column labels -->
-      <text class="dp-label" x="120" y="22">a</text>
-      <text class="dp-label" x="310" y="22">b</text>
+      <text class="svg-label" style="font-size:15px" x="120" y="22">a</text>
+      <text class="svg-label" style="font-size:15px" x="310" y="22">b</text>
 
       <!-- Vector A -->
-      <rect class="dp-box" x="75" y="40" width="90" height="55"/>
-      <text class="dp-num" x="120" y="68">2</text>
+      <rect class="svg-box" x="75" y="40" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="120" y="68">2</text>
 
-      <rect class="dp-box" x="75" y="110" width="90" height="55"/>
-      <text class="dp-num" x="120" y="138">3</text>
+      <rect class="svg-box" x="75" y="110" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="120" y="138">3</text>
 
-      <rect class="dp-box" x="75" y="180" width="90" height="55"/>
-      <text class="dp-num" x="120" y="208">1</text>
+      <rect class="svg-box" x="75" y="180" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="120" y="208">1</text>
 
-      <rect class="dp-box" x="75" y="250" width="90" height="55"/>
-      <text class="dp-num" x="120" y="278">4</text>
+      <rect class="svg-box" x="75" y="250" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="120" y="278">4</text>
 
       <!-- Multiply symbols -->
-      <text class="dp-op" x="215" y="68">&times;</text>
-      <text class="dp-op" x="215" y="138">&times;</text>
-      <text class="dp-op" x="215" y="208">&times;</text>
-      <text class="dp-op" x="215" y="278">&times;</text>
+      <text class="svg-op" style="font-size:22px" x="215" y="68">&times;</text>
+      <text class="svg-op" style="font-size:22px" x="215" y="138">&times;</text>
+      <text class="svg-op" style="font-size:22px" x="215" y="208">&times;</text>
+      <text class="svg-op" style="font-size:22px" x="215" y="278">&times;</text>
 
       <!-- Vector B -->
-      <rect class="dp-box" x="265" y="40" width="90" height="55"/>
-      <text class="dp-num" x="310" y="68">1</text>
+      <rect class="svg-box" x="265" y="40" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="310" y="68">1</text>
 
-      <rect class="dp-box" x="265" y="110" width="90" height="55"/>
-      <text class="dp-num" x="310" y="138">2</text>
+      <rect class="svg-box" x="265" y="110" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="310" y="138">2</text>
 
-      <rect class="dp-box" x="265" y="180" width="90" height="55"/>
-      <text class="dp-num" x="310" y="208">3</text>
+      <rect class="svg-box" x="265" y="180" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="310" y="208">3</text>
 
-      <rect class="dp-box" x="265" y="250" width="90" height="55"/>
-      <text class="dp-num" x="310" y="278">2</text>
+      <rect class="svg-box" x="265" y="250" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="310" y="278">2</text>
 
       <!-- Fragment 1: Element-wise products -->
       <g class="fragment">
         <!-- Equals signs -->
-        <text class="dp-op" x="405" y="68">=</text>
-        <text class="dp-op" x="405" y="138">=</text>
-        <text class="dp-op" x="405" y="208">=</text>
-        <text class="dp-op" x="405" y="278">=</text>
+        <text class="svg-op" style="font-size:22px" x="405" y="68">=</text>
+        <text class="svg-op" style="font-size:22px" x="405" y="138">=</text>
+        <text class="svg-op" style="font-size:22px" x="405" y="208">=</text>
+        <text class="svg-op" style="font-size:22px" x="405" y="278">=</text>
 
         <!-- Product boxes -->
-        <rect class="dp-prod-box" x="455" y="40" width="90" height="55"/>
-        <text class="dp-num" x="500" y="68">2</text>
+        <rect class="svg-accent-box" x="455" y="40" width="90" height="55"/>
+        <text class="svg-num" style="font-size:24px" x="500" y="68">2</text>
 
-        <rect class="dp-prod-box" x="455" y="110" width="90" height="55"/>
-        <text class="dp-num" x="500" y="138">6</text>
+        <rect class="svg-accent-box" x="455" y="110" width="90" height="55"/>
+        <text class="svg-num" style="font-size:24px" x="500" y="138">6</text>
 
-        <rect class="dp-prod-box" x="455" y="180" width="90" height="55"/>
-        <text class="dp-num" x="500" y="208">3</text>
+        <rect class="svg-accent-box" x="455" y="180" width="90" height="55"/>
+        <text class="svg-num" style="font-size:24px" x="500" y="208">3</text>
 
-        <rect class="dp-prod-box" x="455" y="250" width="90" height="55"/>
-        <text class="dp-num" x="500" y="278">8</text>
+        <rect class="svg-accent-box" x="455" y="250" width="90" height="55"/>
+        <text class="svg-num" style="font-size:24px" x="500" y="278">8</text>
 
-        <text class="dp-label" x="500" y="22">a &times; b</text>
+        <text class="svg-label" style="font-size:15px" x="500" y="22">a &times; b</text>
       </g>
 
       <!-- Fragment 2: Sum with bracket -->
       <g class="fragment">
         <!-- Horizontal connectors from each product -->
-        <line class="dp-connector" x1="545" y1="68" x2="610" y2="68"/>
-        <line class="dp-connector" x1="545" y1="138" x2="610" y2="138"/>
-        <line class="dp-connector" x1="545" y1="208" x2="610" y2="208"/>
-        <line class="dp-connector" x1="545" y1="278" x2="610" y2="278"/>
+        <line class="svg-connector" x1="545" y1="68" x2="610" y2="68"/>
+        <line class="svg-connector" x1="545" y1="138" x2="610" y2="138"/>
+        <line class="svg-connector" x1="545" y1="208" x2="610" y2="208"/>
+        <line class="svg-connector" x1="545" y1="278" x2="610" y2="278"/>
 
         <!-- Vertical bracket -->
-        <path class="dp-connector" d="M 610,68 C 630,68 630,68 630,100 L 630,246 C 630,278 630,278 610,278"/>
+        <path class="svg-connector" d="M 610,68 C 630,68 630,68 630,100 L 630,246 C 630,278 630,278 610,278"/>
         <!-- Horizontal to result -->
-        <line class="dp-connector" x1="630" y1="173" x2="680" y2="173"/>
+        <line class="svg-connector" x1="630" y1="173" x2="680" y2="173"/>
         <!-- Arrowhead -->
-        <polygon class="dp-arrow" points="678,166 694,173 678,180"/>
+        <polygon class="fill-accent" style="opacity:0.4" points="678,166 694,173 678,180"/>
 
         <!-- Plus signs along the bracket -->
-        <text class="dp-plus" x="648" y="103">+</text>
-        <text class="dp-plus" x="648" y="173">+</text>
-        <text class="dp-plus" x="648" y="243">+</text>
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="648" y="103">+</text>
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="648" y="173">+</text>
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="648" y="243">+</text>
 
         <!-- Result box -->
-        <rect class="dp-result-box dp-pulse" x="700" y="143" width="110" height="60"/>
-        <text class="dp-result-num" x="755" y="173">19</text>
-        <text class="dp-sum-label" x="755" y="125">sum</text>
+        <rect class="svg-result-box svg-pulse" x="700" y="143" width="110" height="60"/>
+        <text class="svg-num fill-accent" style="font-size:30px;font-weight:bold" x="755" y="173">19</text>
+        <text class="svg-muted" style="font-size:13px" x="755" y="125">sum</text>
       </g>
 
       <!-- Formula at the bottom -->
       <g class="fragment">
-        <text class="dp-op" style="font-size: 16px; fill: var(--color-text-muted, #94a3b8);" x="430" y="340">
+        <text class="svg-op" style="font-size: 16px; fill: var(--color-text-muted, #94a3b8);" x="430" y="340">
           2&times;1 + 3&times;2 + 1&times;3 + 4&times;2 = 19
         </text>
       </g>

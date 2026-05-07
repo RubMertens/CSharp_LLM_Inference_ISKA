@@ -1,0 +1,117 @@
+<section data-id="causal-masking" data-title="Causal Masking">
+  <div class="slide-content">
+    <h2>Causal <span class="highlight">Masking</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 1.2rem;">Tokens can only look at the <span class="highlight">past</span>, never at the future</p>
+
+    <div class="two-column" style="align-items: start; gap: 2rem;">
+      <div class="center">
+        <svg viewBox="0 0 320 340" class="svg-diagram" style="max-width: 300px;" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Axis labels -->
+          <text class="svg-text-xs svg-muted" x="160" y="14">Key (attends to)</text>
+          <text class="svg-text-xs svg-muted" x="14" y="180" transform="rotate(-90 14 180)">Query (current token)</text>
+
+          <!-- Column headers -->
+          <text class="svg-label" style="font-size: 12px;" x="87" y="40">The</text>
+          <text class="svg-label" style="font-size: 12px;" x="142" y="40">cat</text>
+          <text class="svg-label" style="font-size: 12px;" x="197" y="40">sits</text>
+          <text class="svg-label" style="font-size: 12px;" x="252" y="40">on</text>
+          <text class="svg-label" style="font-size: 12px;" x="302" y="40">the</text>
+
+          <!-- Row headers -->
+          <text class="svg-label" style="font-size: 12px;" x="45" y="82">The</text>
+          <text class="svg-label" style="font-size: 12px;" x="45" y="132">cat</text>
+          <text class="svg-label" style="font-size: 12px;" x="45" y="182">sits</text>
+          <text class="svg-label" style="font-size: 12px;" x="45" y="232">on</text>
+          <text class="svg-label" style="font-size: 12px;" x="45" y="282">the</text>
+
+          <!-- Row 1: The -->
+          <rect class="svg-cell-ok" x="65" y="57" width="45" height="45"/>
+          <text class="svg-check" x="87" y="82">&#10003;</text>
+          <rect class="svg-cell-blocked" x="120" y="57" width="45" height="45"/>
+          <text class="svg-cross" x="142" y="82">&#10007;</text>
+          <rect class="svg-cell-blocked" x="175" y="57" width="45" height="45"/>
+          <text class="svg-cross" x="197" y="82">&#10007;</text>
+          <rect class="svg-cell-blocked" x="230" y="57" width="45" height="45"/>
+          <text class="svg-cross" x="252" y="82">&#10007;</text>
+          <rect class="svg-cell-blocked" x="280" y="57" width="45" height="45"/>
+          <text class="svg-cross" x="302" y="82">&#10007;</text>
+
+          <!-- Row 2: cat -->
+          <rect class="svg-cell-ok" x="65" y="107" width="45" height="45"/>
+          <text class="svg-check" x="87" y="132">&#10003;</text>
+          <rect class="svg-cell-ok" x="120" y="107" width="45" height="45"/>
+          <text class="svg-check" x="142" y="132">&#10003;</text>
+          <rect class="svg-cell-blocked" x="175" y="107" width="45" height="45"/>
+          <text class="svg-cross" x="197" y="132">&#10007;</text>
+          <rect class="svg-cell-blocked" x="230" y="107" width="45" height="45"/>
+          <text class="svg-cross" x="252" y="132">&#10007;</text>
+          <rect class="svg-cell-blocked" x="280" y="107" width="45" height="45"/>
+          <text class="svg-cross" x="302" y="132">&#10007;</text>
+
+          <!-- Row 3: sits -->
+          <rect class="svg-cell-ok" x="65" y="157" width="45" height="45"/>
+          <text class="svg-check" x="87" y="182">&#10003;</text>
+          <rect class="svg-cell-ok" x="120" y="157" width="45" height="45"/>
+          <text class="svg-check" x="142" y="182">&#10003;</text>
+          <rect class="svg-cell-ok" x="175" y="157" width="45" height="45"/>
+          <text class="svg-check" x="197" y="182">&#10003;</text>
+          <rect class="svg-cell-blocked" x="230" y="157" width="45" height="45"/>
+          <text class="svg-cross" x="252" y="182">&#10007;</text>
+          <rect class="svg-cell-blocked" x="280" y="157" width="45" height="45"/>
+          <text class="svg-cross" x="302" y="182">&#10007;</text>
+
+          <!-- Row 4: on -->
+          <rect class="svg-cell-ok" x="65" y="207" width="45" height="45"/>
+          <text class="svg-check" x="87" y="232">&#10003;</text>
+          <rect class="svg-cell-ok" x="120" y="207" width="45" height="45"/>
+          <text class="svg-check" x="142" y="232">&#10003;</text>
+          <rect class="svg-cell-ok" x="175" y="207" width="45" height="45"/>
+          <text class="svg-check" x="197" y="232">&#10003;</text>
+          <rect class="svg-cell-ok" x="230" y="207" width="45" height="45"/>
+          <text class="svg-check" x="252" y="232">&#10003;</text>
+          <rect class="svg-cell-blocked" x="280" y="207" width="45" height="45"/>
+          <text class="svg-cross" x="302" y="232">&#10007;</text>
+
+          <!-- Row 5: the -->
+          <rect class="svg-cell-ok" x="65" y="257" width="45" height="45"/>
+          <text class="svg-check" x="87" y="282">&#10003;</text>
+          <rect class="svg-cell-ok" x="120" y="257" width="45" height="45"/>
+          <text class="svg-check" x="142" y="282">&#10003;</text>
+          <rect class="svg-cell-ok" x="175" y="257" width="45" height="45"/>
+          <text class="svg-check" x="197" y="282">&#10003;</text>
+          <rect class="svg-cell-ok" x="230" y="257" width="45" height="45"/>
+          <text class="svg-check" x="252" y="282">&#10003;</text>
+          <rect class="svg-cell-ok" x="280" y="257" width="45" height="45"/>
+          <text class="svg-check" x="302" y="282">&#10003;</text>
+
+          <!-- Diagonal highlight line -->
+          <line x1="65" y1="57" x2="325" y2="302" stroke="var(--color-accent, #38bdf8)" stroke-width="2" opacity="0.3" stroke-dasharray="6,4"/>
+        </svg>
+      </div>
+
+      <div>
+        <div class="fragment" style="margin-bottom: 1.2rem;">
+          <h3 style="color: var(--color-accent);">Why?</h3>
+          <p>During generation, future tokens <strong>don't exist yet</strong>. The model predicts them one by one.</p>
+        </div>
+
+        <div class="fragment" style="margin-bottom: 1.2rem;">
+          <h3 style="color: var(--color-accent);">How?</h3>
+          <p>Attention scores above the diagonal are set to <span class="highlight">-&infin;</span>. After softmax, they effectively become <strong>0</strong>.</p>
+        </div>
+
+        <div class="code-block fragment">
+          <div class="code-header">Causal Mask</div>
+          <pre><code class="language-csharp">for (int i = 0; i < seqLen; i++)
+  for (int j = i + 1; j < seqLen; j++)
+    scores[i, j] = float.NegativeInfinity;</code></pre>
+        </div>
+
+        <p class="fragment" style="color: var(--color-text-muted); font-size: 0.85em; margin-top: 1rem;">
+          Triangular pattern &mdash; simple but essential for autoregressive generation.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

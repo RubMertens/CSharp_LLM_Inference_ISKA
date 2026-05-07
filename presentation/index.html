@@ -5,11 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inference Runner - Engineering Demo</title>
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/svg.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/csharp.min.js"></script>
 </head>
 <body>
+  <svg style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="svg-arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <polygon points="0 0, 8 3, 0 6" class="fill-accent" opacity="0.5"/>
+      </marker>
+      <marker id="svg-arrowhead-muted" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <polygon points="0 0, 8 3, 0 6" class="fill-muted" opacity="0.5"/>
+      </marker>
+    </defs>
+  </svg>
   <div id="progress"></div>
   <div id="presentation"></div>
   <span id="slide-counter"></span>

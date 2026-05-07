@@ -1,0 +1,171 @@
+<section data-id="multi-head-attention" data-title="Multi-Head Attention">
+  <div class="slide-content">
+    <h2><span class="highlight">Multi-Head</span> Attention</h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.8rem;">Splits Q, K, V into multiple heads — each learns different relationships</p>
+
+    <svg viewBox="0 0 900 470" class="svg-diagram" style="max-width: 880px;" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Fragment 0: Input Q, K, V and split into heads -->
+      <g class="fragment" data-fragment-index="0">
+        <!-- Input vectors -->
+        <rect class="svg-accent-box" x="10" y="50" width="70" height="36"/>
+        <text class="svg-label" x="45" y="68">Q</text>
+
+        <rect class="svg-accent-box" x="10" y="110" width="70" height="36"/>
+        <text class="svg-label" x="45" y="128">K</text>
+
+        <rect class="svg-accent-box" x="10" y="170" width="70" height="36"/>
+        <text class="svg-label" x="45" y="188">V</text>
+
+        <!-- Split label -->
+        <rect class="svg-box" x="110" y="100" width="70" height="40"/>
+        <text class="svg-text" style="font-size: 12px;" x="145" y="114">Split</text>
+        <text class="svg-muted" style="font-size: 10px;" x="145" y="130">reshape</text>
+
+        <!-- Arrows from Q,K,V to split -->
+        <line class="svg-arrow" x1="80" y1="68" x2="108" y2="110"/>
+        <line class="svg-arrow" x1="80" y1="128" x2="108" y2="120"/>
+        <line class="svg-arrow" x1="80" y1="188" x2="108" y2="132"/>
+
+        <!-- Split arrows to each head -->
+        <!-- Head 1 -->
+        <line class="svg-arrow-muted" x1="180" y1="108" x2="228" y2="45"/>
+        <!-- Head 2 -->
+        <line class="svg-arrow-muted" x1="180" y1="115" x2="228" y2="115"/>
+        <!-- Head 3 -->
+        <line class="svg-arrow-muted" x1="180" y1="122" x2="228" y2="185"/>
+        <!-- Head 4 -->
+        <line class="svg-arrow-muted" x1="180" y1="130" x2="228" y2="255"/>
+
+        <!-- Head boxes with mini Q,K,V labels -->
+        <!-- Head 1 -->
+        <rect class="svg-head-box" x="230" y="20" width="140" height="55"/>
+        <text class="svg-label-sm" x="300" y="36">Head 1</text>
+        <text class="svg-muted" style="font-size: 9px;" x="265" y="54">Q</text>
+        <text class="svg-muted" style="font-size: 9px;" x="300" y="54">K</text>
+        <text class="svg-muted" style="font-size: 9px;" x="335" y="54">V</text>
+        <rect x="250" y="44" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+        <rect x="286" y="44" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+        <rect x="322" y="44" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+
+        <!-- Head 2 -->
+        <rect class="svg-head-box" x="230" y="90" width="140" height="55"/>
+        <text class="svg-label-sm" x="300" y="106">Head 2</text>
+        <text class="svg-muted" style="font-size: 9px;" x="265" y="124">Q</text>
+        <text class="svg-muted" style="font-size: 9px;" x="300" y="124">K</text>
+        <text class="svg-muted" style="font-size: 9px;" x="335" y="124">V</text>
+        <rect x="250" y="114" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+        <rect x="286" y="114" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+        <rect x="322" y="114" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+
+        <!-- Head 3 -->
+        <rect class="svg-head-box" x="230" y="160" width="140" height="55"/>
+        <text class="svg-label-sm" x="300" y="176">Head 3</text>
+        <text class="svg-muted" style="font-size: 9px;" x="265" y="194">Q</text>
+        <text class="svg-muted" style="font-size: 9px;" x="300" y="194">K</text>
+        <text class="svg-muted" style="font-size: 9px;" x="335" y="194">V</text>
+        <rect x="250" y="184" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+        <rect x="286" y="184" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+        <rect x="322" y="184" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+
+        <!-- Head 4 -->
+        <rect class="svg-head-box" x="230" y="230" width="140" height="55"/>
+        <text class="svg-label-sm" x="300" y="246">Head 4</text>
+        <text class="svg-muted" style="font-size: 9px;" x="265" y="264">Q</text>
+        <text class="svg-muted" style="font-size: 9px;" x="300" y="264">K</text>
+        <text class="svg-muted" style="font-size: 9px;" x="335" y="264">V</text>
+        <rect x="250" y="254" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+        <rect x="286" y="254" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+        <rect x="322" y="254" width="22" height="14" rx="3" fill="rgba(56,189,248,0.12)" stroke="var(--color-accent,#38bdf8)" stroke-width="0.8"/>
+
+        <!-- Dimension annotation -->
+        <text class="svg-muted" style="font-size: 10px; text-anchor: start;" x="12" y="225">d_model</text>
+        <text class="svg-muted" style="font-size: 10px;" x="300" y="300">d_model / n_heads per head</text>
+      </g>
+
+      <!-- Fragment 1: Each head computes attention independently -->
+      <g class="fragment" data-fragment-index="1">
+        <!-- Attention computation boxes -->
+        <rect class="svg-accent-box" x="420" y="24" width="160" height="46"/>
+        <text class="svg-text" style="font-size: 11px;" x="500" y="40">softmax(Q&#xB7;K) &#xD7; V</text>
+        <text class="svg-muted" style="font-size: 9px;" x="500" y="56">out_1</text>
+
+        <rect class="svg-accent-box" x="420" y="94" width="160" height="46"/>
+        <text class="svg-text" style="font-size: 11px;" x="500" y="110">softmax(Q&#xB7;K) &#xD7; V</text>
+        <text class="svg-muted" style="font-size: 9px;" x="500" y="126">out_2</text>
+
+        <rect class="svg-accent-box" x="420" y="164" width="160" height="46"/>
+        <text class="svg-text" style="font-size: 11px;" x="500" y="180">softmax(Q&#xB7;K) &#xD7; V</text>
+        <text class="svg-muted" style="font-size: 9px;" x="500" y="196">out_3</text>
+
+        <rect class="svg-accent-box" x="420" y="234" width="160" height="46"/>
+        <text class="svg-text" style="font-size: 11px;" x="500" y="250">softmax(Q&#xB7;K) &#xD7; V</text>
+        <text class="svg-muted" style="font-size: 9px;" x="500" y="266">out_4</text>
+
+        <!-- Arrows from heads to attention -->
+        <line class="svg-arrow" x1="370" y1="47" x2="418" y2="47"/>
+        <line class="svg-arrow" x1="370" y1="117" x2="418" y2="117"/>
+        <line class="svg-arrow" x1="370" y1="187" x2="418" y2="187"/>
+        <line class="svg-arrow" x1="370" y1="257" x2="418" y2="257"/>
+
+        <!-- Parallel label -->
+        <text class="svg-muted" style="font-size: 10px; font-style: italic;" x="500" y="300">parallel &amp; independent</text>
+      </g>
+
+      <!-- Fragment 2: Concatenate and project -->
+      <g class="fragment" data-fragment-index="2">
+        <!-- Concat arrows -->
+        <line class="svg-arrow-muted" x1="580" y1="47" x2="628" y2="110"/>
+        <line class="svg-arrow-muted" x1="580" y1="117" x2="628" y2="125"/>
+        <line class="svg-arrow-muted" x1="580" y1="187" x2="628" y2="140"/>
+        <line class="svg-arrow-muted" x1="580" y1="257" x2="628" y2="155"/>
+
+        <!-- Concat box -->
+        <rect class="svg-box" x="630" y="100" width="80" height="66"/>
+        <text class="svg-text" style="font-size: 12px;" x="670" y="124">Concat</text>
+        <text class="svg-muted" style="font-size: 9px;" x="670" y="142">stack</text>
+        <text class="svg-muted" style="font-size: 9px;" x="670" y="154">outputs</text>
+
+        <!-- Arrow to W_O -->
+        <line class="svg-arrow" x1="710" y1="133" x2="738" y2="133"/>
+
+        <!-- W_O projection -->
+        <rect class="svg-box" x="740" y="110" width="70" height="46"/>
+        <text class="svg-label" style="font-size: 12px;" x="775" y="126">W_O</text>
+        <text class="svg-muted" style="font-size: 9px;" x="775" y="142">project</text>
+
+        <!-- Arrow to output -->
+        <line class="svg-arrow" x1="810" y1="133" x2="828" y2="133"/>
+
+        <!-- Final output -->
+        <rect class="svg-result-box svg-pulse" x="830" y="110" width="60" height="46"/>
+        <text class="svg-text fill-accent" style="font-size: 12px;" x="860" y="133">Out</text>
+
+        <!-- Dimension flow -->
+        <text class="svg-muted" style="font-size: 9px;" x="670" y="180">d_model</text>
+        <text class="svg-muted" style="font-size: 9px;" x="860" y="170">d_model</text>
+      </g>
+
+      <!-- Fragment 3: Key insight -->
+      <g class="fragment" data-fragment-index="3">
+        <rect class="svg-insight-box" x="90" y="330" width="720" height="55"/>
+        <text class="svg-text fill-accent" x="450" y="350">
+          Each head learns different patterns
+        </text>
+        <text class="svg-muted" style="font-size: 13px;" x="450" y="372">
+          syntax, semantics, position, co-reference ...
+        </text>
+      </g>
+
+      <!-- Fragment 3 also: formula -->
+      <g class="fragment" data-fragment-index="3">
+        <text class="svg-muted" style="font-size: 12px;" x="450" y="410">
+          MultiHead(Q, K, V) = Concat(head_1, ..., head_h) &#xB7; W_O
+        </text>
+        <text class="svg-muted" style="font-size: 11px;" x="450" y="430">
+          where head_i = Attention(Q&#xB7;W_Qi, K&#xB7;W_Ki, V&#xB7;W_Vi)
+        </text>
+      </g>
+    </svg>
+  </div>
+</section>
