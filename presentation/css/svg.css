@@ -3,62 +3,62 @@
 /* ── Box / rect styles ─────────────────────────────────── */
 
 .svg-box {
-  fill: var(--color-bg-subtle, #111827);
-  stroke: var(--color-border, #1e293b);
+  fill: var(--color-bg-subtle, #F0F4F8);
+  stroke: var(--color-border, #C8D8E8);
   stroke-width: 1.5;
   rx: 6;
 }
 
 .svg-accent-box {
-  fill: rgba(56, 189, 248, 0.08);
-  stroke: var(--color-accent, #38bdf8);
+  fill: rgba(0, 163, 224, 0.08);
+  stroke: var(--color-accent, #00A3E0);
   stroke-width: 1.5;
   rx: 6;
 }
 
 .svg-result-box {
-  fill: rgba(56, 189, 248, 0.12);
-  stroke: var(--color-accent, #38bdf8);
+  fill: rgba(0, 163, 224, 0.12);
+  stroke: var(--color-accent, #00A3E0);
   stroke-width: 2.5;
   rx: 8;
 }
 
 .svg-head-box {
-  fill: var(--color-bg-subtle, #111827);
-  stroke: var(--color-border, #1e293b);
+  fill: var(--color-bg-subtle, #F0F4F8);
+  stroke: var(--color-border, #C8D8E8);
   stroke-width: 1.5;
   rx: 8;
 }
 
 .svg-cell {
-  fill: var(--color-bg-subtle, #111827);
-  stroke: var(--color-border, #1e293b);
+  fill: var(--color-bg-subtle, #F0F4F8);
+  stroke: var(--color-border, #C8D8E8);
   stroke-width: 1;
   rx: 3;
 }
 
 .svg-cell-ok {
-  fill: rgba(56, 189, 248, 0.15);
-  stroke: var(--color-border, #1e293b);
+  fill: rgba(0, 163, 224, 0.15);
+  stroke: var(--color-border, #C8D8E8);
   stroke-width: 1;
 }
 
 .svg-cell-blocked {
-  fill: rgba(239, 68, 68, 0.08);
-  stroke: var(--color-border, #1e293b);
+  fill: rgba(240, 78, 35, 0.08);
+  stroke: var(--color-border, #C8D8E8);
   stroke-width: 1;
 }
 
 .svg-cell-highlight {
-  fill: rgba(56, 189, 248, 0.15);
-  stroke: var(--color-accent, #38bdf8);
+  fill: rgba(0, 163, 224, 0.15);
+  stroke: var(--color-accent, #00A3E0);
   stroke-width: 1.5;
   rx: 3;
 }
 
 .svg-insight-box {
-  fill: rgba(56, 189, 248, 0.08);
-  stroke: var(--color-accent, #38bdf8);
+  fill: rgba(0, 163, 224, 0.08);
+  stroke: var(--color-accent, #00A3E0);
   stroke-width: 1.5;
   rx: 10;
 }
@@ -66,7 +66,7 @@
 /* ── Text styles ───────────────────────────────────────── */
 
 .svg-text {
-  fill: var(--color-text, #e2e8f0);
+  fill: var(--color-text, #003865);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 14px;
   text-anchor: middle;
@@ -74,7 +74,7 @@
 }
 
 .svg-text-lg {
-  fill: var(--color-text, #e2e8f0);
+  fill: var(--color-text, #003865);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 20px;
   text-anchor: middle;
@@ -82,7 +82,7 @@
 }
 
 .svg-text-xl {
-  fill: var(--color-text, #e2e8f0);
+  fill: var(--color-text, #003865);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 24px;
   text-anchor: middle;
@@ -90,7 +90,7 @@
 }
 
 .svg-text-sm {
-  fill: var(--color-text, #e2e8f0);
+  fill: var(--color-text, #003865);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 12px;
   text-anchor: middle;
@@ -99,7 +99,7 @@
 
 .svg-text-xs,
 .svg-sublabel {
-  fill: var(--color-text, #e2e8f0);
+  fill: var(--color-text, #003865);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 11px;
   text-anchor: middle;
@@ -107,14 +107,14 @@
 }
 
 .svg-num {
-  fill: var(--color-text, #e2e8f0);
+  fill: var(--color-text, #003865);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   text-anchor: middle;
   dominant-baseline: central;
 }
 
 .svg-label {
-  fill: var(--color-accent, #38bdf8);
+  fill: var(--color-accent, #00A3E0);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 13px;
   font-weight: bold;
@@ -124,7 +124,7 @@
 }
 
 .svg-label-sm {
-  fill: var(--color-accent, #38bdf8);
+  fill: var(--color-accent, #00A3E0);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 11px;
   font-weight: bold;
@@ -134,7 +134,7 @@
 }
 
 .svg-muted {
-  fill: var(--color-text-muted, #94a3b8);
+  fill: var(--color-text-muted, #4A6A8A);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 13px;
   text-anchor: middle;
@@ -142,7 +142,7 @@
 }
 
 .svg-op {
-  fill: var(--color-text-muted, #94a3b8);
+  fill: var(--color-text-muted, #4A6A8A);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 18px;
   text-anchor: middle;
@@ -150,7 +150,7 @@
 }
 
 .svg-formula {
-  fill: var(--color-text-muted, #94a3b8);
+  fill: var(--color-text-muted, #4A6A8A);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 14px;
   text-anchor: middle;
@@ -158,7 +158,7 @@
 }
 
 .svg-heading {
-  fill: var(--color-text, #e2e8f0);
+  fill: var(--color-text, #003865);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 13px;
   font-weight: bold;
@@ -167,7 +167,7 @@
 }
 
 .svg-token {
-  fill: var(--color-text, #e2e8f0);
+  fill: var(--color-text, #003865);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 16px;
   font-weight: bold;
@@ -176,7 +176,7 @@
 }
 
 .svg-check {
-  fill: var(--color-accent, #38bdf8);
+  fill: var(--color-accent, #00A3E0);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 18px;
   text-anchor: middle;
@@ -184,7 +184,7 @@
 }
 
 .svg-cross {
-  fill: var(--color-danger, #ef4444);
+  fill: var(--color-danger, #F04E23);
   font-family: var(--font-mono, "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace);
   font-size: 16px;
   opacity: 0.5;
@@ -195,7 +195,7 @@
 /* ── Line / arrow styles ───────────────────────────────── */
 
 .svg-arrow {
-  stroke: var(--color-accent, #38bdf8);
+  stroke: var(--color-accent, #00A3E0);
   stroke-width: 1.5;
   opacity: 0.5;
   fill: none;
@@ -203,7 +203,7 @@
 }
 
 .svg-arrow-muted {
-  stroke: var(--color-text-muted, #94a3b8);
+  stroke: var(--color-text-muted, #4A6A8A);
   stroke-width: 1.2;
   opacity: 0.5;
   fill: none;
@@ -211,7 +211,7 @@
 }
 
 .svg-connector {
-  stroke: var(--color-accent, #38bdf8);
+  stroke: var(--color-accent, #00A3E0);
   stroke-width: 1.5;
   opacity: 0.4;
   fill: none;
@@ -219,19 +219,19 @@
 
 .svg-bracket {
   fill: none;
-  stroke: var(--color-text-muted, #94a3b8);
+  stroke: var(--color-text-muted, #4A6A8A);
   stroke-width: 2;
   stroke-linecap: round;
 }
 
 .svg-axis {
-  stroke: var(--color-border, #1e293b);
+  stroke: var(--color-border, #C8D8E8);
   stroke-width: 1.5;
 }
 
 .svg-circle {
   fill: none;
-  stroke: var(--color-border, #1e293b);
+  stroke: var(--color-border, #C8D8E8);
   stroke-width: 1;
   stroke-dasharray: 4 3;
 }
@@ -271,10 +271,10 @@
 
 /* ── Utility fill / stroke ─────────────────────────────── */
 
-.fill-accent { fill: var(--color-accent, #38bdf8); }
-.fill-muted { fill: var(--color-text-muted, #94a3b8); }
-.fill-text { fill: var(--color-text, #e2e8f0); }
-.fill-danger { fill: var(--color-danger, #ef4444); }
-.fill-accent-secondary { fill: var(--color-accent-secondary, #818cf8); }
-.stroke-accent { stroke: var(--color-accent, #38bdf8); }
-.stroke-muted { stroke: var(--color-text-muted, #94a3b8); }
+.fill-accent { fill: var(--color-accent, #00A3E0); }
+.fill-muted { fill: var(--color-text-muted, #4A6A8A); }
+.fill-text { fill: var(--color-text, #003865); }
+.fill-danger { fill: var(--color-danger, #F04E23); }
+.fill-accent-secondary { fill: var(--color-accent-secondary, #6ECFF6); }
+.stroke-accent { stroke: var(--color-accent, #00A3E0); }
+.stroke-muted { stroke: var(--color-text-muted, #4A6A8A); }

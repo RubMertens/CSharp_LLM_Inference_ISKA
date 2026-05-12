@@ -4,7 +4,7 @@
     <p style="color: var(--color-text-muted); margin-bottom: 0.6rem;">Remember the dot product? Matmul is just doing that for <span class="highlight">every row-column pair</span>.</p>
 
     <div class="svg-fill">
-    <svg class="svg-diagram" viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg">
+    <svg class="svg-diagram" viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg">
 
       <!-- Matrix A: 2x3 -->
       <text class="svg-muted" style="font-size:13px" x="130" y="20">A</text>
@@ -73,8 +73,8 @@
 
       <!-- Step 0: row 1 · col 1 → C[0,0] = 58 -->
       <g class="fragment current-visible" data-fragment-index="0">
-        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#38bdf8);stroke-width:1.5;rx:4" x="53" y="53" width="164" height="44"/>
-        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#38bdf8);stroke-width:1.5;rx:4" x="303" y="53" width="54" height="144"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="53" y="53" width="164" height="44"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="303" y="53" width="54" height="144"/>
         <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 217,75 C 260,75 260,55 305,55"/>
         <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 330,195 C 330,210 520,210 555,75"/>
         <text class="svg-formula" x="450" y="268">row 1 · col 1</text>
@@ -87,8 +87,8 @@
 
       <!-- Step 1: row 1 · col 2 → C[0,1] = 64 -->
       <g class="fragment current-visible" data-fragment-index="1">
-        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#38bdf8);stroke-width:1.5;rx:4" x="53" y="53" width="164" height="44"/>
-        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#38bdf8);stroke-width:1.5;rx:4" x="383" y="53" width="54" height="144"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="53" y="53" width="164" height="44"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="383" y="53" width="54" height="144"/>
         <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 217,75 C 260,75 280,55 385,55"/>
         <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 410,195 C 410,210 600,210 625,75"/>
         <text class="svg-formula" x="450" y="268">row 1 · col 2</text>
@@ -101,8 +101,8 @@
 
       <!-- Step 2: row 2 · col 1 → C[1,0] = 139 -->
       <g class="fragment current-visible" data-fragment-index="2">
-        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#38bdf8);stroke-width:1.5;rx:4" x="53" y="103" width="164" height="44"/>
-        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#38bdf8);stroke-width:1.5;rx:4" x="303" y="53" width="54" height="144"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="53" y="103" width="164" height="44"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="303" y="53" width="54" height="144"/>
         <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 217,125 C 260,125 260,55 305,55"/>
         <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 330,195 C 330,220 520,220 555,125"/>
         <text class="svg-formula" x="450" y="268">row 2 · col 1</text>
@@ -115,8 +115,8 @@
 
       <!-- Step 3: row 2 · col 2 → C[1,1] = 154 -->
       <g class="fragment current-visible" data-fragment-index="3">
-        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#38bdf8);stroke-width:1.5;rx:4" x="53" y="103" width="164" height="44"/>
-        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#38bdf8);stroke-width:1.5;rx:4" x="383" y="53" width="54" height="144"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="53" y="103" width="164" height="44"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="383" y="53" width="54" height="144"/>
         <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 217,125 C 260,125 280,55 385,55"/>
         <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 410,195 C 410,220 600,220 625,125"/>
         <text class="svg-formula" x="450" y="268">row 2 · col 2</text>
@@ -125,14 +125,6 @@
       <g class="fragment" data-fragment-index="3">
         <rect class="svg-result-box" style="stroke-width:2" x="615" y="105" width="50" height="40"/>
         <text class="svg-num fill-accent" style="font-weight:bold" x="640" y="125">154</text>
-      </g>
-
-      <!-- Fragment 5: Key insight -->
-      <g class="fragment">
-        <rect x="120" y="410" width="660" height="50" rx="10" fill="rgba(56, 189, 248, 0.08)" stroke="var(--color-accent, #38bdf8)" stroke-width="1.5"/>
-        <text style="fill: var(--color-accent, #38bdf8); font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace; font-size: 16px; text-anchor: middle; dominant-baseline: central;" x="450" y="435">
-          4 cells in result = 4 dot products. That's all matmul is!
-        </text>
       </g>
     </svg>
     </div>

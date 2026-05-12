@@ -1,16 +1,16 @@
 :root {
-  --color-bg: #0a0e17;
-  --color-bg-subtle: #111827;
-  --color-text: #e2e8f0;
-  --color-text-muted: #94a3b8;
-  --color-heading: #f1f5f9;
-  --color-accent: #38bdf8;
-  --color-accent-glow: rgba(56, 189, 248, 0.15);
-  --color-code-bg: #1e293b;
-  --color-code-text: #e2e8f0;
-  --color-border: #1e293b;
-  --color-accent-secondary: #818cf8;
-  --color-danger: #ef4444;
+  --color-bg: #FFFFFF;
+  --color-bg-subtle: #F0F4F8;
+  --color-text: #003865;
+  --color-text-muted: #4A6A8A;
+  --color-heading: #003865;
+  --color-accent: #00A3E0;
+  --color-accent-glow: rgba(0, 163, 224, 0.35);
+  --color-code-bg: #F0F4F8;
+  --color-code-text: #003865;
+  --color-border: #C8D8E8;
+  --color-accent-secondary: #6ECFF6;
+  --color-danger: #F04E23;
   --svg-glow-duration: 2.5s;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "SF Mono", "Cascadia Code", "Fira Code", Consolas, "DejaVu Sans Mono", monospace;
@@ -53,10 +53,7 @@ html, body {
   justify-content: flex-start;
   align-items: center;
   padding: clamp(2rem, 4vh, 3.5rem) var(--slide-padding) var(--slide-padding);
-  background:
-    radial-gradient(ellipse at 20% 50%, rgba(56, 189, 248, 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.04) 0%, transparent 50%),
-    var(--color-bg);
+  background: var(--color-bg);
   opacity: 0;
   visibility: hidden;
   transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
@@ -103,7 +100,7 @@ html, body {
 
 .slide.error,
 .error {
-  color: #f87171;
+  color: #F04E23;
   text-align: center;
   font-family: var(--font-mono);
   font-size: 0.9em;
@@ -244,6 +241,7 @@ pre code {
 
 .slide-title h1 {
   font-size: clamp(2.5rem, 5vw, 4rem);
+  color: var(--color-heading);
   background: linear-gradient(135deg, var(--color-heading) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -311,7 +309,7 @@ pre code {
   font-family: var(--font-mono);
   font-size: 0.7em;
   color: var(--color-text-muted);
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 56, 101, 0.06);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -338,7 +336,7 @@ pre code {
 }
 
 .card-accent {
-  background: rgba(56, 189, 248, 0.08);
+  background: rgba(0, 163, 224, 0.08);
   border-color: var(--color-accent);
 }
 
@@ -467,7 +465,7 @@ pre code {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(10, 14, 23, 0.95);
+  background: rgba(240, 244, 248, 0.97);
   backdrop-filter: blur(8px);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -540,20 +538,6 @@ pre code {
 }
 
 @media print {
-  :root {
-    --color-bg: #ffffff;
-    --color-text: #1a1a1a;
-    --color-heading: #000000;
-    --color-accent: #0369a1;
-    --color-code-bg: #f1f5f9;
-    --color-code-text: #1a1a1a;
-    --color-text-muted: #64748b;
-    --color-border: #e2e8f0;
-    --color-bg-subtle: #f8fafc;
-    --color-accent-secondary: #4f46e5;
-    --color-danger: #dc2626;
-  }
-
   html, body {
     height: auto;
     overflow: visible;
