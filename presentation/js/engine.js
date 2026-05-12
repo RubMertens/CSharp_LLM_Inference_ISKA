@@ -256,17 +256,44 @@ class PresentationEngine {
 
     const overview = document.createElement('div');
     overview.className = 'slide-overview';
+    document.body.appendChild(overview);
+
+    const SLIDE_W = 1280;
+    const SLIDE_H = 720;
 
     this.#slides.forEach((slide, i) => {
-      const thumb = document.createElement('button');
-      thumb.className = 'slide-overview-item';
-      if (i === this.#currentIndex) thumb.classList.add('current');
-      thumb.textContent = `${i + 1}. ${slide.title ?? slide.id}`;
-      thumb.addEventListener('click', () => { overview.remove(); this.goTo(i); });
-      overview.appendChild(thumb);
+      const item = document.createElement('div');
+      item.className = 'slide-overview-item';
+      if (i === this.#currentIndex) item.classList.add('current');
+
+      const inner = document.createElement('div');
+      inner.className = 'slide';
+      inner.innerHTML = slide.html;
+
+      inner.querySelectorAll('.speaker-notes').forEach(n => n.hidden = true);
+      inner.querySelectorAll('.fragment').forEach(f => {
+        f.classList.remove('fragment-hidden');
+        f.classList.add('fragment-visible');
+      });
+
+      inner.style.width = `${SLIDE_W}px`;
+      inner.style.height = `${SLIDE_H}px`;
+      inner.style.pointerEvents = 'none';
+
+      item.appendChild(inner);
+      item.addEventListener('click', () => { overview.remove(); this.goTo(i); });
+      overview.appendChild(item);
     });
 
-    document.body.appendChild(overview);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const items = [...overview.querySelectorAll('.slide-overview-item')];
+      const widths = items.map(el => el.getBoundingClientRect().width);
+      items.forEach((el, i) => {
+        el.style.height = `${widths[i] * 9 / 16}px`;
+        const inner = el.querySelector('.slide');
+        if (inner) inner.style.transform = `scale(${widths[i] / SLIDE_W})`;
+      });
+    }));
   }
 }
 
