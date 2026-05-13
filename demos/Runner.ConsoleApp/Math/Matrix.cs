@@ -104,4 +104,12 @@ public class Matrix
         }
         return result;
     }
+
+    public List<Vector> ToRowList()
+    {
+        var list = new List<Vector>(Rows);
+        for (int i = 0; i < Rows; i++)
+            list.Add(new Vector(Data[i], Columns));
+        return list;
+    }
 }

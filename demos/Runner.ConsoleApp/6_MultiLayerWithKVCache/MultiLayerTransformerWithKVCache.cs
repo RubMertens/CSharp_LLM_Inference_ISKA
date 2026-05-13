@@ -3,46 +3,31 @@ using Runner.ConsoleApp.RandomOneLayer;
 
 namespace Runner.ConsoleApp._6_MultiLayerWithKVCache;
 
-public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
+public class MultiLayerTransformerWithKVCache(ModelWeights weights)
 {
-    // KV cache: one list per layer, each Vector is kvDim wide (all KV heads concatenated)
-    private List<Vector>[]? _keyCache;
-    private List<Vector>[]? _valueCache;
-    private int _lastPredictedToken;
+    private readonly List<Vector>[] _keyCache = new List<Vector>[weights.Layers.Length];
+    private readonly List<Vector>[] _valueCache = new List<Vector>[weights.Layers.Length];
 
     // Process the full prompt, populate the cache, return the first predicted token
     public int Prefill(int[] promptTokens)
     {
-        _keyCache = new List<Vector>[Weights.Layers.Length];
-        _valueCache = new List<Vector>[Weights.Layers.Length];
-        
-        for (int i = 0; i < Weights.Layers.Length; i++)
-        {
-            _keyCache[i] = new List<Vector>();
-            _valueCache[i] = new List<Vector>();
-        }
-
         int sequenceLength = promptTokens.Length;
         Matrix embeddings = Embed(promptTokens);
 
 
-        for (int layerIndex = 0; layerIndex < Weights.Layers.Length; layerIndex++)
+        for (int layerIndex = 0; layerIndex < weights.Layers.Length; layerIndex++)
         {
-            LayerWeights layer = Weights.Layers[layerIndex];
+            LayerWeights layer = weights.Layers[layerIndex];
             Matrix residual = embeddings;
 
             Matrix normalizedEmbeddings = RMSNorm(embeddings, layer.AttentionNormWeight);
 
-            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, Weights.HeadDimension);
-            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, Weights.HeadDimension);
+            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, weights.HeadDimension);
+            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, weights.HeadDimension);
             var values = normalizedEmbeddings * layer.ValueProjection;
 
-            // populate the KV cache with all prompt positions
-            for (int t = 0; t < sequenceLength; t++)
-            {
-                _keyCache[layerIndex].Add(keys[t]);
-                _valueCache[layerIndex].Add(values[t]);
-            }
+            _keyCache[layerIndex] = keys.ToRowList();
+            _valueCache[layerIndex] = values.ToRowList();
 
             var attentionOutput = GroupedQueryAttention(sequenceLength, queries, keys, values);
 
@@ -61,40 +46,36 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
             embeddings = residual + feedForwardOutput;
         }
 
-        embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
-        var logits = embeddings * Weights.OutputEmbedding;
+        embeddings = RMSNorm(embeddings, weights.FinalNormWeight);
+        var logits = embeddings * weights.OutputEmbedding;
 
         Vector last = logits[sequenceLength - 1];
         var best = last.Data.Max();
-        _lastPredictedToken = Array.IndexOf(last.Data, best);
-        return _lastPredictedToken;
+        return Array.IndexOf(last.Data, best);
     }
 
-    // Process a single new token using the cached K/V, return the next predicted token
-    public int DecodeNext()
+    public int DecodeNext(int token)
     {
-        Vector embedding = Weights.EmbeddedTokens[_lastPredictedToken];
+        Vector embedding = weights.EmbeddedTokens[token];
 
-        for (int layerIndex = 0; layerIndex < Weights.Layers.Length; layerIndex++)
+        for (int layerIndex = 0; layerIndex < weights.Layers.Length; layerIndex++)
         {
-            var layer = Weights.Layers[layerIndex];
-            var residual = embedding;
+            LayerWeights layer = weights.Layers[layerIndex];
+            Vector residual = embedding;
 
             Vector normalized = RootMeanSquareNormalisation(embedding, layer.AttentionNormWeight);
 
-            // position of this new token = number of tokens already in cache
-            int position = _keyCache![layerIndex].Count;
+            int position = _keyCache[layerIndex].Count;
 
             Vector query = normalized * layer.QueryProjection;
             Vector key = normalized * layer.KeyProjection;
             Vector value = normalized * layer.ValueProjection;
 
-            query = ApplyRoPEToSingleVector(query, Weights.HeadDimension, position);
-            key = ApplyRoPEToSingleVector(key, Weights.HeadDimension, position);
+            query = ApplyRoPETo(query, weights.HeadDimension, position);
+            key = ApplyRoPETo(key, weights.HeadDimension, position);
 
-            // append new K/V to cache before attending (current token attends to itself)
             _keyCache[layerIndex].Add(key);
-            _valueCache![layerIndex].Add(value);
+            _valueCache[layerIndex].Add(value);
 
             Vector attentionOut = GroupedQueryAttentionWithCache(
                 query,
@@ -110,22 +91,21 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
 
             Vector gate = MatVec(normalizedFF, layer.GateProjection);
             Vector up = MatVec(normalizedFF, layer.UpProjection);
-            Vector activatedGate = SiLUSingleVector(gate);
-            Vector gated = VecElementwiseMul(activatedGate, up);
+            Vector activatedGate = SigmoidLinearUnit(gate);
+            Vector gated = activatedGate.ElementwiseMultiply(up);
             Vector ffOut = MatVec(gated, layer.DownProjection);
 
             embedding = residual + ffOut;
         }
 
-        Vector finalNorm = RootMeanSquareNormalisation(embedding, Weights.FinalNormWeight);
-        Vector logits = MatVec(finalNorm, Weights.OutputEmbedding);
+        Vector finalNorm = RootMeanSquareNormalisation(embedding, weights.FinalNormWeight);
+        Vector logits = MatVec(finalNorm, weights.OutputEmbedding);
 
         float best = logits.Data.Max();
-        _lastPredictedToken = Array.IndexOf(logits.Data, best);
-        return _lastPredictedToken;
+        return Array.IndexOf(logits.Data, best);
     }
 
-    
+
     public int PredictNextTokenGreedy(int[] tokens)
     {
         var logits = Forward(tokens);
@@ -140,10 +120,10 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
     {
         var sequenceLength = tokens.Length;
         //translate the tokens to a sequence of embeddings
-        Matrix embeddings = new(sequenceLength, Weights.HiddenDimension);
+        Matrix embeddings = new(sequenceLength, weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
-            embeddings[row] = Weights.EmbeddedTokens[tokens[row]];
+            embeddings[row] = weights.EmbeddedTokens[tokens[row]];
         }
 
         return embeddings;
@@ -157,7 +137,7 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
         Matrix embeddings = Embed(tokens);
 
 
-        foreach (var layer in Weights.Layers)
+        foreach (var layer in weights.Layers)
         {
             var residual = embeddings;
 
@@ -168,9 +148,9 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
             // Q is sequenceLength x hiddenDim (all query heads concatenated)
             // K and V are sequenceLength x keyValueDim (fewer heads than Q — this is the GQA optimization)
             // So sequenceLength x hiddenDim * hiddenDim x hiddenDim = sequenceLength x hiddenDim
-            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, Weights.HeadDimension);
+            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, weights.HeadDimension);
             //and sequenceLength x hiddenDim * hiddenDim x keyValueDim = sequenceLength x keyValueDim
-            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, Weights.HeadDimension);
+            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, weights.HeadDimension);
             var values = normalizedEmbeddings * layer.ValueProjection;
 
             // grouped query attention: multiple query heads share the same K/V head
@@ -193,8 +173,8 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
             embeddings = residual + feedForwardOutput;
         }
 
-        embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
-        var logits = embeddings * Weights.OutputEmbedding;
+        embeddings = RMSNorm(embeddings, weights.FinalNormWeight);
+        var logits = embeddings * weights.OutputEmbedding;
         return logits;
     }
 
@@ -204,52 +184,30 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
     // the theta formula uses headDimension, not the full concatenated width.
     private static Matrix ApplyRoPETo(Matrix matrix, int headDimension)
     {
-        int sequenceLength = matrix.Rows;
-        int totalDimension = matrix.Columns;
-
         Matrix result = new(matrix.Rows, matrix.Columns);
-        for (int position = 0; position < sequenceLength; position++)
+        for (int position = 0; position < matrix.Rows; position++)
         {
-            // rotate pairs within each head independently
-            for (int headStart = 0; headStart < totalDimension; headStart += headDimension)
-            {
-                for (int j = 0; j < headDimension; j += 2)
-                {
-                    var x1 = matrix[position][headStart + j];
-                    var x2 = matrix[position][headStart + j + 1];
-
-                    //"low" dimensions rotate fast -> 0 / dimension = small exponent -> 10000^small = close to 1 -> 1/1 = large theta -> fast rotation
-                    //"high" dimensions rotate slower -> j / dimension = large exponent -> 10000^large = huge number -> 1/huge = tiny theta -> slow rotation
-                    var theta = 1.0F / MathF.Pow(10000.0F, (float)j / headDimension);
-
-                    //change the angle for the pair based on the position in the sequence
-                    var angle = position * theta;
-                    var cos = MathF.Cos(angle);
-                    var sin = MathF.Sin(angle);
-
-                    result[position][headStart + j] = x1 * cos - x2 * sin;
-                    result[position][headStart + j + 1] = x1 * sin + x2 * cos;
-                }
-            }
+            result[position] = ApplyRoPETo(matrix[position], headDimension, position);
         }
 
         return result;
     }
+
     // Grouped Query Attention: each KV head is shared by a group of query heads.
     // With 32 query heads and 4 KV heads, every 8 query heads attend against the same key/value head.
     // This saves memory and compute on K/V projections while keeping Q expressive.
     private Matrix GroupedQueryAttention(int sequenceLength, Matrix queries, Matrix keys, Matrix values)
     {
-        Matrix output = new(sequenceLength, Weights.HiddenDimension);
+        Matrix output = new(sequenceLength, weights.HiddenDimension);
 
-        var groupSize = Weights.NumberdOfQueryHeads / Weights.NumberOfKeyValueHeads;
-        float scale = MathF.Sqrt(Weights.HeadDimension);
+        var groupSize = weights.NumberdOfQueryHeads / weights.NumberOfKeyValueHeads;
+        float scale = MathF.Sqrt(weights.HeadDimension);
 
-        for (int queryHead = 0; queryHead < Weights.NumberdOfQueryHeads; queryHead++)
+        for (int queryHead = 0; queryHead < weights.NumberdOfQueryHeads; queryHead++)
         {
             var keyValueHead = queryHead / groupSize;
-            var queryOffset = queryHead * Weights.HeadDimension;
-            var keyValueOffset = keyValueHead * Weights.HeadDimension;
+            var queryOffset = queryHead * weights.HeadDimension;
+            var keyValueOffset = keyValueHead * weights.HeadDimension;
 
 
             for (int lookingFrom = 0; lookingFrom < sequenceLength; lookingFrom++)
@@ -264,20 +222,20 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
                     }
 
                     var queryVector = queries[lookingFrom]
-                        [queryOffset..(queryOffset + Weights.HeadDimension)];
+                        [queryOffset..(queryOffset + weights.HeadDimension)];
                     var keyVector = keys[lookingTo]
-                        [keyValueOffset..(keyValueOffset + Weights.HeadDimension)];
+                        [keyValueOffset..(keyValueOffset + weights.HeadDimension)];
 
                     scores[lookingTo] = queryVector * keyVector / scale;
                 }
 
                 var attentionWeights = Softmax(scores);
 
-                Vector outputVector = new(Weights.HeadDimension);
+                Vector outputVector = new(weights.HeadDimension);
                 for (int j = 0; j < sequenceLength; j++)
                 {
                     var valueVector = values[j]
-                        [keyValueOffset..(keyValueOffset + Weights.HeadDimension)];
+                        [keyValueOffset..(keyValueOffset + weights.HeadDimension)];
                     outputVector += attentionWeights[j] * valueVector;
                 }
 
@@ -287,6 +245,7 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
                 }
             }
         }
+
         return output;
     }
 
@@ -294,15 +253,9 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
     public static Matrix SigmoidLinearUnit(Matrix input)
     {
         Matrix result = new(input.Rows, input.Columns);
-
         for (int row = 0; row < input.Rows; row++)
         {
-            for (int i = 0; i < input.Columns; i++)
-            {
-                float x = input[row][i];
-                float sigmoid = 1 / (1 + MathF.Exp(-x));
-                result[row][i] = x * sigmoid;
-            }
+            result[row] = SigmoidLinearUnit(input[row]);
         }
 
         return result;
@@ -350,12 +303,7 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
         return new(exp.Select(x => x / sum).ToArray(), input.Length);
     }
 
-    // ──────────────────────────────────────────────────────────────────
-    // New helpers for single-token decode path
-    // ──────────────────────────────────────────────────────────────────
-
-    // Same RoPE rotation as ApplyRoPETo, but for a single vector at a known absolute position
-    private static Vector ApplyRoPEToSingleVector(Vector v, int headDimension, int position)
+    private static Vector ApplyRoPETo(Vector v, int headDimension, int position)
     {
         int totalDimension = v.Length;
         Vector result = new(totalDimension);
@@ -376,6 +324,7 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
                 result[headStart + j + 1] = x1 * sin + x2 * cos;
             }
         }
+
         return result;
     }
 
@@ -387,61 +336,55 @@ public class MultiLayerTransformerWithKVCache(ModelWeights Weights)
         List<Vector> cachedValues)
     {
         int cacheLength = cachedKeys.Count;
-        Vector output = new(Weights.HiddenDimension);
+        Vector output = new(weights.HiddenDimension);
 
-        var groupSize = Weights.NumberdOfQueryHeads / Weights.NumberOfKeyValueHeads;
-        float scale = MathF.Sqrt(Weights.HeadDimension);
+        var groupSize = weights.NumberdOfQueryHeads / weights.NumberOfKeyValueHeads;
+        float scale = MathF.Sqrt(weights.HeadDimension);
 
-        for (int queryHead = 0; queryHead < Weights.NumberdOfQueryHeads; queryHead++)
+        for (int queryHead = 0; queryHead < weights.NumberdOfQueryHeads; queryHead++)
         {
             var keyValueHead = queryHead / groupSize;
-            var queryOffset = queryHead * Weights.HeadDimension;
-            var keyValueOffset = keyValueHead * Weights.HeadDimension;
+            var queryOffset = queryHead * weights.HeadDimension;
+            var keyValueOffset = keyValueHead * weights.HeadDimension;
 
-            var q = queryRow[queryOffset..(queryOffset + Weights.HeadDimension)];
+            var q = queryRow[queryOffset..(queryOffset + weights.HeadDimension)];
 
             Vector scores = new(cacheLength);
             for (int t = 0; t < cacheLength; t++)
             {
-                var k = cachedKeys[t][keyValueOffset..(keyValueOffset + Weights.HeadDimension)];
+                var k = cachedKeys[t][keyValueOffset..(keyValueOffset + weights.HeadDimension)];
                 scores[t] = q * k / scale;
             }
 
             var attentionWeights = Softmax(scores);
 
-            Vector headOutput = new(Weights.HeadDimension);
+            Vector headOutput = new(weights.HeadDimension);
             for (int t = 0; t < cacheLength; t++)
             {
-                var v = cachedValues[t][keyValueOffset..(keyValueOffset + Weights.HeadDimension)];
+                var v = cachedValues[t][keyValueOffset..(keyValueOffset + weights.HeadDimension)];
                 headOutput += attentionWeights[t] * v;
             }
 
-            for (int j = 0; j < Weights.HeadDimension; j++)
+            for (int j = 0; j < weights.HeadDimension; j++)
                 output[queryOffset + j] = headOutput[j];
         }
 
         return output;
     }
 
-    private static Vector SiLUSingleVector(Vector v)
+    public static Vector SigmoidLinearUnit(Vector input)
     {
-        Vector result = new(v.Length);
-        for (int i = 0; i < v.Length; i++)
+        Vector result = new(input.Length);
+        for (int i = 0; i < input.Length; i++)
         {
-            float x = v[i];
+            float x = input[i];
             float sigmoid = 1 / (1 + MathF.Exp(-x));
             result[i] = x * sigmoid;
         }
+
         return result;
     }
 
-    private static Vector VecElementwiseMul(Vector a, Vector b)
-    {
-        Vector result = new(a.Length);
-        for (int i = 0; i < a.Length; i++)
-            result[i] = a[i] * b[i];
-        return result;
-    }
 
     private static Vector MatVec(Vector v, Matrix m) => v * m;
 }

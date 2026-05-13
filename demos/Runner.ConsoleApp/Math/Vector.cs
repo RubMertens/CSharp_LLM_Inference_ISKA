@@ -88,6 +88,14 @@ public class Vector
         set => Data[index] = value;
     }
 
+    public Vector ElementwiseMultiply(Vector other)
+    {
+        Vector result = new(Length);
+        for (int i = 0; i < Length; i++)
+            result[i] = Data[i] * other.Data[i];
+        return result;
+    }
+
     public Vector this[Range range]
     {
         get

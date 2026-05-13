@@ -1,14 +1,9 @@
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Net.Security;
-using System.Security.Cryptography;
 using Runner.ConsoleApp.Math;
 using Runner.ConsoleApp.RandomOneLayer;
 
-namespace Runner.ConsoleApp._3_MultiLayer;
+namespace Runner.ConsoleApp._5_MultiLayerWithGQA;
 
-public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights)
+public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights weights)
 {
     public int PredictNextTokenGreedy(int[] tokens)
     {
@@ -24,10 +19,10 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
     {
         var sequenceLength = tokens.Length;
         //translate the tokens to a sequence of embeddings
-        Matrix embeddings = new(sequenceLength, Weights.HiddenDimension);
+        Matrix embeddings = new(sequenceLength, weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
-            embeddings[row] = Weights.EmbeddedTokens[tokens[row]];
+            embeddings[row] = weights.EmbeddedTokens[tokens[row]];
         }
 
         return embeddings;
@@ -41,7 +36,7 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
         Matrix embeddings = Embed(tokens);
 
 
-        foreach (var layer in Weights.Layers)
+        foreach (var layer in weights.Layers)
         {
             var residual = embeddings;
 
@@ -52,9 +47,9 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
             // Q is sequenceLength x hiddenDim (all query heads concatenated)
             // K and V are sequenceLength x keyValueDim (fewer heads than Q — this is the GQA optimization)
             // So sequenceLength x hiddenDim * hiddenDim x hiddenDim = sequenceLength x hiddenDim
-            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, Weights.HeadDimension);
+            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, weights.HeadDimension);
             //and sequenceLength x hiddenDim * hiddenDim x keyValueDim = sequenceLength x keyValueDim
-            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, Weights.HeadDimension);
+            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, weights.HeadDimension);
             var values = normalizedEmbeddings * layer.ValueProjection;
 
             // grouped query attention: multiple query heads share the same K/V head
@@ -77,8 +72,8 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
             embeddings = residual + feedForwardOutput;
         }
 
-        embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
-        var logits = embeddings * Weights.OutputEmbedding;
+        embeddings = RMSNorm(embeddings, weights.FinalNormWeight);
+        var logits = embeddings * weights.OutputEmbedding;
         return logits;
     }
 
@@ -124,16 +119,16 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
     // This saves memory and compute on K/V projections while keeping Q expressive.
     private Matrix GroupedQueryAttention(int sequenceLength, Matrix queries, Matrix keys, Matrix values)
     {
-        Matrix output = new(sequenceLength, Weights.HiddenDimension);
+        Matrix output = new(sequenceLength, weights.HiddenDimension);
 
-        var groupSize = Weights.NumberdOfQueryHeads / Weights.NumberOfKeyValueHeads;
-        float scale = MathF.Sqrt(Weights.HeadDimension);
+        var groupSize = weights.NumberdOfQueryHeads / weights.NumberOfKeyValueHeads;
+        float scale = MathF.Sqrt(weights.HeadDimension);
 
-        for (int queryHead = 0; queryHead < Weights.NumberdOfQueryHeads; queryHead++)
+        for (int queryHead = 0; queryHead < weights.NumberdOfQueryHeads; queryHead++)
         {
             var keyValueHead = queryHead / groupSize;
-            var queryOffset = queryHead * Weights.HeadDimension;
-            var keyValueOffset = keyValueHead * Weights.HeadDimension;
+            var queryOffset = queryHead * weights.HeadDimension;
+            var keyValueOffset = keyValueHead * weights.HeadDimension;
 
 
             for (int lookingFrom = 0; lookingFrom < sequenceLength; lookingFrom++)
@@ -148,20 +143,20 @@ public class MultiLayerTransformerWithGroupedQueryAttention(ModelWeights Weights
                     }
 
                     var queryVector = queries[lookingFrom]
-                        [queryOffset..(queryOffset + Weights.HeadDimension)];
+                        [queryOffset..(queryOffset + weights.HeadDimension)];
                     var keyVector = keys[lookingTo]
-                        [keyValueOffset..(keyValueOffset + Weights.HeadDimension)];
+                        [keyValueOffset..(keyValueOffset + weights.HeadDimension)];
 
                     scores[lookingTo] = queryVector * keyVector / scale;
                 }
 
                 var attentionWeights = Softmax(scores);
 
-                Vector outputVector = new(Weights.HeadDimension);
+                Vector outputVector = new(weights.HeadDimension);
                 for (int j = 0; j < sequenceLength; j++)
                 {
                     var valueVector = values[j]
-                        [keyValueOffset..(keyValueOffset + Weights.HeadDimension)];
+                        [keyValueOffset..(keyValueOffset + weights.HeadDimension)];
                     outputVector += attentionWeights[j] * valueVector;
                 }
 
