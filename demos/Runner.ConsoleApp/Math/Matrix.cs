@@ -68,6 +68,7 @@ public class Matrix
         return result;
     }
 
+
     public static Matrix operator +(Matrix a, Matrix b)
     {
         if (a.Rows != b.Rows || a.Columns != b.Columns)

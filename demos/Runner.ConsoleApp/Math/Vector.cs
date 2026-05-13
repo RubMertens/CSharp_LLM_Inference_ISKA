@@ -64,6 +64,24 @@ public class Vector
 
     public static Vector operator *(float scalar, Vector a) => a * scalar;
 
+    public static Vector operator *(Vector a, Matrix m)
+    {
+        if (a.Length != m.Rows)
+            throw new InvalidOperationException("Incompatible dimensions for vector-matrix multiplication.");
+
+        Vector result = new(m.Columns);
+        for (var j = 0; j < m.Columns; j++)
+        {
+            float sum = 0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                sum += a.Data[i] * m.Data[i][j];
+            }
+            result.Data[j] = sum;
+        }
+        return result;
+    }
+
     public float this[int index]
     {
         get => Data[index];

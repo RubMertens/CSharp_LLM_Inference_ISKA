@@ -12,19 +12,34 @@ public class RandomWeightLoader
 
         var weights = new SingleLayerModelWeights
         {
-            EmbeddedTokens = GenerateRandomMatrix(vocabularySize, hiddenDimension, random),
-            QueryProjection = GenerateRandomMatrix(hiddenDimension, hiddenDimension, random),
-            KeyProjection = GenerateRandomMatrix(hiddenDimension, hiddenDimension, random),
-            ValueProjection = GenerateRandomMatrix(hiddenDimension, hiddenDimension, random),
-            OutputProjection = GenerateRandomMatrix(hiddenDimension, hiddenDimension, random),
-            OutputEmbedding = GenerateRandomMatrix(hiddenDimension, vocabularySize, random)
+            EmbeddedTokens = GenerateRandomMatrix(vocabularySize,
+                hiddenDimension,
+                random),
+            QueryProjection = GenerateRandomMatrix(hiddenDimension,
+                hiddenDimension,
+                random),
+            KeyProjection = GenerateRandomMatrix(hiddenDimension,
+                hiddenDimension,
+                random),
+            ValueProjection = GenerateRandomMatrix(hiddenDimension,
+                hiddenDimension,
+                random),
+            OutputProjection = GenerateRandomMatrix(hiddenDimension,
+                hiddenDimension,
+                random),
+            OutputEmbedding = GenerateRandomMatrix(hiddenDimension,
+                vocabularySize,
+                random),
+            AttentionNormWeight = GenerateRandomVector(hiddenDimension, random),
+            FeedForwardNormWeight = GenerateRandomVector(hiddenDimension, random)
         };
 
 
         return weights;
     }
 
-    public static ModelWeights LoadWeights(int vocabularySize, int hiddenDimension, int numberOfQueryHeads, int numberOfKeyValueHeads, int gateDimension, int numberOfLayers)
+    public static ModelWeights LoadWeights(int vocabularySize, int hiddenDimension, int numberOfQueryHeads,
+        int numberOfKeyValueHeads, int gateDimension, int numberOfLayers)
     {
         var random = new Random();
         int headDimension = hiddenDimension / numberOfQueryHeads;
@@ -77,6 +92,7 @@ public class RandomWeightLoader
                 data[i][j] = (float)(random.NextDouble() * 2 - 1); // Random values between -1 and 1
             }
         }
+
         return new Matrix(data, rows, columns);
     }
 }
