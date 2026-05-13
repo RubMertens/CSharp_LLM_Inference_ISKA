@@ -105,7 +105,7 @@ public class MultiLayerTransformerWithKVCache(ModelWeights weights)
         return Array.IndexOf(logits.Data, best);
     }
 
-
+    
     public int PredictNextTokenGreedy(int[] tokens)
     {
         var logits = Forward(tokens);
@@ -185,14 +185,12 @@ public class MultiLayerTransformerWithKVCache(ModelWeights weights)
     private static Matrix ApplyRoPETo(Matrix matrix, int headDimension)
     {
         Matrix result = new(matrix.Rows, matrix.Columns);
-        for (int position = 0; position < matrix.Rows; position++)
-        {
+        for (int position = 0; position < matrix.Rows; position++){
             result[position] = ApplyRoPETo(matrix[position], headDimension, position);
+            
         }
-
         return result;
     }
-
     // Grouped Query Attention: each KV head is shared by a group of query heads.
     // With 32 query heads and 4 KV heads, every 8 query heads attend against the same key/value head.
     // This saves memory and compute on K/V projections while keeping Q expressive.
@@ -245,7 +243,6 @@ public class MultiLayerTransformerWithKVCache(ModelWeights weights)
                 }
             }
         }
-
         return output;
     }
 
@@ -253,11 +250,8 @@ public class MultiLayerTransformerWithKVCache(ModelWeights weights)
     public static Matrix SigmoidLinearUnit(Matrix input)
     {
         Matrix result = new(input.Rows, input.Columns);
-        for (int row = 0; row < input.Rows; row++)
-        {
-            result[row] = SigmoidLinearUnit(input[row]);
-        }
-
+        for (int row = 0; row < input.Rows; row++){
+            result[row] = SigmoidLinearUnit(input[row]);}
         return result;
     }
 
@@ -324,7 +318,6 @@ public class MultiLayerTransformerWithKVCache(ModelWeights weights)
                 result[headStart + j + 1] = x1 * sin + x2 * cos;
             }
         }
-
         return result;
     }
 
@@ -381,7 +374,6 @@ public class MultiLayerTransformerWithKVCache(ModelWeights weights)
             float sigmoid = 1 / (1 + MathF.Exp(-x));
             result[i] = x * sigmoid;
         }
-
         return result;
     }
 
