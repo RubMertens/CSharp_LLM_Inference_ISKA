@@ -15,7 +15,7 @@ const MIME = {
 function slidesManifest() {
   return JSON.stringify(
     readdirSync(join(ROOT, 'slides'))
-      .filter(f => /^\d{2}-.*\.html$/.test(f))
+      .filter(f => f.endsWith('.html'))
       .sort()
       .map(f => `slides/${f}`)
   );
