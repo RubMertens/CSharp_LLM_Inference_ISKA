@@ -109,16 +109,6 @@ public class MultiLayerTransformerWithKVCache(ModelWeights weights)
     }
 
 
-    public int PredictNextTokenGreedy(int[] tokens)
-    {
-        var logits = Forward(tokens);
-        Vector last = logits[tokens.Length - 1];
-        var best = last.Data.Max();
-        var bestIndex = Array.IndexOf(last.Data, best);
-        return bestIndex;
-    }
-
-
     private Matrix Embed(int[] tokens)
     {
         var sequenceLength = tokens.Length;
@@ -130,55 +120,6 @@ public class MultiLayerTransformerWithKVCache(ModelWeights weights)
         }
 
         return embeddings;
-    }
-
-    public Matrix Forward(int[] tokens)
-    {
-        var sequenceLength = tokens.Length;
-        //translate the tokens to a sequence of embeddings
-
-        Matrix embeddings = Embed(tokens);
-
-
-        foreach (var layer in weights.Layers)
-        {
-            var residual = embeddings;
-
-            // normalize
-            Matrix normalizedEmbeddings = RootMeanSquareNormalisation(embeddings, layer.AttentionNormWeight);
-
-            // project each token into Q, K, V
-            // Q is sequenceLength x hiddenDim (all query heads concatenated)
-            // K and V are sequenceLength x keyValueDim (fewer heads than Q — this is the GQA optimization)
-            // So sequenceLength x hiddenDim * hiddenDim x hiddenDim = sequenceLength x hiddenDim
-            var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, weights.HeadDimension);
-            //and sequenceLength x hiddenDim * hiddenDim x keyValueDim = sequenceLength x keyValueDim
-            var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, weights.HeadDimension);
-            var values = normalizedEmbeddings * layer.ValueProjection;
-
-            // grouped query attention: multiple query heads share the same K/V head
-            var attentionOutput = GroupedQueryAttention(sequenceLength, queries, keys, values);
-
-            var projectedAttention = attentionOutput * layer.OutputProjection;
-
-            embeddings = residual + projectedAttention;
-            residual = embeddings;
-            normalizedEmbeddings = RootMeanSquareNormalisation(embeddings, layer.FeedForwardNormWeight);
-
-            //gate and up projction are larger than hidden dimension, to allow for more complex interactions in the feedforward network
-            Matrix gate = normalizedEmbeddings * layer.GateProjection;
-            Matrix up = normalizedEmbeddings * layer.UpProjection;
-            Matrix activated = SigmoidLinearUnit(gate);
-            Matrix gated = activated.ElementwiseMultiply(up);
-            // brings the dimension back down to hidden dimension so it can be added to the residual and passed to the next layer
-            Matrix feedForwardOutput = gated * layer.DownProjection;
-
-            embeddings = residual + feedForwardOutput;
-        }
-
-        embeddings = RootMeanSquareNormalisation(embeddings, weights.FinalNormWeight);
-        var logits = embeddings * weights.OutputEmbedding;
-        return logits;
     }
 
     // Rotary Position Embedding: encode position by rotating consecutive dimension pairs

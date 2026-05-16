@@ -10,7 +10,8 @@ public class ModelWeights
 
     public int NumberdOfQueryHeads {get;set;}
     public int NumberOfKeyValueHeads {get;set;}
-    public int HeadDimension => HiddenDimension / NumberdOfQueryHeads;
+    public int HeadDimension { get; set; }
+    // public int HeadDimension => HiddenDimension / NumberdOfQueryHeads;
 
     /// <summary>
     /// vocabSize x hiddenDim
@@ -22,7 +23,7 @@ public class ModelWeights
     /// <summary>
     /// hiddenDim x vocabSize
     /// </summary>
-    public required Matrix OutputEmbedding { get; set; }
+    public required Matrix? OutputEmbedding { get; set; }
 
     /// <summary>
     /// hiddenDim

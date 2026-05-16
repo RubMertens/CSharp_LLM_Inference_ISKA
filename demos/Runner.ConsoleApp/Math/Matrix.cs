@@ -112,4 +112,22 @@ public class Matrix
             list.Add(new Vector(Data[i], Columns));
         return list;
     }
+
+    /// <summary>
+    /// returns a new matrix that is the transpose of this matrix (rows and columns swapped).
+    /// Rows x Columns --> Columns x Rows
+    /// </summary>
+    public Matrix Transpose()
+    {
+        Matrix transposed = new Matrix(Columns, Rows);
+        for (var i = 0; i < Rows; i++)
+        {
+            for (var j = 0; j < Columns; j++)
+            {
+                transposed.Data[j][i] = Data[i][j];
+            }
+
+        }
+        return transposed;
+    }     
 }
