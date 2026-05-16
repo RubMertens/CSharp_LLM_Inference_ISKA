@@ -1,10 +1,9 @@
 using Runner.ConsoleApp.Math;
+using Runner.ConsoleApp.RandomOneLayer;
 
-namespace Runner.ConsoleApp.RandomOneLayer;
+namespace Runner.ConsoleApp._1_SingleLayer;
 
-
-
-public class Transformer(SingleLayerModelWeights Weights)
+public class Transformer(SingleLayerModelWeights weights)
 {
 
     public int PredictNextTokenGreedy(int[] tokens)
@@ -20,35 +19,35 @@ public class Transformer(SingleLayerModelWeights Weights)
     {
         var sequenceLength = tokens.Length;
         //translate the tokens to a sequence of embeddings
-        Matrix embeddings = new(sequenceLength, Weights.HiddenDimension);
+        Matrix embeddings = new(sequenceLength, weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
-            embeddings[row] = Weights.EmbeddedTokens[tokens[row]];
+            embeddings[row] = weights.EmbeddedTokens[tokens[row]];
         }
 
         // normalize 
-        Matrix normalizedEmbeddings = new(sequenceLength, Weights.HiddenDimension);
+        Matrix normalizedEmbeddings = new(sequenceLength, weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
-            normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row], Weights.AttentionNormWeight);
+            normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row], weights.AttentionNormWeight);
         }
 
         // project each token into Q, K, V
         // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
-        var queries = normalizedEmbeddings * Weights.QueryProjection;
-        var keys = normalizedEmbeddings * Weights.KeyProjection;
-        var values = normalizedEmbeddings * Weights.ValueProjection;
+        var queries = normalizedEmbeddings * weights.QueryProjection;
+        var keys = normalizedEmbeddings * weights.KeyProjection;
+        var values = normalizedEmbeddings * weights.ValueProjection;
 
-        var attentionOutput = SingleHeadSelfAttention(Weights.HiddenDimension, sequenceLength, queries, keys, values);
+        var attentionOutput = SingleHeadSelfAttention(weights.HiddenDimension, sequenceLength, queries, keys, values);
 
-        var projectedAttention = attentionOutput * Weights.OutputProjection;
+        var projectedAttention = attentionOutput * weights.OutputProjection;
 
-        Matrix hidden = new(sequenceLength, Weights.HiddenDimension);
+        Matrix hidden = new(sequenceLength, weights.HiddenDimension);
         for (int row = 0; row < sequenceLength; row++)
         {
             hidden[row] = embeddings[row] + projectedAttention[row];
         }
-        var logits = hidden * Weights.OutputEmbedding;
+        var logits = hidden * weights.OutputEmbedding;
         return logits;
     }
 
