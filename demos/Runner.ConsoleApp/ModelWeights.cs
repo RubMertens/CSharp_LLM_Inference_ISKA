@@ -22,8 +22,9 @@ public class ModelWeights
 
     /// <summary>
     /// hiddenDim x vocabSize
+    /// Optional: if not provided, we can reuse the EmbeddedTokens for output projection. that is just loaded as a transposed matrix.
     /// </summary>
-    public required Matrix? OutputEmbedding { get; set; }
+    public required Matrix OutputEmbedding { get; set; } 
 
     /// <summary>
     /// hiddenDim
