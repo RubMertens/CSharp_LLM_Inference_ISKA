@@ -21,7 +21,8 @@ public class Vector
             throw new ArgumentException($"Data length {data.Length} does not match specified length {length}.");
         }
         Length = length;
-        Data = data;
+        Data = new float[length];
+        Array.Copy(data, Data, length);
     }
 
     public static float operator *(Vector a, Vector b)

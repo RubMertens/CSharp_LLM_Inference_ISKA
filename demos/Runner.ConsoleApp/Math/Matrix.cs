@@ -43,7 +43,7 @@ public class Matrix
     public Vector this[int row]
     {
         get => new(Data[row], Columns);
-        set => Data[row] = value.Data;
+        set => Array.Copy(value.Data, Data[row], Columns);
     }
 
 
