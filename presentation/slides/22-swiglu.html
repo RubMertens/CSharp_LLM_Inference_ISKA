@@ -1,20 +1,22 @@
 <section data-id="swiglu" data-title="SwiGLU">
-  <div class="slide-content">
-    <h2 style="margin-bottom: 0.3em;"><span class="highlight">SwiGLU</span> Activation</h2>
-    <p style="color: var(--color-text-muted); margin-bottom: 0.3rem; font-size: 0.8em;">The non-linear "thinking" step between attention layers</p>
+  <div class="slide-content" style="display: flex; flex-direction: column; gap: clamp(0.4rem, 1.2vh, 1rem); padding-bottom: 1.5rem;">
+    <div>
+      <h2 style="margin-bottom: 0.2em;"><span class="highlight">SwiGLU</span> Activation</h2>
+      <p style="color: var(--color-text-muted); margin: 0; font-size: clamp(0.95rem, 1.6vw, 1.1em);">The non-linear "thinking" step between attention layers</p>
+    </div>
 
-    <div class="fragment card" style="padding: 0.5rem 0.8rem; margin-bottom: 0.4rem;">
-      <h3 style="font-size: 0.75em; margin-bottom: 0.2rem;">Why do we need activation functions?</h3>
-      <p style="font-size: 0.7em; color: var(--color-text-muted); margin-bottom: 0.15rem;">
+    <div class="fragment card" style="padding: clamp(0.6rem, 1.5vh, 1rem) clamp(1rem, 2vw, 1.4rem); margin: 0;">
+      <h3 style="font-size: clamp(1rem, 1.8vw, 1.3em); margin-bottom: 0.3rem;">Why do we need activation functions?</h3>
+      <p style="font-size: clamp(0.9rem, 1.5vw, 1.05em); color: var(--color-text-muted); margin-bottom: 0.25rem;">
         Without them, stacking layers is pointless — <span class="highlight">N linear layers = 1 linear layer</span>.
       </p>
-      <p style="font-size: 0.7em; color: var(--color-text-muted); margin-bottom: 0;">
+      <p style="font-size: clamp(0.9rem, 1.5vw, 1.05em); color: var(--color-text-muted); margin: 0;">
         Matrix × Matrix × Matrix = just another Matrix. Activation functions break this linearity and let networks learn <span class="highlight">complex patterns</span>.
       </p>
     </div>
 
-    <div class="fragment">
-      <svg class="svg-diagram" viewBox="0 0 800 180" style="width: 100%; max-width: 620px; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+    <div class="fragment svg-fill" style="min-height: 0;">
+      <svg class="svg-diagram" viewBox="0 0 800 180" xmlns="http://www.w3.org/2000/svg">
 
         <!-- Input x -->
         <rect class="svg-box" x="10" y="65" width="70" height="50"/>
@@ -53,19 +55,19 @@
       </svg>
     </div>
 
-    <div class="fragment" style="margin-top: 0.3rem;">
-      <div class="card" style="padding: 0.4rem 0.8rem; text-align: center;">
-        <code style="font-size: 0.85em; color: var(--color-accent);">SwiGLU(x) = Swish(xW₁) ⊙ (xW₂)</code>
-        <p style="font-size: 0.65em; color: var(--color-text-muted); margin-top: 0.2rem; margin-bottom: 0.1rem;">
+    <div class="fragment">
+      <div class="card" style="padding: clamp(0.5rem, 1.2vh, 0.8rem) clamp(1rem, 2vw, 1.4rem); text-align: center;">
+        <code style="font-size: clamp(1rem, 1.8vw, 1.25em); color: var(--color-accent);">SwiGLU(x) = Swish(xW₁) ⊙ (xW₂)</code>
+        <p style="font-size: clamp(0.85rem, 1.4vw, 1em); color: var(--color-text-muted); margin-top: 0.3rem; margin-bottom: 0.1rem;">
           Swish(x) = x × sigmoid(x) — a smooth version of ReLU
         </p>
-        <p style="font-size: 0.65em; color: var(--color-text-muted); margin-top: 0; margin-bottom: 0;">
+        <p style="font-size: clamp(0.85rem, 1.4vw, 1em); color: var(--color-text-muted); margin: 0;">
           ⊙ = element-wise multiplication (the "gating" mechanism)
         </p>
       </div>
     </div>
 
-    <p class="fragment" style="text-align: center; margin-top: 0.3rem; color: var(--color-text-muted); font-size: 0.7em; margin-bottom: 0;">
+    <p class="fragment" style="text-align: center; margin: 0; color: var(--color-text-muted); font-size: clamp(0.85rem, 1.4vw, 1em);">
       The gate learns <span class="highlight">which parts of the signal to keep</span> and which to suppress
     </p>
   </div>

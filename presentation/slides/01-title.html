@@ -1,5 +1,716 @@
 <section data-id="title" data-title="Title">
-  <div class="slide-title">
-    <h1>Building an LLM Inference Runner</h1>
+  <!-- dark hero backdrop so neon pops against the otherwise-light deck -->
+  <div class="title-backdrop"></div>
+  <!-- slow rotating conic gradient wash -->
+  <div class="title-conic-wash"></div>
+
+  <!-- animated SVG turbulence/displacement warp filter (SMIL-driven, no JS) -->
+  <svg class="title-warp-svg" width="0" height="0" aria-hidden="true">
+    <defs>
+      <filter id="title-warp-filter" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" numOctaves="2" seed="7" result="noise"
+                      baseFrequency="0.012 0.02">
+          <animate attributeName="baseFrequency"
+                   dur="18s" repeatCount="indefinite"
+                   values="0.012 0.02; 0.03 0.012; 0.008 0.028; 0.012 0.02"/>
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="noise" xChannelSelector="R" yChannelSelector="G">
+          <animate attributeName="scale"
+                   dur="12s" repeatCount="indefinite"
+                   values="22; 60; 14; 40; 22"/>
+        </feDisplacementMap>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- wavy distortion layer: warped neon caustics driven by the SVG filter -->
+  <div class="title-warp-layer" aria-hidden="true"></div>
+
+  <!-- animated perspective grid floor (now with breathing perspective bend) -->
+  <div class="title-grid"></div>
+  <!-- twinkling starfield -->
+  <div class="title-starfield" aria-hidden="true"></div>
+
+  <!-- moving background glow blobs -->
+  <div class="title-blob title-blob-1"></div>
+  <div class="title-blob title-blob-2"></div>
+  <div class="title-blob title-blob-3"></div>
+  <div class="title-blob title-blob-4"></div>
+  <div class="title-blob title-blob-5"></div>
+
+  <!-- confetti drifting shapes -->
+  <div class="title-confetti" aria-hidden="true">
+    <i class="title-conf c1"></i><i class="title-conf c2"></i><i class="title-conf c3"></i>
+    <i class="title-conf c4"></i><i class="title-conf c5"></i><i class="title-conf c6"></i>
+    <i class="title-conf c7"></i><i class="title-conf c8"></i><i class="title-conf c9"></i>
+    <i class="title-conf c10"></i><i class="title-conf c11"></i><i class="title-conf c12"></i>
+    <i class="title-conf c13"></i><i class="title-conf c14"></i><i class="title-conf c15"></i>
   </div>
+
+  <!-- floating sparkle particle field (dozens) -->
+  <div class="title-sparkles" aria-hidden="true">
+    <span class="title-sparkle" style="left:5%;  top:14%; animation-delay:0s,   0s;   font-size:1.4rem">✨</span>
+    <span class="title-sparkle" style="left:11%; top:62%; animation-delay:1.3s, 0.4s; font-size:1rem">💫</span>
+    <span class="title-sparkle" style="left:17%; top:30%; animation-delay:2.1s, 1.1s; font-size:1.8rem">⭐</span>
+    <span class="title-sparkle" style="left:24%; top:82%; animation-delay:0.6s, 0.9s; font-size:1.2rem">🌟</span>
+    <span class="title-sparkle" style="left:31%; top:20%; animation-delay:3.0s, 1.7s; font-size:1.5rem">💎</span>
+    <span class="title-sparkle" style="left:37%; top:70%; animation-delay:1.8s, 0.2s; font-size:1.1rem">⚡</span>
+    <span class="title-sparkle" style="left:43%; top:8%;  animation-delay:2.6s, 1.4s; font-size:1.6rem">✨</span>
+    <span class="title-sparkle" style="left:49%; top:90%; animation-delay:3.6s, 0.6s; font-size:0.9rem">🔥</span>
+    <span class="title-sparkle" style="left:56%; top:16%; animation-delay:4.2s, 1.9s; font-size:1.3rem">🦄</span>
+    <span class="title-sparkle" style="left:62%; top:74%; animation-delay:0.9s, 0.3s; font-size:1.7rem">🚀</span>
+    <span class="title-sparkle" style="left:68%; top:34%; animation-delay:2.4s, 1.2s; font-size:1.2rem">✨</span>
+    <span class="title-sparkle" style="left:74%; top:64%; animation-delay:1.1s, 0.8s; font-size:1.9rem">🌟</span>
+    <span class="title-sparkle" style="left:80%; top:24%; animation-delay:3.3s, 1.6s; font-size:1rem">💫</span>
+    <span class="title-sparkle" style="left:86%; top:78%; animation-delay:0.4s, 0.1s; font-size:1.5rem">⚡</span>
+    <span class="title-sparkle" style="left:92%; top:46%; animation-delay:2.0s, 1.0s; font-size:1.3rem">💎</span>
+    <span class="title-sparkle" style="left:95%; top:12%; animation-delay:4.0s, 0.5s; font-size:1.1rem">✨</span>
+    <span class="title-sparkle" style="left:3%;  top:42%; animation-delay:1.6s, 1.5s; font-size:1.4rem">🔥</span>
+    <span class="title-sparkle" style="left:9%;  top:88%; animation-delay:2.9s, 0.7s; font-size:1.2rem">🌟</span>
+    <span class="title-sparkle" style="left:28%; top:50%; animation-delay:0.2s, 1.3s; font-size:1rem">💫</span>
+    <span class="title-sparkle" style="left:53%; top:48%; animation-delay:3.8s, 0.4s; font-size:1.6rem">✨</span>
+    <span class="title-sparkle" style="left:71%; top:6%;  animation-delay:1.4s, 1.8s; font-size:1.3rem">🦄</span>
+    <span class="title-sparkle" style="left:88%; top:58%; animation-delay:2.7s, 0.9s; font-size:1.8rem">🚀</span>
+    <span class="title-sparkle" style="left:20%; top:6%;  animation-delay:0.7s, 0.6s; font-size:1.1rem">💎</span>
+    <span class="title-sparkle" style="left:64%; top:92%; animation-delay:3.1s, 1.1s; font-size:1.5rem">⚡</span>
+  </div>
+
+  <!-- flying emojis: traverse the whole viewport on long keyframe paths -->
+  <div class="title-flyers" aria-hidden="true">
+    <span class="title-flyer f1">🚀</span>
+    <span class="title-flyer f2">✨</span>
+    <span class="title-flyer f3">💫</span>
+    <span class="title-flyer f4">⚡</span>
+    <span class="title-flyer f5">🦄</span>
+    <span class="title-flyer f6">🔥</span>
+    <span class="title-flyer f7">🌟</span>
+    <span class="title-flyer f8">💎</span>
+    <span class="title-flyer f9">🤖</span>
+    <span class="title-flyer f10">🧠</span>
+    <span class="title-flyer f11">🚀</span>
+    <span class="title-flyer f12">✨</span>
+    <span class="title-flyer f13">💫</span>
+    <span class="title-flyer f14">🌟</span>
+    <span class="title-flyer f15">🔥</span>
+    <span class="title-flyer f16">🦄</span>
+  </div>
+
+  <div class="slide-title title-stage">
+
+
+    <div class="title-h1-wrap">
+      <h1 class="title-holo" aria-label="Building an LLM Inference Runner">
+        <span class="title-word"><span class="title-ltr" style="--i:0">B</span><span class="title-ltr" style="--i:1">u</span><span class="title-ltr" style="--i:2">i</span><span class="title-ltr" style="--i:3">l</span><span class="title-ltr" style="--i:4">d</span><span class="title-ltr" style="--i:5">i</span><span class="title-ltr" style="--i:6">n</span><span class="title-ltr" style="--i:7">g</span></span>
+        <span class="title-word"><span class="title-ltr" style="--i:8">a</span><span class="title-ltr" style="--i:9">n</span></span>
+        <span class="title-word"><span class="title-ltr" style="--i:10">L</span><span class="title-ltr" style="--i:11">L</span><span class="title-ltr" style="--i:12">M</span></span>
+        <span class="title-word"><span class="title-ltr" style="--i:13">I</span><span class="title-ltr" style="--i:14">n</span><span class="title-ltr" style="--i:15">f</span><span class="title-ltr" style="--i:16">e</span><span class="title-ltr" style="--i:17">r</span><span class="title-ltr" style="--i:18">e</span><span class="title-ltr" style="--i:19">n</span><span class="title-ltr" style="--i:20">c</span><span class="title-ltr" style="--i:21">e</span></span>
+        <span class="title-word"><span class="title-ltr" style="--i:22">R</span><span class="title-ltr" style="--i:23">u</span><span class="title-ltr" style="--i:24">n</span><span class="title-ltr" style="--i:25">n</span><span class="title-ltr" style="--i:26">e</span><span class="title-ltr" style="--i:27">r</span></span>
+      </h1>
+      <!-- emoji orbiting the headline (nested rotate: outer spins, inner counter-spins) -->
+      <span class="title-orbit title-orbit-1"><span class="title-orbit-emoji">🚀</span></span>
+      <span class="title-orbit title-orbit-2"><span class="title-orbit-emoji">✨</span></span>
+      <span class="title-orbit title-orbit-3"><span class="title-orbit-emoji">💫</span></span>
+      <span class="title-orbit title-orbit-4"><span class="title-orbit-emoji">⚡</span></span>
+    </div>
+    <div class="title-underline"></div>
+
+    <div class="title-qr">
+      <div class="title-qr-card">
+        <svg class="title-qr-code" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" shape-rendering="crispEdges" role="img" aria-label="QR code linking to the live presentation"><path fill="#ffffff" d="M0 0h35v35H0z"/><path stroke="#000000" d="M1 1.5h7m3 0h1m4 0h1m2 0h3m2 0h2m1 0h7M1 2.5h1m5 0h1m3 0h1m1 0h1m3 0h1m1 0h1m2 0h2m1 0h1m1 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h1m6 0h1m1 0h1m2 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h1m9 0h1m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h4m3 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h2m1 0h2m1 0h1m1 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 8.5h2m1 0h4m1 0h1m2 0h4M1 9.5h1m1 0h5m3 0h1m3 0h1m3 0h3m1 0h3m1 0h5M3 10.5h2m1 0h1m1 0h2m3 0h2m1 0h1m1 0h1m1 0h1m2 0h2m2 0h2m1 0h3M2 11.5h1m1 0h1m2 0h3m2 0h1m1 0h2m1 0h2m2 0h3m3 0h1m1 0h1m1 0h1m1 0h1M2 12.5h1m1 0h1m1 0h1m1 0h1m2 0h2m1 0h4m1 0h1m7 0h3m1 0h1M2 13.5h1m3 0h2m1 0h1m1 0h2m2 0h3m2 0h1m1 0h2m2 0h1m3 0h1m1 0h2M3 14.5h1m2 0h1m1 0h1m2 0h3m2 0h1m2 0h1m2 0h1m3 0h1m1 0h1m1 0h1m1 0h2M2 15.5h2m3 0h4m1 0h2m1 0h3m1 0h1m3 0h1m1 0h3m2 0h3M3 16.5h2m1 0h1m1 0h1m2 0h3m1 0h2m2 0h1m2 0h2m1 0h3m1 0h3M2 17.5h1m3 0h5m1 0h2m2 0h1m2 0h1m3 0h4m1 0h4m1 0h1M4 18.5h1m1 0h1m4 0h1m1 0h1m1 0h2m3 0h1m3 0h1m2 0h2m1 0h3M1 19.5h3m1 0h5m1 0h4m1 0h2m1 0h1m6 0h4m1 0h2M1 20.5h4m7 0h2m1 0h3m2 0h1m2 0h1m2 0h1m1 0h4M1 21.5h1m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1m5 0h1m2 0h1m7 0h1m2 0h1M1 22.5h1m1 0h1m4 0h2m1 0h2m1 0h1m1 0h3m3 0h2m2 0h1m2 0h2m2 0h1M1 23.5h1m3 0h3m2 0h1m1 0h2m4 0h1m2 0h2m1 0h3m1 0h1m2 0h2M1 24.5h1m1 0h1m2 0h1m1 0h1m2 0h3m1 0h1m1 0h3m1 0h3m1 0h3m1 0h1m3 0h1M1 25.5h1m1 0h1m2 0h3m2 0h1m1 0h1m6 0h2m1 0h10M9 26.5h1m4 0h3m1 0h1m1 0h2m1 0h1m1 0h1m3 0h1m1 0h2M1 27.5h7m2 0h1m1 0h2m2 0h3m2 0h1m2 0h2m1 0h1m1 0h1m1 0h1m1 0h1M1 28.5h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h5m1 0h1m1 0h3m3 0h5M1 29.5h1m1 0h3m1 0h1m1 0h2m2 0h3m1 0h1m3 0h2m2 0h6m2 0h1M1 30.5h1m1 0h3m1 0h1m1 0h1m2 0h3m1 0h1m2 0h1m1 0h3m2 0h1m2 0h1m2 0h1M1 31.5h1m1 0h3m1 0h1m1 0h2m5 0h3m2 0h3m1 0h4m1 0h2M1 32.5h1m5 0h1m2 0h2m1 0h4m5 0h1m1 0h2m1 0h1m1 0h3M1 33.5h7m1 0h2m1 0h1m2 0h4m1 0h1m2 0h3m1 0h2m1 0h3"/></svg>
+      </div>
+      <a class="title-qr-url" href="https://green-water-0a7275003.7.azurestaticapps.net">green-water-0a7275003.7.azurestaticapps.net</a>
+    </div>
+  </div>
+
+  <style>
+    /* ===== dark hero backdrop (covers the light deck bg for this slide) ===== */
+    .title-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(120% 120% at 50% 0%, #1a1040 0%, #0b0a1f 45%, #06060f 100%);
+      pointer-events: none;
+    }
+
+    /* ===== slow rotating conic gradient wash ===== */
+    .title-conic-wash {
+      position: fixed;
+      top: 50%; left: 50%;
+      width: 200vmax; height: 200vmax;
+      margin: -100vmax 0 0 -100vmax;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.22;
+      mix-blend-mode: screen;
+      background: conic-gradient(from 0deg,
+        #ff4d9d, #ff8a3d, #ffe24d, #4dff9d, #38bdf8, #a855f7, #ff4d9d);
+      animation: title-wash-spin 28s linear infinite,
+                 title-wash-hue 14s ease-in-out infinite;
+      will-change: transform, filter;
+    }
+    @keyframes title-wash-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    /* slow hue-rotate pulsing on the conic wash */
+    @keyframes title-wash-hue {
+      0%,100% { filter: hue-rotate(0deg) saturate(1); }
+      50%     { filter: hue-rotate(180deg) saturate(1.6); }
+    }
+
+    /* ===== SVG warp filter host (zero footprint) ===== */
+    .title-warp-svg {
+      position: absolute;
+      width: 0; height: 0;
+      pointer-events: none;
+    }
+
+    /* ===== wavy distortion layer: neon caustics warped by the SVG turbulence filter ===== */
+    .title-warp-layer {
+      position: fixed;
+      inset: -10%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.4;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(40% 60% at 25% 30%, rgba(168,85,247,0.55), transparent 60%),
+        radial-gradient(45% 55% at 75% 65%, rgba(56,189,248,0.5), transparent 60%),
+        radial-gradient(35% 45% at 55% 20%, rgba(255,77,157,0.45), transparent 60%),
+        repeating-linear-gradient(60deg,
+          rgba(168,85,247,0.18) 0 18px, transparent 18px 46px);
+      filter: url(#title-warp-filter) blur(2px);
+      animation: title-warp-shift 24s ease-in-out infinite;
+      will-change: transform, background-position;
+    }
+    @keyframes title-warp-shift {
+      0%,100% { transform: scale(1.05) translate3d(0,0,0); background-position: 0 0; }
+      50%     { transform: scale(1.18) translate3d(-3%, 2%, 0); background-position: 60px -40px; }
+    }
+
+    /* ===== perspective grid floor ===== */
+    .title-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168,85,247,0.35) 1px, transparent 1px);
+      background-size: 48px 48px;
+      -webkit-mask: radial-gradient(120% 80% at 50% 40%, #000 0%, transparent 70%);
+      mask: radial-gradient(120% 80% at 50% 40%, #000 0%, transparent 70%);
+      transform-origin: 50% 100%;
+      animation: title-grid-pan 6s linear infinite,
+                 title-grid-bend 11s ease-in-out infinite;
+      will-change: background-position, transform;
+    }
+    @keyframes title-grid-pan {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 48px, 48px 0; }
+    }
+    /* breathing perspective floor bend + skew wobble warp */
+    @keyframes title-grid-bend {
+      0%,100% { transform: perspective(520px) rotateX(46deg) skewX(0deg)   scale(1.05); }
+      33%     { transform: perspective(520px) rotateX(58deg) skewX(-7deg)  scale(1.15); }
+      66%     { transform: perspective(520px) rotateX(40deg) skewX(7deg)   scale(1.1); }
+    }
+
+    /* ===== twinkling starfield (CSS box-shadow dots) ===== */
+    .title-starfield {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      animation: title-sparkle-twinkle 3.5s ease-in-out infinite;
+    }
+    .title-starfield::before,
+    .title-starfield::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow:
+        40px 60px #fff, 180px 120px #bfe9ff, 320px 40px #fff, 500px 200px #ffd6f3,
+        640px 90px #fff, 760px 260px #d6c7ff, 900px 50px #fff, 1040px 180px #bfe9ff,
+        1180px 100px #fff, 120px 320px #fff, 280px 420px #ffd6f3, 460px 360px #fff,
+        620px 460px #d6c7ff, 820px 400px #fff, 980px 500px #bfe9ff, 1140px 360px #fff,
+        220px 560px #fff, 540px 600px #ffd6f3, 880px 640px #fff, 1100px 600px #d6c7ff;
+      animation: title-star-drift 40s linear infinite;
+      will-change: transform;
+    }
+    .title-starfield::after {
+      transform: translateY(340px) scale(0.7);
+      opacity: 0.7;
+      animation-duration: 55s;
+      animation-direction: reverse;
+    }
+    @keyframes title-star-drift {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-200px); }
+    }
+
+    /* ===== moving radial glow blobs in background ===== */
+    .title-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: 0;
+      will-change: transform;
+    }
+    .title-blob-1 {
+      width: 480px; height: 480px;
+      top: -120px; left: -80px;
+      background: radial-gradient(circle, #ff4d9d 0%, transparent 70%);
+      animation: title-blob-drift-a 18s ease-in-out infinite;
+    }
+    .title-blob-2 {
+      width: 520px; height: 520px;
+      bottom: -160px; right: -120px;
+      background: radial-gradient(circle, #38bdf8 0%, transparent 70%);
+      animation: title-blob-drift-b 22s ease-in-out infinite;
+    }
+    .title-blob-3 {
+      width: 400px; height: 400px;
+      top: 30%; left: 55%;
+      background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+      animation: title-blob-drift-c 26s ease-in-out infinite;
+    }
+    .title-blob-4 {
+      width: 360px; height: 360px;
+      top: 60%; left: 8%;
+      background: radial-gradient(circle, #ffe24d 0%, transparent 70%);
+      animation: title-blob-drift-a 20s ease-in-out infinite reverse;
+    }
+    .title-blob-5 {
+      width: 440px; height: 440px;
+      top: -60px; right: 10%;
+      background: radial-gradient(circle, #4dff9d 0%, transparent 70%);
+      animation: title-blob-drift-c 24s ease-in-out infinite reverse;
+    }
+    @keyframes title-blob-drift-a {
+      0%,100% { transform: translate3d(0,0,0) scale(1); }
+      50%     { transform: translate3d(120px,80px,0) scale(1.25); }
+    }
+    @keyframes title-blob-drift-b {
+      0%,100% { transform: translate3d(0,0,0) scale(1.1); }
+      50%     { transform: translate3d(-140px,-90px,0) scale(0.85); }
+    }
+    @keyframes title-blob-drift-c {
+      0%,100% { transform: translate3d(0,0,0) scale(0.9); }
+      33%     { transform: translate3d(-90px,60px,0) scale(1.3); }
+      66%     { transform: translate3d(70px,-50px,0) scale(1); }
+    }
+
+    /* ===== confetti drifting shapes ===== */
+    .title-confetti {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .title-conf {
+      position: absolute;
+      top: -8%;
+      width: 12px;
+      height: 12px;
+      opacity: 0.9;
+      will-change: transform;
+      animation: title-confetti-fall 9s linear infinite;
+    }
+    .title-conf::before { content: ""; display: block; width: 100%; height: 100%; }
+    .c1  { left: 6%;  background: #ff4d9d; animation-duration: 8s;  animation-delay: 0s;   border-radius: 2px; }
+    .c2  { left: 14%; background: #38bdf8; animation-duration: 11s; animation-delay: 1.2s; border-radius: 50%; }
+    .c3  { left: 22%; background: #ffe24d; animation-duration: 9s;  animation-delay: 2.4s; }
+    .c4  { left: 30%; background: #4dff9d; animation-duration: 12s; animation-delay: 0.6s; border-radius: 50%; }
+    .c5  { left: 38%; background: #a855f7; animation-duration: 10s; animation-delay: 3.1s; border-radius: 2px; }
+    .c6  { left: 46%; background: #ff8a3d; animation-duration: 8.5s;animation-delay: 1.8s; }
+    .c7  { left: 54%; background: #38bdf8; animation-duration: 11.5s;animation-delay: 0.3s;border-radius: 50%; }
+    .c8  { left: 62%; background: #ff4d9d; animation-duration: 9.5s;animation-delay: 2.7s; border-radius: 2px; }
+    .c9  { left: 70%; background: #ffe24d; animation-duration: 10.5s;animation-delay: 1.0s; }
+    .c10 { left: 78%; background: #4dff9d; animation-duration: 8s;  animation-delay: 3.6s; border-radius: 50%; }
+    .c11 { left: 86%; background: #a855f7; animation-duration: 12s; animation-delay: 0.9s; border-radius: 2px; }
+    .c12 { left: 94%; background: #ff8a3d; animation-duration: 9s;  animation-delay: 2.2s; }
+    .c13 { left: 10%; background: #ffe24d; animation-duration: 11s; animation-delay: 4.0s; border-radius: 50%; }
+    .c14 { left: 50%; background: #ff4d9d; animation-duration: 10s; animation-delay: 4.6s; }
+    .c15 { left: 90%; background: #38bdf8; animation-duration: 9.5s;animation-delay: 5.1s; border-radius: 2px; }
+    @keyframes title-confetti-fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      8%   { opacity: 0.9; }
+      100% { transform: translateY(115vh) rotate(720deg); opacity: 0.9; }
+    }
+
+    /* ===== sparkle particle field ===== */
+    .title-sparkles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .title-sparkle {
+      position: absolute;
+      display: inline-block;
+      filter: drop-shadow(0 0 6px rgba(255,255,255,0.7));
+      animation: title-sparkle-float 6s ease-in-out infinite,
+                 title-sparkle-twinkle 2.4s ease-in-out infinite;
+      will-change: transform, opacity;
+    }
+    @keyframes title-sparkle-float {
+      0%,100% { transform: translateY(0) rotate(0deg) scale(1); }
+      50%     { transform: translateY(-26px) rotate(20deg) scale(1.15); }
+    }
+    @keyframes title-sparkle-twinkle {
+      0%,100% { opacity: 0.25; }
+      50%     { opacity: 1; }
+    }
+
+    /* ===== flying emojis: full-viewport fly-bys ===== */
+    .title-flyers {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .title-flyer {
+      position: absolute;
+      top: 0; left: 0;
+      font-size: 2rem;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.55));
+      will-change: transform, opacity;
+      opacity: 0;
+    }
+    /* each flyer rides its own long diagonal/arc path; vary scale + blur for depth */
+    .f1  { animation: title-fly-ltr   17s linear     infinite; animation-delay: 0s;    font-size: 2.4rem; }
+    .f2  { animation: title-fly-rtl   21s linear     infinite; animation-delay: -3s;   font-size: 1.3rem; filter: blur(1px) drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
+    .f3  { animation: title-fly-arc   24s ease-in-out infinite; animation-delay: -8s;  font-size: 1.8rem; }
+    .f4  { animation: title-fly-diag-dn 19s linear   infinite; animation-delay: -5s;   font-size: 2rem; }
+    .f5  { animation: title-fly-diag-up 26s linear   infinite; animation-delay: -12s;  font-size: 2.6rem; }
+    .f6  { animation: title-fly-rtl   15s linear     infinite; animation-delay: -7s;   font-size: 1.6rem; }
+    .f7  { animation: title-fly-ltr   29s linear     infinite; animation-delay: -2s;   font-size: 1.2rem; filter: blur(1.5px) drop-shadow(0 0 5px rgba(255,255,255,0.35)); }
+    .f8  { animation: title-fly-arc   22s ease-in-out infinite; animation-delay: -16s; font-size: 2.1rem; }
+    .f9  { animation: title-fly-diag-dn 27s linear   infinite; animation-delay: -10s;  font-size: 2.3rem; }
+    .f10 { animation: title-fly-diag-up 18s linear   infinite; animation-delay: -1s;   font-size: 2.5rem; }
+    .f11 { animation: title-fly-rtl   30s linear     infinite; animation-delay: -20s;  font-size: 1.4rem; filter: blur(1px) drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
+    .f12 { animation: title-fly-ltr   13s linear     infinite; animation-delay: -6s;   font-size: 2.2rem; }
+    .f13 { animation: title-fly-arc   28s ease-in-out infinite; animation-delay: -4s;  font-size: 1.7rem; }
+    .f14 { animation: title-fly-diag-dn 23s linear   infinite; animation-delay: -14s;  font-size: 1.5rem; filter: blur(1.5px) drop-shadow(0 0 5px rgba(255,255,255,0.35)); }
+    .f15 { animation: title-fly-diag-up 20s linear   infinite; animation-delay: -9s;   font-size: 2rem; }
+    .f16 { animation: title-fly-ltr   25s linear     infinite; animation-delay: -18s;  font-size: 2.7rem; }
+
+    /* left-to-right sweep across mid screen */
+    @keyframes title-fly-ltr {
+      0%   { transform: translate3d(-12vw, 78vh, 0) rotate(0deg) scale(0.8); opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translate3d(112vw, 22vh, 0) rotate(420deg) scale(1.2); opacity: 0; }
+    }
+    /* right-to-left sweep */
+    @keyframes title-fly-rtl {
+      0%   { transform: translate3d(112vw, 30vh, 0) rotate(0deg) scale(1.1); opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translate3d(-12vw, 80vh, 0) rotate(-500deg) scale(0.7); opacity: 0; }
+    }
+    /* big looping arc through the middle */
+    @keyframes title-fly-arc {
+      0%   { transform: translate3d(-10vw, 60vh, 0) rotate(0deg) scale(0.9); opacity: 0; }
+      10%  { opacity: 1; }
+      50%  { transform: translate3d(50vw, 8vh, 0) rotate(220deg) scale(1.3); }
+      90%  { opacity: 1; }
+      100% { transform: translate3d(110vw, 55vh, 0) rotate(420deg) scale(0.8); opacity: 0; }
+    }
+    /* top-left to bottom-right diagonal */
+    @keyframes title-fly-diag-dn {
+      0%   { transform: translate3d(-10vw, -10vh, 0) rotate(0deg) scale(0.8); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translate3d(110vw, 105vh, 0) rotate(540deg) scale(1.25); opacity: 0; }
+    }
+    /* bottom-left to top-right diagonal */
+    @keyframes title-fly-diag-up {
+      0%   { transform: translate3d(-10vw, 108vh, 0) rotate(0deg) scale(1.2); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translate3d(110vw, -12vh, 0) rotate(-540deg) scale(0.75); opacity: 0; }
+    }
+
+    /* ===== headline stage above the chrome ===== */
+    .title-stage {
+      position: relative;
+      z-index: 2;
+      perspective: 800px;
+    }
+
+    /* ===== gratuitous badge chips ===== */
+    .title-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+    .title-badge {
+      font-family: var(--font-mono);
+      font-size: clamp(0.6rem, 1vw, 0.8rem);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      color: #fff;
+      white-space: nowrap;
+      background-size: 300% 100%;
+      animation: title-badge-shift 4s linear infinite,
+                 title-badge-bob 3.2s ease-in-out infinite;
+      will-change: background-position, transform;
+    }
+    .title-badge-a {
+      background: linear-gradient(90deg, #ff4d9d, #a855f7, #38bdf8, #ff4d9d);
+      box-shadow: 0 0 22px rgba(168,85,247,0.8);
+      animation-delay: 0s, 0s;
+    }
+    .title-badge-b {
+      background: linear-gradient(90deg, #ff8a3d, #ffe24d, #ff4d9d, #ff8a3d);
+      box-shadow: 0 0 22px rgba(255,138,61,0.8);
+      animation-delay: 0s, -1s;
+    }
+    .title-badge-c {
+      background: linear-gradient(90deg, #38bdf8, #4dff9d, #a855f7, #38bdf8);
+      box-shadow: 0 0 22px rgba(56,189,248,0.8);
+      animation-delay: 0s, -2s;
+    }
+    @keyframes title-badge-shift {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+    @keyframes title-badge-bob {
+      0%,100% { transform: translateY(0) scale(1); }
+      50%     { transform: translateY(-6px) scale(1.05); }
+    }
+
+    /* ===== holographic animated headline w/ 3D wobble + glow pulse ===== */
+    .title-h1-wrap {
+      position: relative;
+      display: inline-block;
+      padding: 0 2.5rem;
+      transform-style: preserve-3d;
+      animation: title-h1-wobble 7s ease-in-out infinite;
+      will-change: transform;
+    }
+    @keyframes title-h1-wobble {
+      0%,100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+      25%     { transform: translateY(-8px) rotateX(6deg) rotateY(-7deg); }
+      50%     { transform: translateY(-12px) rotateX(0deg) rotateY(0deg); }
+      75%     { transform: translateY(-8px) rotateX(-6deg) rotateY(7deg); }
+    }
+    /* per-letter wave bounce + holographic gradient + glow pulse */
+    .slide-title h1.title-holo {
+      position: relative;
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0 0.35em;
+      background: none;
+      -webkit-text-fill-color: initial;
+      animation: title-holo-glow 2.4s ease-in-out infinite;
+      will-change: filter;
+    }
+    .title-word { display: inline-flex; }
+    .title-ltr {
+      display: inline-block;
+      background: linear-gradient(115deg,
+        #ff4d9d 0%, #ff8a3d 18%, #ffe24d 36%,
+        #4dff9d 54%, #38bdf8 72%, #a855f7 90%, #ff4d9d 100%);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      animation:
+        title-holo-slide 6s linear infinite,
+        title-holo-hue 8s linear infinite,
+        title-ltr-wave 2.2s ease-in-out infinite;
+      animation-delay:
+        calc(var(--i) * -0.12s),
+        calc(var(--i) * -0.1s),
+        calc(var(--i) * 0.08s);
+      will-change: transform, background-position;
+    }
+    @keyframes title-holo-slide {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+    @keyframes title-holo-hue {
+      0%   { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    @keyframes title-ltr-wave {
+      0%,100% { transform: translateY(0) scale(1); }
+      50%     { transform: translateY(-0.16em) scale(1.12); }
+    }
+    @keyframes title-holo-glow {
+      0%,100% { filter: drop-shadow(0 0 14px rgba(168,85,247,0.45)); }
+      50%     { filter: drop-shadow(0 0 30px rgba(56,189,248,0.85)); }
+    }
+
+    /* ===== emoji orbiting the headline: outer span spins, inner counter-spins upright ===== */
+    .title-orbit {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      pointer-events: none;
+      will-change: transform;
+      animation: title-orbit-spin 9s linear infinite;
+    }
+    .title-orbit-emoji {
+      position: absolute;
+      /* push emoji out along the orbit radius (X = horizontal reach, Y = vertical squash for elliptical path) */
+      transform: translate(13em, -3.4em);
+      font-size: 1.9rem;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.6));
+      animation: title-orbit-counter 9s linear infinite,
+                 title-sparkle-twinkle 2.8s ease-in-out infinite;
+      will-change: transform, opacity;
+    }
+    /* four emoji spaced around the ring via quarter-period negative delays (offsets start angle) */
+    .title-orbit-1 { animation-duration: 9s;  animation-delay: 0s; }
+    .title-orbit-2 { animation-duration: 9s;  animation-delay: -2.25s; }
+    .title-orbit-3 { animation-duration: 9s;  animation-delay: -4.5s; }
+    .title-orbit-4 { animation-duration: 9s;  animation-delay: -6.75s; }
+    /* inner emoji counter-spins at the matching period + own twinkle, delay-matched */
+    .title-orbit-1 .title-orbit-emoji { animation-duration: 9s, 2.8s; animation-delay: 0s,     0s; }
+    .title-orbit-2 .title-orbit-emoji { animation-duration: 9s, 2.8s; animation-delay: -2.25s, -0.7s; }
+    .title-orbit-3 .title-orbit-emoji { animation-duration: 9s, 2.8s; animation-delay: -4.5s,  -1.4s; }
+    .title-orbit-4 .title-orbit-emoji { animation-duration: 9s, 2.8s; animation-delay: -6.75s, -2.1s; }
+    @keyframes title-orbit-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    /* counter-rotate so the emoji glyph stays upright while circling */
+    @keyframes title-orbit-counter {
+      from { transform: translate(13em, -3.4em) rotate(0deg); }
+      to   { transform: translate(13em, -3.4em) rotate(-360deg); }
+    }
+
+    /* ===== shimmering animated underline ===== */
+    .title-underline {
+      height: 5px;
+      width: clamp(220px, 36vw, 460px);
+      border-radius: 999px;
+      margin-top: 0.5rem;
+      background: linear-gradient(90deg, transparent, #ff4d9d, #ffe24d, #4dff9d, #38bdf8, #a855f7, transparent);
+      background-size: 200% 100%;
+      box-shadow: 0 0 22px rgba(56,189,248,0.9);
+      animation: title-underline-sweep 3s linear infinite,
+                 title-underline-pulse 2s ease-in-out infinite;
+      will-change: background-position, transform;
+    }
+    @keyframes title-underline-sweep {
+      0%   { background-position: 200% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes title-underline-pulse {
+      0%,100% { transform: scaleX(1); }
+      50%     { transform: scaleX(1.12); }
+    }
+
+    /* ===== QR block ===== */
+    .title-qr {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 2.2rem;
+      animation: title-qr-bob 4.5s ease-in-out infinite;
+      will-change: transform;
+    }
+    @keyframes title-qr-bob {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-10px); }
+    }
+    /* animated conic-gradient border ring around the QR card */
+    .title-qr-card {
+      position: relative;
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 12px;
+      animation: title-qr-pulse 2.6s ease-in-out infinite;
+      will-change: box-shadow;
+    }
+    .title-qr-card::before {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 18px;
+      padding: 8px;
+      background: conic-gradient(from 0deg,
+        #ff4d9d, #ff8a3d, #ffe24d, #4dff9d, #38bdf8, #a855f7, #ff4d9d);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      animation: title-qr-ring-spin 4s linear infinite;
+      z-index: -1;
+      will-change: transform;
+    }
+    /* second outer ring spinning the other way */
+    .title-qr-card::after {
+      content: "";
+      position: absolute;
+      inset: -16px;
+      border-radius: 24px;
+      padding: 3px;
+      background: conic-gradient(from 180deg,
+        #38bdf8, #a855f7, #ff4d9d, #ffe24d, #4dff9d, #38bdf8);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      opacity: 0.8;
+      animation: title-qr-ring-spin 7s linear infinite reverse;
+      z-index: -1;
+      will-change: transform;
+    }
+    @keyframes title-qr-ring-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    /* glow cycles colors around card — does NOT touch the QR pixels */
+    @keyframes title-qr-pulse {
+      0%,100% { box-shadow: 0 0 34px rgba(56,189,248,0.6), 0 0 70px rgba(168,85,247,0.4); }
+      50%     { box-shadow: 0 0 52px rgba(255,77,157,0.8), 0 0 110px rgba(56,189,248,0.55); }
+    }
+    .title-qr-code {
+      display: block;
+      width: clamp(160px, 18vw, 220px);
+      height: clamp(160px, 18vw, 220px);
+    }
+    .title-qr-url {
+      font-family: var(--font-mono);
+      font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      background: linear-gradient(90deg, #38bdf8, #4dff9d, #a855f7, #ff4d9d, #38bdf8);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: title-url-shift 5s linear infinite;
+      will-change: background-position;
+    }
+    @keyframes title-url-shift {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+  </style>
 </section>

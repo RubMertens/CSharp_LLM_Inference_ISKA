@@ -160,6 +160,19 @@ html, body {
   border-radius: 4px;
 }
 
+/* Swipe hint shown only on touch (coarse pointer) devices */
+.nav-hint-swipe {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+@media (pointer: coarse) {
+  .nav-hint kbd { display: none; }
+  .nav-hint-swipe { display: inline-flex; }
+}
+
 h1, h2, h3, h4, h5, h6 {
   color: var(--color-heading);
   font-weight: 700;

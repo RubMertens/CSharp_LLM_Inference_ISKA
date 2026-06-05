@@ -1,36 +1,74 @@
 <section data-id="architecture-simple" data-title="The Simplest Transformer">
   <div class="slide-content">
     <h2>The simplest <span class="highlight">transformer</span></h2>
-    <p style="color: var(--color-text-muted); margin-bottom: 1.5rem;">1 layer, no frills — the core of every LLM</p>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.4rem;">1 layer, no frills — the core of every LLM</p>
 
-    <div class="pipeline">
-      <div class="stage fragment">
-        <strong>Input Tokens</strong>
-        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">[15496, 995, ...]</span>
-      </div>
-      <div class="arrow fragment"></div>
-      <div class="stage fragment">
-        <strong>RMSNorm</strong>
-        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">Normalize activations</span>
-      </div>
-      <div class="arrow fragment"></div>
-      <div class="stage fragment" style="border-color: var(--color-accent);">
-        <strong style="color: var(--color-accent);">Self-Attention</strong>
-        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">Q, K, V + Causal Mask</span>
-      </div>
-      <div class="arrow fragment"></div>
-      <div class="stage fragment">
-        <strong>Feed Forward</strong>
-        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">SwiGLU activation</span>
-      </div>
-      <div class="arrow fragment"></div>
-      <div class="stage fragment">
-        <strong>Output</strong>
-        <span style="color: var(--color-text-muted); font-size: 0.8em; display: block;">Logits &rarr; next token</span>
-      </div>
+    <div class="svg-fill">
+      <svg class="svg-diagram" viewBox="0 0 1064 420" xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="xMidYMid meet">
+
+        <!-- Stage 1: Input Tokens -->
+        <g class="fragment" data-fragment-index="0">
+          <rect class="svg-box" x="20" y="90" width="160" height="240" rx="14" />
+          <text class="svg-text-lg" x="100" y="200" style="font-weight:bold">Input Tokens</text>
+          <text class="svg-sublabel" x="100" y="235">[15496, 995, ...]</text>
+        </g>
+
+        <!-- Arrow 1 -->
+        <g class="fragment" data-fragment-index="1">
+          <line class="svg-connector" x1="184" y1="210" x2="218" y2="210" />
+          <path class="fill-accent" d="M 216,202 L 233,210 L 216,218 Z" />
+        </g>
+
+        <!-- Stage 2: RMSNorm -->
+        <g class="fragment" data-fragment-index="1">
+          <rect class="svg-box" x="236" y="90" width="160" height="240" rx="14" />
+          <text class="svg-text-lg" x="316" y="200" style="font-weight:bold">RMSNorm</text>
+          <text class="svg-sublabel" x="316" y="235">Normalize activations</text>
+        </g>
+
+        <!-- Arrow 2 -->
+        <g class="fragment" data-fragment-index="2">
+          <line class="svg-connector" x1="400" y1="210" x2="434" y2="210" />
+          <path class="fill-accent" d="M 432,202 L 449,210 L 432,218 Z" />
+        </g>
+
+        <!-- Stage 3: Self-Attention (accent) -->
+        <g class="fragment" data-fragment-index="2">
+          <rect class="svg-accent-box" x="452" y="90" width="160" height="240" rx="14" stroke-width="2.5" />
+          <text class="svg-text-lg fill-accent" x="532" y="200" style="font-weight:bold">Self-Attention</text>
+          <text class="svg-sublabel" x="532" y="235">Q, K, V + Causal Mask</text>
+        </g>
+
+        <!-- Arrow 3 -->
+        <g class="fragment" data-fragment-index="3">
+          <line class="svg-connector" x1="616" y1="210" x2="650" y2="210" />
+          <path class="fill-accent" d="M 648,202 L 665,210 L 648,218 Z" />
+        </g>
+
+        <!-- Stage 4: Feed Forward -->
+        <g class="fragment" data-fragment-index="3">
+          <rect class="svg-box" x="668" y="90" width="160" height="240" rx="14" />
+          <text class="svg-text-lg" x="748" y="200" style="font-weight:bold">Feed Forward</text>
+          <text class="svg-sublabel" x="748" y="235">SwiGLU activation</text>
+        </g>
+
+        <!-- Arrow 4 -->
+        <g class="fragment" data-fragment-index="4">
+          <line class="svg-connector" x1="832" y1="210" x2="866" y2="210" />
+          <path class="fill-accent" d="M 864,202 L 881,210 L 864,218 Z" />
+        </g>
+
+        <!-- Stage 5: Output -->
+        <g class="fragment" data-fragment-index="4">
+          <rect class="svg-box" x="884" y="90" width="160" height="240" rx="14" />
+          <text class="svg-text-lg" x="964" y="200" style="font-weight:bold">Output</text>
+          <text class="svg-sublabel" x="964" y="235">Logits &rarr; next token</text>
+        </g>
+      </svg>
     </div>
 
-    <p class="fragment" style="text-align: center; margin-top: 1.5rem; color: var(--color-text-muted); font-size: 0.85em;">
+    <p class="fragment" data-fragment-index="5" style="text-align: center; margin-top: 0.4rem; color: var(--color-text-muted); font-size: 0.85em;">
       Real models repeat the middle steps <span class="highlight">32&times;</span> or more — but the structure is identical.
     </p>
   </div>

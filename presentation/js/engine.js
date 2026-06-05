@@ -7,6 +7,9 @@ class PresentationEngine {
   #progressBar = null;
   #slideCounter = null;
   #wheelCooldown = false;
+  #touchStartX = 0;
+  #touchStartY = 0;
+  #touchTracking = false;
 
   async init() {
     this.#container = document.getElementById('presentation');
@@ -28,6 +31,7 @@ class PresentationEngine {
 
     this.#bindKeys();
     this.#bindWheel();
+    this.#bindTouch();
     this.#bindHash();
 
     const hash = location.hash.slice(1);
@@ -238,6 +242,37 @@ class PresentationEngine {
       if (e.deltaY > 0) this.next();
       else if (e.deltaY < 0) this.prev();
     }, { passive: false });
+  }
+
+  #bindTouch() {
+    const SWIPE_THRESHOLD = 50;   // min horizontal distance (px) to count as swipe
+    const HORIZONTAL_RATIO = 1.5; // horizontal travel must dominate vertical
+
+    document.addEventListener('touchstart', (e) => {
+      // Ignore multi-touch (pinch/zoom) and swipes while overview is open
+      if (e.touches.length !== 1 || document.querySelector('.slide-overview')) {
+        this.#touchTracking = false;
+        return;
+      }
+      this.#touchTracking = true;
+      this.#touchStartX = e.touches[0].clientX;
+      this.#touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      if (!this.#touchTracking) return;
+      this.#touchTracking = false;
+
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - this.#touchStartX;
+      const dy = touch.clientY - this.#touchStartY;
+
+      if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+      if (Math.abs(dx) < Math.abs(dy) * HORIZONTAL_RATIO) return; // mostly vertical, let it scroll
+
+      if (dx < 0) this.next();  // swipe left → forward
+      else this.prev();         // swipe right → back
+    }, { passive: true });
   }
 
   #bindHash() {
