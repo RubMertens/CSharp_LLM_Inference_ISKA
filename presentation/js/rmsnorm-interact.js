@@ -1,14 +1,13 @@
+import { makeDraggable, el } from './interactions.js';
+
+/* ── Numeric table slide (rms-*) ──────────────────────── */
 (function () {
   const N = 4;
   const WEIGHTS = [1.0, 0.5, 2.0, 1.0];
   const x = [2, 3, 1, 4];
 
-  let dragging = null;
   let dragStartY = 0;
   let dragStartVal = 0;
-  let svg = null;
-
-  function el(id) { return document.getElementById(id); }
 
   function fmt(v, d) { return v.toFixed(d === undefined ? 2 : d); }
 
@@ -51,48 +50,21 @@
     if (scaleEl) scaleEl.textContent = fmt(scale);
   }
 
-  function clientToSVG(svgEl, clientX, clientY) {
-    var pt = svgEl.createSVGPoint();
-    pt.x = clientX;
-    pt.y = clientY;
-    return pt.matrixTransform(svgEl.getScreenCTM().inverse());
-  }
-
-  function hitIndex(target) {
-    if (!target || !target.id) return -1;
-    var m = target.id.match(/^rms-hit(\d)$/);
-    return m ? parseInt(m[1], 10) : -1;
-  }
-
-  document.addEventListener('pointerdown', function (e) {
-    var idx = hitIndex(e.target);
-    if (idx < 0) return;
-    e.preventDefault();
-    e.stopPropagation();
-    dragging = idx;
-    svg = e.target.closest('svg');
-    dragStartY = clientToSVG(svg, e.clientX, e.clientY).y;
-    dragStartVal = x[idx];
-    document.body.style.cursor = 'ns-resize';
-  });
-
-  document.addEventListener('pointermove', function (e) {
-    if (dragging === null || !svg) return;
-    e.preventDefault();
-    var pt = clientToSVG(svg, e.clientX, e.clientY);
-    var dy = dragStartY - pt.y;
-    var newVal = dragStartVal + dy / 25;
-    newVal = Math.round(newVal * 10) / 10;
-    newVal = Math.max(-9, Math.min(9, newVal));
-    x[dragging] = newVal;
-    update();
-  });
-
-  document.addEventListener('pointerup', function () {
-    if (dragging === null) return;
-    dragging = null;
-    document.body.style.cursor = '';
-    svg = null;
+  makeDraggable({
+    hit: /^rms-hit(\d)$/,
+    cursor: 'ns-resize',
+    onStart({ index, point }) {
+      dragStartY = point.y;
+      dragStartVal = x[index];
+    },
+    onDrag({ index, point }) {
+      const dy = dragStartY - point.y;
+      let newVal = dragStartVal + dy / 25;
+      newVal = Math.round(newVal * 10) / 10;
+      newVal = Math.max(-9, Math.min(9, newVal));
+      x[index] = newVal;
+      update();
+    },
   });
 })();
 
@@ -109,11 +81,9 @@
   var IC = [127, 212, 297, 382];
   var OX = [700, 785, 870, 955];
   var OC = [732, 817, 902, 987];
-  var BAR_W = 65;
 
-  var dragging = null, dragStartY = 0, dragStartVal = 0, svg = null;
+  var dragStartY = 0, dragStartVal = 0;
 
-  function el(id) { return document.getElementById(id); }
   function fmt(v) { return Math.abs(v) < 10 ? v.toFixed(2) : v.toFixed(1); }
   function fmtIn(v) { return v % 1 === 0 ? String(v) : v.toFixed(1); }
 
@@ -159,40 +129,20 @@
     if (rmsLabel) rmsLabel.setAttribute('y', BASELINE - Math.min(rms * IN_SCALE, MAX_H));
   }
 
-  function clientToSVG(svgEl, cx, cy) {
-    var pt = svgEl.createSVGPoint();
-    pt.x = cx; pt.y = cy;
-    return pt.matrixTransform(svgEl.getScreenCTM().inverse());
-  }
-
-  document.addEventListener('pointerdown', function (e) {
-    if (!e.target || !e.target.id) return;
-    var m = e.target.id.match(/^rmsv-hit(\d)$/);
-    if (!m) return;
-    e.preventDefault(); e.stopPropagation();
-    dragging = parseInt(m[1], 10);
-    svg = e.target.closest('svg');
-    dragStartY = clientToSVG(svg, e.clientX, e.clientY).y;
-    dragStartVal = x[dragging];
-    document.body.style.cursor = 'ns-resize';
-  });
-
-  document.addEventListener('pointermove', function (e) {
-    if (dragging === null || !svg) return;
-    e.preventDefault();
-    var pt = clientToSVG(svg, e.clientX, e.clientY);
-    var dy = dragStartY - pt.y;
-    var newVal = dragStartVal + dy / 18;
-    newVal = Math.round(newVal * 10) / 10;
-    newVal = Math.max(0.1, Math.min(9, newVal));
-    x[dragging] = newVal;
-    update();
-  });
-
-  document.addEventListener('pointerup', function () {
-    if (dragging === null) return;
-    dragging = null;
-    document.body.style.cursor = '';
-    svg = null;
+  makeDraggable({
+    hit: /^rmsv-hit(\d)$/,
+    cursor: 'ns-resize',
+    onStart: function (ctx) {
+      dragStartY = ctx.point.y;
+      dragStartVal = x[ctx.index];
+    },
+    onDrag: function (ctx) {
+      var dy = dragStartY - ctx.point.y;
+      var newVal = dragStartVal + dy / 18;
+      newVal = Math.round(newVal * 10) / 10;
+      newVal = Math.max(0.1, Math.min(9, newVal));
+      x[ctx.index] = newVal;
+      update();
+    },
   });
 })();

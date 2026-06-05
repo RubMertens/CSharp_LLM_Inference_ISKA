@@ -1,0 +1,64 @@
+<section data-id="dot-product-geometric" data-title="Dot Product: Geometry">
+  <div class="slide-content">
+    <h2>Dot Product: <span class="highlight">Geometry</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.6rem;">That number 19 measures alignment — how much one vector points along the other. Drag <span style="color: var(--color-accent);">b</span>.</p>
+
+    <svg id="dp-svg" class="svg-diagram" viewBox="0 0 760 460" style="max-height: 68vh; width: auto; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Axes -->
+      <line class="svg-axis" x1="40" y1="250" x2="470" y2="250"/>
+      <line class="svg-axis" x1="250" y1="40" x2="250" y2="440"/>
+      <text class="svg-text" style="font-size: 14px; fill: var(--color-text-muted);" x="478" y="250">x</text>
+      <text class="svg-text" style="font-size: 14px; fill: var(--color-text-muted);" x="250" y="32">y</text>
+
+      <!-- Fixed vector a (muted), pointing right along +x. |a| = LEN = 130 -->
+      <line id="dp-vec-a" class="svg-vec" x1="250" y1="250" x2="380" y2="250" stroke="var(--color-text-muted, #4A6A8A)"/>
+      <text class="svg-text" style="font-size: 16px; font-weight: bold; fill: var(--color-text-muted);" x="396" y="238">a</text>
+
+      <!-- Projection drop: perpendicular from b's tip onto a's direction (x-axis) -->
+      <line id="dp-proj-drop" class="svg-proj" x1="341.9" y1="158.1" x2="341.9" y2="250" stroke="var(--color-accent-secondary, #6ECFF6)" opacity="0.8"/>
+
+      <!-- Projection segment of b onto a (highlighted, along a's line) -->
+      <line id="dp-proj-seg" x1="250" y1="250" x2="341.9" y2="250" stroke="var(--color-accent-secondary, #6ECFF6)" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+      <text id="dp-proj-label" class="svg-text-sm" style="fill: var(--color-accent-secondary, #6ECFF6);" x="296" y="270">proj</text>
+
+      <!-- θ arc between a and b -->
+      <path id="dp-arc" class="svg-arc" d="M 310.0,250.0 A 60,60 0 0,0 292.4,207.6" stroke="var(--color-accent, #00A3E0)"/>
+      <text id="dp-theta" class="svg-text" style="font-size: 15px; fill: var(--color-accent);" x="327.6" y="217.9">θ = 45°</text>
+
+      <!-- Draggable vector b (accent) -->
+      <line id="dp-vec-b" class="svg-vec" x1="250" y1="250" x2="341.9" y2="158.1" stroke="var(--color-accent, #00A3E0)"/>
+      <text id="dp-b-label" class="svg-text" style="font-size: 16px; font-weight: bold; fill: var(--color-accent);" x="359.9" y="146.1">b</text>
+
+      <!-- Visible dot + larger invisible hit target on b's tip -->
+      <circle id="dp-drag-dot" cx="341.9" cy="158.1" fill="var(--color-accent, #00A3E0)" style="cursor: grab; r: 10;"/>
+      <circle id="dp-drag-hit" cx="341.9" cy="158.1" style="cursor: grab; fill: transparent; r: 26; pointer-events: all;"/>
+
+      <!-- Readout panel (right side) -->
+      <text class="svg-muted" style="font-size: 13px;" x="615" y="70" text-anchor="middle">a · b</text>
+      <rect id="dp-result-box" class="svg-result-box" x="520" y="85" width="190" height="78" rx="10"
+            fill="rgba(0,163,224,0.08)" stroke="var(--color-accent, #00A3E0)" stroke-width="2.5"/>
+      <text id="dp-result" class="svg-num" style="font-size: 38px; font-weight: bold; fill: var(--color-accent);" x="615" y="125" text-anchor="middle">+0.71</text>
+      <text id="dp-sign-tag" class="svg-text-sm" style="font-size: 12px; fill: var(--color-accent);" x="615" y="150" text-anchor="middle">same direction</text>
+
+      <!-- Breakdown: |a||b|cos θ -->
+      <text id="dp-breakdown" class="svg-text" style="font-size: 14px; fill: var(--color-text-muted);" x="615" y="200" text-anchor="middle">|a|·|b|·cos(45°)</text>
+      <text id="dp-breakdown-nums" class="svg-text-sm" style="font-size: 13px; fill: var(--color-text-muted);" x="615" y="224" text-anchor="middle">1.00 · 1.00 · 0.71</text>
+
+      <!-- Sign scale: positive / zero / negative cue -->
+      <text class="svg-text-sm" style="font-size: 11px; fill: var(--color-text-muted);" x="615" y="280" text-anchor="middle">aligned → 0 → opposed</text>
+      <line x1="525" y1="298" x2="705" y2="298" stroke="var(--color-border, #C8D8E8)" stroke-width="3" stroke-linecap="round"/>
+      <circle id="dp-sign-marker" cx="551" cy="298" r="7" fill="var(--color-accent, #00A3E0)"/>
+      <text class="svg-text-xs" style="font-size: 10px; fill: var(--color-text-muted);" x="525" y="315" text-anchor="start">+</text>
+      <text class="svg-text-xs" style="font-size: 10px; fill: var(--color-text-muted);" x="615" y="315" text-anchor="middle">0</text>
+      <text class="svg-text-xs" style="font-size: 10px; fill: var(--color-text-muted);" x="705" y="315" text-anchor="end">−</text>
+
+      <!-- Fragment: formula box -->
+      <g class="fragment">
+        <rect x="170" y="380" width="420" height="56" rx="10"
+              fill="var(--color-bg-subtle, #F0F4F8)" stroke="var(--color-accent, #00A3E0)" stroke-width="2.5"/>
+        <text class="svg-text" style="font-size: 20px; fill: var(--color-accent);" x="380" y="408" text-anchor="middle">a · b = |a| · |b| · cos(θ)</text>
+      </g>
+    </svg>
+  </div>
+</section>

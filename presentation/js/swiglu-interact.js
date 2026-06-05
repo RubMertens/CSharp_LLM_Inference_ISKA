@@ -1,27 +1,20 @@
+import { makeDraggable, registerInteraction, el } from './interactions.js';
+
 (function () {
   var N = 4;
   var x = [-3, 4, -1, 2];
   var ZERO = 320;
   var SCALE = 35;
 
-  var IX = [340, 430, 520, 610];
-  var IC = [372, 462, 552, 642];
-  var OX = [800, 890, 980, 1070];
-  var OC = [832, 922, 1012, 1102];
-  var BAR_W = 65;
-
-  var dragging = null, dragStartY = 0, dragStartVal = 0, svg = null;
-
-  function el(id) { return document.getElementById(id); }
-
   function swish(v) { return v / (1 + Math.exp(-v)); }
-  function sigmoid(v) { return 1 / (1 + Math.exp(-v)); }
 
   var G_L = 30, G_R = 270, G_T = 60, G_B = 520;
   var G_W = G_R - G_L, G_H = G_B - G_T;
   var G_YMIN = -1, G_YMAX = 6;
   function gx(v) { return G_L + (v + 6) / 12 * G_W; }
   function gy(v) { return G_B - (v - G_YMIN) / (G_YMAX - G_YMIN) * G_H; }
+
+  var dragStartY = 0, dragStartVal = 0;
 
   function fmt(v) {
     if (Math.abs(v) < 0.01) return '0';
@@ -57,14 +50,13 @@
 
   function initSigmoidGraph() {
     var curve = el('sigmoid-curve');
-    if (!curve) return false;
+    if (!curve) return;
     var d = '';
     for (var v = -6; v <= 6; v += 0.1) {
       d += (d ? 'L' : 'M') + gx(v).toFixed(1) + ',' + gy(swish(v)).toFixed(1);
     }
     curve.setAttribute('d', d);
     updateSigmoidDot();
-    return true;
   }
 
   function updateSigmoidDot() {
@@ -88,44 +80,23 @@
     }
   }
 
-  function clientToSVG(svgEl, cx, cy) {
-    var pt = svgEl.createSVGPoint();
-    pt.x = cx; pt.y = cy;
-    return pt.matrixTransform(svgEl.getScreenCTM().inverse());
-  }
-
-  document.addEventListener('pointerdown', function (e) {
-    if (!e.target || !e.target.id) return;
-    var m = e.target.id.match(/^silu-hit(\d)$/);
-    if (!m) return;
-    e.preventDefault(); e.stopPropagation();
-    dragging = parseInt(m[1], 10);
-    svg = e.target.closest('svg');
-    dragStartY = clientToSVG(svg, e.clientX, e.clientY).y;
-    dragStartVal = x[dragging];
-    document.body.style.cursor = 'ns-resize';
+  makeDraggable({
+    hit: /^silu-hit(\d)$/,
+    cursor: 'ns-resize',
+    onStart: function (ctx) {
+      dragStartY = ctx.point.y;
+      dragStartVal = x[ctx.index];
+    },
+    onDrag: function (ctx) {
+      var dy = dragStartY - ctx.point.y;
+      var newVal = dragStartVal + dy / 18;
+      newVal = Math.round(newVal * 10) / 10;
+      newVal = Math.max(-5, Math.min(5, newVal));
+      x[ctx.index] = newVal;
+      update();
+    },
   });
 
-  document.addEventListener('pointermove', function (e) {
-    if (dragging === null || !svg) return;
-    e.preventDefault();
-    var pt = clientToSVG(svg, e.clientX, e.clientY);
-    var dy = dragStartY - pt.y;
-    var newVal = dragStartVal + dy / 18;
-    newVal = Math.round(newVal * 10) / 10;
-    newVal = Math.max(-5, Math.min(5, newVal));
-    x[dragging] = newVal;
-    update();
-  });
-
-  document.addEventListener('pointerup', function () {
-    if (dragging === null) return;
-    dragging = null;
-    document.body.style.cursor = '';
-    svg = null;
-  });
-
-  (function tryInit() {
-    if (!initSigmoidGraph()) requestAnimationFrame(tryInit);
-  })();
+  // Draw the sigmoid curve when this slide enters (replaces old rAF poll).
+  registerInteraction('sigmoid-curve', initSigmoidGraph);
 })();
