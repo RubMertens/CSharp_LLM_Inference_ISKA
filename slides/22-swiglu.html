@@ -1,0 +1,74 @@
+<section data-id="swiglu" data-title="SwiGLU">
+  <div class="slide-content" style="display: flex; flex-direction: column; gap: clamp(0.4rem, 1.2vh, 1rem); padding-bottom: 1.5rem;">
+    <div>
+      <h2 style="margin-bottom: 0.2em;"><span class="highlight">SwiGLU</span> Activation</h2>
+      <p style="color: var(--color-text-muted); margin: 0; font-size: clamp(0.95rem, 1.6vw, 1.1em);">The non-linear "thinking" step between attention layers</p>
+    </div>
+
+    <div class="fragment card" style="padding: clamp(0.6rem, 1.5vh, 1rem) clamp(1rem, 2vw, 1.4rem); margin: 0;">
+      <h3 style="font-size: clamp(1rem, 1.8vw, 1.3em); margin-bottom: 0.3rem;">Why do we need activation functions?</h3>
+      <p style="font-size: clamp(0.9rem, 1.5vw, 1.05em); color: var(--color-text-muted); margin-bottom: 0.25rem;">
+        Without them, stacking layers is pointless — <span class="highlight">N linear layers = 1 linear layer</span>.
+      </p>
+      <p style="font-size: clamp(0.9rem, 1.5vw, 1.05em); color: var(--color-text-muted); margin: 0;">
+        Matrix × Matrix × Matrix = just another Matrix. Activation functions break this linearity and let networks learn <span class="highlight">complex patterns</span>.
+      </p>
+    </div>
+
+    <div class="fragment svg-fill" style="min-height: 0;">
+      <svg class="svg-diagram" viewBox="0 0 800 180" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- Input x -->
+        <rect class="svg-box" x="10" y="65" width="70" height="50"/>
+        <text class="svg-text" style="font-size: 16px;" x="45" y="90">x</text>
+
+        <!-- Top branch: Swish(xW1) -->
+        <line class="svg-arrow-muted" x1="80" y1="80" x2="130" y2="50"/>
+        <line class="svg-arrow-muted" x1="80" y1="100" x2="130" y2="130"/>
+
+        <rect class="svg-box" x="135" y="25" width="110" height="50"/>
+        <text class="svg-text" style="font-size: 16px;" x="190" y="43">x × W₁</text>
+        <text class="svg-text-sm svg-muted" x="190" y="63">linear</text>
+
+        <!-- Bottom branch: xW2 -->
+        <rect class="svg-box" x="135" y="105" width="110" height="50"/>
+        <text class="svg-text" style="font-size: 16px;" x="190" y="123">x × W₂</text>
+        <text class="svg-text-sm svg-muted" x="190" y="143">linear</text>
+
+        <!-- Swish activation -->
+        <line class="svg-arrow-muted" x1="245" y1="50" x2="290" y2="50"/>
+        <rect class="svg-accent-box" x="295" y="25" width="120" height="50"/>
+        <text class="svg-text" style="font-size: 16px;" x="355" y="43">Swish()</text>
+        <text class="svg-text-sm svg-muted" x="355" y="63">x · σ(x)</text>
+
+        <!-- Element-wise multiply -->
+        <line class="svg-arrow-muted" x1="415" y1="50" x2="475" y2="80"/>
+        <line class="svg-arrow-muted" x1="245" y1="130" x2="475" y2="100"/>
+
+        <text class="svg-op fill-accent" style="font-size: 20px;" x="505" y="90">⊙</text>
+
+        <!-- Output -->
+        <line class="svg-arrow-muted" x1="525" y1="90" x2="570" y2="90"/>
+        <rect class="svg-accent-box" x="575" y="65" width="130" height="50"/>
+        <text class="svg-text" style="font-size: 16px;" x="640" y="83">SwiGLU(x)</text>
+        <text class="svg-text-sm svg-muted" x="640" y="103">output</text>
+      </svg>
+    </div>
+
+    <div class="fragment">
+      <div class="card" style="padding: clamp(0.5rem, 1.2vh, 0.8rem) clamp(1rem, 2vw, 1.4rem); text-align: center;">
+        <code style="font-size: clamp(1rem, 1.8vw, 1.25em); color: var(--color-accent);">SwiGLU(x) = Swish(xW₁) ⊙ (xW₂)</code>
+        <p style="font-size: clamp(0.85rem, 1.4vw, 1em); color: var(--color-text-muted); margin-top: 0.3rem; margin-bottom: 0.1rem;">
+          Swish(x) = x × sigmoid(x) — a smooth version of ReLU
+        </p>
+        <p style="font-size: clamp(0.85rem, 1.4vw, 1em); color: var(--color-text-muted); margin: 0;">
+          ⊙ = element-wise multiplication (the "gating" mechanism)
+        </p>
+      </div>
+    </div>
+
+    <p class="fragment" style="text-align: center; margin: 0; color: var(--color-text-muted); font-size: clamp(0.85rem, 1.4vw, 1em);">
+      The gate learns <span class="highlight">which parts of the signal to keep</span> and which to suppress
+    </p>
+  </div>
+</section>

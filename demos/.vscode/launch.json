@@ -1,0 +1,82 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Scenario 1: Single-Layer Transformer",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Runner.ConsoleApp/bin/Debug/net10.0/Runner.ConsoleApp.dll",
+            "args": ["1"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Scenario 2: Single-Layer with RoPE",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Runner.ConsoleApp/bin/Debug/net10.0/Runner.ConsoleApp.dll",
+            "args": ["2"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Scenario 3: Multi-Layer Transformer",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Runner.ConsoleApp/bin/Debug/net10.0/Runner.ConsoleApp.dll",
+            "args": ["3"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Scenario 4: Multi-Layer with SiLU Activation",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Runner.ConsoleApp/bin/Debug/net10.0/Runner.ConsoleApp.dll",
+            "args": ["4"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Scenario 5: Multi-Layer with Grouped Query Attention",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Runner.ConsoleApp/bin/Debug/net10.0/Runner.ConsoleApp.dll",
+            "args": ["5"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Scenario 6: Multi-Layer with KV Cache",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Runner.ConsoleApp/bin/Debug/net10.0/Runner.ConsoleApp.dll",
+            "args": ["6"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Scenario 7: Real TinyLlama",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Runner.ConsoleApp/bin/Debug/net10.0/Runner.ConsoleApp.dll",
+            "args": ["7", "/Users/rubenmertens/_projects/iska-llm-runner/demos/model"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        }
+    ]
+}

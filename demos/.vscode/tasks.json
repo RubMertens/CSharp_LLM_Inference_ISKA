@@ -1,0 +1,99 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Runner.ConsoleApp/Runner.ConsoleApp.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Scenario 1: Single-Layer Transformer",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "Runner.ConsoleApp", "--", "1"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Scenario 2: Single-Layer with RoPE",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "Runner.ConsoleApp", "--", "2"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Scenario 3: Multi-Layer Transformer",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "Runner.ConsoleApp", "--", "3"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Scenario 4: Multi-Layer with SiLU Activation",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "Runner.ConsoleApp", "--", "4"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Scenario 5: Multi-Layer with Grouped Query Attention",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "Runner.ConsoleApp", "--", "5"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Scenario 6: Multi-Layer with KV Cache",
+            "type": "process",
+            "command": "dotnet",
+            "args": ["run", "--project", "Runner.ConsoleApp", "--", "6"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

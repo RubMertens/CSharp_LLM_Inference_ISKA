@@ -1,0 +1,79 @@
+<section data-id="rmsnorm-visual" data-title="RMSNorm — Visual">
+  <div class="slide-content">
+    <h2>What <span class="highlight">Normalization</span> Looks Like</h2>
+
+    <svg id="rmsv-svg" class="svg-diagram" viewBox="0 0 1200 600" style="width: 100%; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- ── Input section ─────────────────────────── -->
+      <text class="svg-label" style="font-size:18px" x="240" y="35">input vector</text>
+
+      <!-- Input baseline -->
+      <line x1="75" y1="540" x2="430" y2="540" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+
+      <!-- Input bars -->
+      <rect id="rmsv-ib0" x="95" y="447" width="65" height="93" rx="4"
+            style="fill: rgba(0,163,224,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="rmsv-ib1" x="180" y="400" width="65" height="140" rx="4"
+            style="fill: rgba(0,163,224,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="rmsv-ib2" x="265" y="493" width="65" height="47" rx="4"
+            style="fill: rgba(0,163,224,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="rmsv-ib3" x="350" y="353" width="65" height="187" rx="4"
+            style="fill: rgba(0,163,224,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+
+      <!-- Input value labels -->
+      <text id="rmsv-iv0" class="svg-num" style="font-size:20px" x="127" y="437">2</text>
+      <text id="rmsv-iv1" class="svg-num" style="font-size:20px" x="212" y="390">3</text>
+      <text id="rmsv-iv2" class="svg-num" style="font-size:20px" x="297" y="483">1</text>
+      <text id="rmsv-iv3" class="svg-num" style="font-size:20px" x="382" y="343">4</text>
+
+      <!-- Drag hint -->
+      <text class="svg-muted" style="font-size:13px" x="240" y="572">↕ drag to change</text>
+
+      <!-- Invisible drag targets -->
+      <rect id="rmsv-hit0" x="80" y="80" width="95" height="470" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="rmsv-hit1" x="165" y="80" width="95" height="470" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="rmsv-hit2" x="250" y="80" width="95" height="470" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="rmsv-hit3" x="335" y="80" width="95" height="470" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+
+      <!-- ── Fragment 1: RMS line + arrow + output ─── -->
+      <g class="fragment">
+        <!-- RMS reference line on input bars -->
+        <line id="rmsv-rmsline" x1="80" y1="412" x2="425" y2="412"
+              style="stroke: var(--color-accent-secondary, #6ECFF6); stroke-width: 2; stroke-dasharray: 6 4; opacity: 0.7;"/>
+        <text id="rmsv-rmslabel" class="svg-text-sm" style="font-size:13px; fill: var(--color-accent-secondary, #6ECFF6); text-anchor: end;" x="72" y="412">average size</text>
+
+        <!-- Arrow -->
+        <line class="svg-connector" x1="460" y1="320" x2="650" y2="320" style="stroke-width: 2; opacity: 0.5;"/>
+        <polygon class="fill-accent" style="opacity:0.4" points="644,312 660,320 644,328"/>
+        <text class="svg-muted" style="font-size:16px" x="558" y="300">normalize</text>
+
+        <!-- Output section -->
+        <text class="svg-label" style="font-size:18px" x="860" y="35">normalized</text>
+
+        <!-- Output baseline -->
+        <line x1="685" y1="540" x2="1035" y2="540" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+
+        <!-- Reference line at 1.0 on output (fixed scale) -->
+        <line id="rmsv-refline" x1="685" y1="340" x2="1035" y2="340"
+              style="stroke: var(--color-accent); stroke-width: 1.5; stroke-dasharray: 6 4; opacity: 0.4;"/>
+        <text class="svg-text-sm" style="font-size:14px; fill: var(--color-accent); text-anchor: start; opacity: 0.6;" x="1042" y="340">1.0</text>
+
+        <!-- Output bars -->
+        <rect id="rmsv-ob0" x="700" y="394" width="65" height="146" rx="4"
+              style="fill: rgba(0,163,224,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="rmsv-ob1" x="785" y="320" width="65" height="220" rx="4"
+              style="fill: rgba(0,163,224,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="rmsv-ob2" x="870" y="466" width="65" height="74" rx="4"
+              style="fill: rgba(0,163,224,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="rmsv-ob3" x="955" y="248" width="65" height="292" rx="4"
+              style="fill: rgba(0,163,224,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+
+        <!-- Output value labels -->
+        <text id="rmsv-ov0" class="svg-num fill-accent" style="font-size:20px" x="732" y="384">0.73</text>
+        <text id="rmsv-ov1" class="svg-num fill-accent" style="font-size:20px" x="817" y="310">1.10</text>
+        <text id="rmsv-ov2" class="svg-num fill-accent" style="font-size:20px" x="902" y="456">0.37</text>
+        <text id="rmsv-ov3" class="svg-num fill-accent" style="font-size:20px" x="987" y="238">1.46</text>
+      </g>
+    </svg>
+  </div>
+</section>

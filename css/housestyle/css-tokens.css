@@ -1,0 +1,178 @@
+/*
+ * Info Support -- CSS Design Tokens
+ * Extracted from: Huisstijlrichtlijnen Info Support, versie februari 2020
+ *
+ * Usage:
+ *   @import url("housestyle/css-tokens.css");
+ *   -- or copy the :root block into your stylesheet.
+ */
+
+/* ============================================================
+   FONTS
+   ============================================================
+   Primary fonts (Px Grotesk, Graphik) are commercial typefaces.
+   We provide @font-face stubs with system/Google-Fonts fallbacks.
+   If you have the licensed .woff2 files, update the src paths.
+   ============================================================ */
+
+/* --- Px Grotesk Bold (heading font) --- */
+@font-face {
+  font-family: "Px Grotesk";
+  font-weight: 700;
+  font-style: normal;
+  /* Replace with actual file path if licensed font is available */
+  src: local("Px Grotesk Bold"), local("PxGrotesk-Bold");
+  font-display: swap;
+}
+
+/* --- Px Grotesk Screen (display accent font) --- */
+@font-face {
+  font-family: "Px Grotesk Screen";
+  font-weight: 400;
+  font-style: normal;
+  src: local("Px Grotesk Screen"), local("PxGrotesk-Screen");
+  font-display: swap;
+}
+
+/* --- Graphik Regular (body font) --- */
+@font-face {
+  font-family: "Graphik";
+  font-weight: 400;
+  font-style: normal;
+  src: local("Graphik Regular"), local("Graphik-Regular");
+  font-display: swap;
+}
+
+/* --- Graphik Bold (sub-heading font) --- */
+@font-face {
+  font-family: "Graphik";
+  font-weight: 700;
+  font-style: normal;
+  src: local("Graphik Bold"), local("Graphik-Bold");
+  font-display: swap;
+}
+
+/* ============================================================
+   CUSTOM PROPERTIES (Design Tokens)
+   ============================================================ */
+
+:root {
+  /* --------------------------------------------------------
+     PRIMARY COLOURS
+     -------------------------------------------------------- */
+  --is-white:             #FFFFFF;
+  --is-blue:              #00A3E0;   /* Info Support Blauw  -- PMS 299 C  */
+  --is-navy:              #003865;   /* Navy                -- PMS 2955 C */
+
+  /* --------------------------------------------------------
+     SECONDARY COLOURS
+     -------------------------------------------------------- */
+  --is-groen:             #BED62F;   /* Groen  (Green)      */
+  --is-geel:              #FFE800;   /* Geel   (Yellow)     */
+  --is-roze:              #F172AC;   /* Roze   (Pink)       */
+  --is-paars:             #784E90;   /* Paars  (Purple)     */
+  --is-felblauw:          #6ECFF6;   /* Felblauw (Bright Blue) */
+  --is-rood:              #F04E23;   /* Rood   (Red)        */
+
+  /* --------------------------------------------------------
+     SEMANTIC ALIASES
+     -------------------------------------------------------- */
+  --is-primary:           var(--is-blue);
+  --is-primary-dark:      var(--is-navy);
+  --is-accent:            var(--is-felblauw);
+  --is-background:        var(--is-white);
+  --is-text:              var(--is-navy);
+  --is-text-inverse:      var(--is-white);
+  --is-link:              var(--is-blue);
+
+  /* --------------------------------------------------------
+     FONT FAMILIES
+     Fallback chain: commercial font -> system alternative
+     -------------------------------------------------------- */
+  --is-font-heading:      "Px Grotesk", "Arial Black", "Arial", Helvetica, sans-serif;
+  --is-font-display:      "Px Grotesk Screen", "Px Grotesk", "Arial Black", sans-serif;
+  --is-font-subheading:   "Graphik", Arial, Helvetica, sans-serif;
+  --is-font-body:         "Graphik", Arial, Helvetica, sans-serif;
+
+  /* Secondary (fallback) font families */
+  --is-font-heading-fallback:  Arial, Helvetica, sans-serif;
+  --is-font-body-fallback:     Arial, Helvetica, sans-serif;
+
+  /* --------------------------------------------------------
+     FONT SIZES  (rem-based, assuming 16px root)
+     -------------------------------------------------------- */
+  --is-size-h1:           2.25rem;   /* 36px  */
+  --is-size-h2:           1.5rem;    /* 24px  */
+  --is-size-h3:           1.125rem;  /* 18px  */
+  --is-size-body:         0.75rem;   /* 12px  */
+  --is-size-small:        0.625rem;  /* 10px  */
+
+  /* Presentation / large-format sizes */
+  --is-size-display:      4.5rem;    /* 72px  */
+  --is-size-display-md:   2.5rem;    /* 40px  */
+
+  /* --------------------------------------------------------
+     FONT WEIGHTS
+     -------------------------------------------------------- */
+  --is-weight-regular:    400;
+  --is-weight-bold:       700;
+
+  /* --------------------------------------------------------
+     LINE HEIGHTS
+     Heading fonts: corps + 2pt  ->  ~1.06
+     Body fonts:    corps + 4pt  ->  ~1.33
+     -------------------------------------------------------- */
+  --is-lh-heading:        1.06;
+  --is-lh-body:           1.33;
+
+  /* --------------------------------------------------------
+     LETTER SPACING
+     -------------------------------------------------------- */
+  --is-ls-heading:        -0.05em;   /* -50 tracking (Px Grotesk) */
+  --is-ls-body:           0;         /* Graphik / Arial           */
+
+  /* --------------------------------------------------------
+     SPACING / GRID
+     -------------------------------------------------------- */
+  --is-grid-columns:      16;
+  --is-margin:            6.25%;     /* 1/16 = 6.25% of container width */
+  --is-triangle-grid:     8;         /* 8-column grid for style elements */
+
+  /* --------------------------------------------------------
+     MISC
+     -------------------------------------------------------- */
+  --is-triangle-angle:    45deg;     /* The "Vooruit" angle */
+  --is-border-radius:     0;         /* Brand uses sharp edges throughout */
+}
+
+/* ============================================================
+   UTILITY CLASSES (optional -- remove if not needed)
+   ============================================================ */
+
+.is-heading {
+  font-family: var(--is-font-heading);
+  font-weight: var(--is-weight-bold);
+  line-height: var(--is-lh-heading);
+  letter-spacing: var(--is-ls-heading);
+  color: var(--is-navy);
+}
+
+.is-subheading {
+  font-family: var(--is-font-subheading);
+  font-weight: var(--is-weight-bold);
+  line-height: var(--is-lh-body);
+  letter-spacing: var(--is-ls-body);
+  color: var(--is-navy);
+}
+
+.is-body {
+  font-family: var(--is-font-body);
+  font-weight: var(--is-weight-regular);
+  line-height: var(--is-lh-body);
+  letter-spacing: var(--is-ls-body);
+  color: var(--is-navy);
+}
+
+.is-bg-white   { background-color: var(--is-white); }
+.is-bg-blue    { background-color: var(--is-blue);  color: var(--is-text-inverse); }
+.is-bg-navy    { background-color: var(--is-navy);  color: var(--is-text-inverse); }

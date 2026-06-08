@@ -1,0 +1,104 @@
+<section data-id="dot-product" data-title="The Dot Product">
+  <div class="slide-content">
+    <h2>The <span class="highlight">Dot Product</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.8rem;">The core operation behind every neural network — multiply matching pairs, then add them up</p>
+
+    <div class="svg-fill">
+      <svg class="svg-diagram" viewBox="0 0 860 370" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Column labels -->
+      <text class="svg-label" style="font-size:15px" x="120" y="22">a</text>
+      <text class="svg-label" style="font-size:15px" x="310" y="22">b</text>
+
+      <!-- Vector A -->
+      <rect class="svg-box" x="75" y="40" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="120" y="68">2</text>
+
+      <rect class="svg-box" x="75" y="110" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="120" y="138">3</text>
+
+      <rect class="svg-box" x="75" y="180" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="120" y="208">1</text>
+
+      <rect class="svg-box" x="75" y="250" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="120" y="278">4</text>
+
+      <!-- Multiply symbols -->
+      <text class="svg-op" style="font-size:22px" x="215" y="68">&times;</text>
+      <text class="svg-op" style="font-size:22px" x="215" y="138">&times;</text>
+      <text class="svg-op" style="font-size:22px" x="215" y="208">&times;</text>
+      <text class="svg-op" style="font-size:22px" x="215" y="278">&times;</text>
+
+      <!-- Vector B -->
+      <rect class="svg-box" x="265" y="40" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="310" y="68">1</text>
+
+      <rect class="svg-box" x="265" y="110" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="310" y="138">2</text>
+
+      <rect class="svg-box" x="265" y="180" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="310" y="208">3</text>
+
+      <rect class="svg-box" x="265" y="250" width="90" height="55"/>
+      <text class="svg-num" style="font-size:24px" x="310" y="278">2</text>
+
+      <!-- Fragment 1: Element-wise products -->
+      <g class="fragment">
+        <!-- Equals signs -->
+        <text class="svg-op" style="font-size:22px" x="405" y="68">=</text>
+        <text class="svg-op" style="font-size:22px" x="405" y="138">=</text>
+        <text class="svg-op" style="font-size:22px" x="405" y="208">=</text>
+        <text class="svg-op" style="font-size:22px" x="405" y="278">=</text>
+
+        <!-- Product boxes -->
+        <rect class="svg-accent-box" x="455" y="40" width="90" height="55"/>
+        <text class="svg-num" style="font-size:24px" x="500" y="68">2</text>
+
+        <rect class="svg-accent-box" x="455" y="110" width="90" height="55"/>
+        <text class="svg-num" style="font-size:24px" x="500" y="138">6</text>
+
+        <rect class="svg-accent-box" x="455" y="180" width="90" height="55"/>
+        <text class="svg-num" style="font-size:24px" x="500" y="208">3</text>
+
+        <rect class="svg-accent-box" x="455" y="250" width="90" height="55"/>
+        <text class="svg-num" style="font-size:24px" x="500" y="278">8</text>
+
+        <text class="svg-label" style="font-size:15px" x="500" y="22">a &times; b</text>
+      </g>
+
+      <!-- Fragment 2: Sum with bracket -->
+      <g class="fragment">
+        <!-- Horizontal connectors from each product -->
+        <line class="svg-connector" x1="545" y1="68" x2="610" y2="68"/>
+        <line class="svg-connector" x1="545" y1="138" x2="610" y2="138"/>
+        <line class="svg-connector" x1="545" y1="208" x2="610" y2="208"/>
+        <line class="svg-connector" x1="545" y1="278" x2="610" y2="278"/>
+
+        <!-- Vertical bracket -->
+        <path class="svg-connector" d="M 610,68 C 630,68 630,68 630,100 L 630,246 C 630,278 630,278 610,278"/>
+        <!-- Horizontal to result -->
+        <line class="svg-connector" x1="630" y1="173" x2="680" y2="173"/>
+        <!-- Arrowhead -->
+        <polygon class="fill-accent" style="opacity:0.4" points="678,166 694,173 678,180"/>
+
+        <!-- Plus signs along the bracket -->
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="648" y="103">+</text>
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="648" y="173">+</text>
+        <text class="svg-op fill-accent" style="font-size:16px;opacity:0.6" x="648" y="243">+</text>
+
+        <!-- Result box -->
+        <rect class="svg-result-box svg-pulse" x="700" y="143" width="110" height="60"/>
+        <text class="svg-num fill-accent" style="font-size:30px;font-weight:bold" x="755" y="173">19</text>
+        <text class="svg-muted" style="font-size:13px" x="755" y="125">sum</text>
+      </g>
+
+      <!-- Formula at the bottom -->
+      <g class="fragment">
+        <text class="svg-op" style="font-size: 16px; fill: var(--color-text-muted, #4A6A8A);" x="430" y="340">
+          2&times;1 + 3&times;2 + 1&times;3 + 4&times;2 = 19
+        </text>
+      </g>
+      </svg>
+    </div>
+  </div>
+</section>

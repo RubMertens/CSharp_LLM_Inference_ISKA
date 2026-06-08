@@ -1,0 +1,177 @@
+<section data-id="grouped-query-attention" data-title="Grouped Query Attention">
+  <div class="slide-content">
+    <h2><span class="highlight">Grouped Query</span> Attention</h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.6rem;">Multiple query heads share K/V heads — same head size, fewer K/V heads</p>
+
+    <div class="svg-fill">
+      <svg class="svg-diagram" viewBox="-15 0 830 350" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- Arrowhead marker -->
+        <defs>
+          <marker id="arrowGQA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-text-muted,#94a3b8)"/>
+          </marker>
+        </defs>
+
+        <!-- ═══ Fragment 0: Q head segments ═══ -->
+        <g class="fragment" data-fragment-index="0">
+          <text class="svg-label" style="text-anchor:end" x="42" y="37">Q</text>
+
+          <!-- Dimension label -->
+          <text class="svg-muted" style="font-size:10px" x="392" y="12">8 heads &times; 128d = 1024 (hiddenDim)</text>
+
+          <!-- Group 0 (accent): Q0-Q3 -->
+          <rect x="55" y="20" width="80" height="26" rx="4" fill="rgba(0,163,224,0.12)" stroke="var(--color-accent,#00A3E0)" stroke-width="1.5"/>
+          <text class="svg-label-sm" x="95" y="37">Q₀</text>
+
+          <rect x="138" y="20" width="80" height="26" rx="4" fill="rgba(0,163,224,0.12)" stroke="var(--color-accent,#00A3E0)" stroke-width="1.5"/>
+          <text class="svg-label-sm" x="178" y="37">Q₁</text>
+
+          <rect x="221" y="20" width="80" height="26" rx="4" fill="rgba(0,163,224,0.12)" stroke="var(--color-accent,#00A3E0)" stroke-width="1.5"/>
+          <text class="svg-label-sm" x="261" y="37">Q₂</text>
+
+          <rect x="304" y="20" width="80" height="26" rx="4" fill="rgba(0,163,224,0.12)" stroke="var(--color-accent,#00A3E0)" stroke-width="1.5"/>
+          <text class="svg-label-sm" x="344" y="37">Q₃</text>
+
+          <!-- Group 1 (accent-secondary): Q4-Q7 -->
+          <rect x="400" y="20" width="80" height="26" rx="4" fill="rgba(110,207,246,0.12)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1.5"/>
+          <text class="svg-label-sm" style="fill:var(--color-accent-secondary,#6ECFF6)" x="440" y="37">Q₄</text>
+
+          <rect x="483" y="20" width="80" height="26" rx="4" fill="rgba(110,207,246,0.12)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1.5"/>
+          <text class="svg-label-sm" style="fill:var(--color-accent-secondary,#6ECFF6)" x="523" y="37">Q₅</text>
+
+          <rect x="566" y="20" width="80" height="26" rx="4" fill="rgba(110,207,246,0.12)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1.5"/>
+          <text class="svg-label-sm" style="fill:var(--color-accent-secondary,#6ECFF6)" x="606" y="37">Q₆</text>
+
+          <rect x="649" y="20" width="80" height="26" rx="4" fill="rgba(110,207,246,0.12)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1.5"/>
+          <text class="svg-label-sm" style="fill:var(--color-accent-secondary,#6ECFF6)" x="689" y="37">Q₇</text>
+
+          <!-- Group brackets -->
+          <path d="M 55,46 L 55,52 L 384,52 L 384,46" fill="none" stroke="var(--color-accent,#00A3E0)" stroke-width="1" opacity="0.5"/>
+          <path d="M 400,46 L 400,52 L 729,52 L 729,46" fill="none" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1" opacity="0.5"/>
+          <text class="svg-muted" style="font-size:9px" x="220" y="63">group 0</text>
+          <text class="svg-muted" style="font-size:9px" x="565" y="63">group 1</text>
+        </g>
+
+        <!-- ═══ Fragment 1: K/V heads + fan lines ═══ -->
+        <g class="fragment" data-fragment-index="1">
+          <!-- Dimension label -->
+          <text class="svg-muted" style="font-size:10px" x="392" y="78">2 heads &times; 128d = 256 (kvDim)</text>
+
+          <!-- Fan lines: Q0-Q3 → K0 -->
+          <line x1="95" y1="46" x2="220" y2="85" stroke="var(--color-accent,#00A3E0)" stroke-width="1" opacity="0.35"/>
+          <line x1="178" y1="46" x2="220" y2="85" stroke="var(--color-accent,#00A3E0)" stroke-width="1" opacity="0.35"/>
+          <line x1="261" y1="46" x2="220" y2="85" stroke="var(--color-accent,#00A3E0)" stroke-width="1" opacity="0.35"/>
+          <line x1="344" y1="46" x2="220" y2="85" stroke="var(--color-accent,#00A3E0)" stroke-width="1" opacity="0.35"/>
+
+          <!-- Fan lines: Q4-Q7 → K1 -->
+          <line x1="440" y1="46" x2="565" y2="85" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1" opacity="0.35"/>
+          <line x1="523" y1="46" x2="565" y2="85" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1" opacity="0.35"/>
+          <line x1="606" y1="46" x2="565" y2="85" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1" opacity="0.35"/>
+          <line x1="689" y1="46" x2="565" y2="85" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1" opacity="0.35"/>
+
+          <!-- K row -->
+          <text class="svg-label" style="text-anchor:end" x="42" y="102">K</text>
+
+          <rect x="180" y="85" width="80" height="26" rx="4" fill="rgba(0,163,224,0.12)" stroke="var(--color-accent,#00A3E0)" stroke-width="1.5"/>
+          <text class="svg-label-sm" x="220" y="102">K₀</text>
+
+          <rect x="525" y="85" width="80" height="26" rx="4" fill="rgba(110,207,246,0.12)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1.5"/>
+          <text class="svg-label-sm" style="fill:var(--color-accent-secondary,#6ECFF6)" x="565" y="102">K₁</text>
+
+          <!-- V row -->
+          <text class="svg-label" style="text-anchor:end" x="42" y="132">V</text>
+
+          <rect x="180" y="115" width="80" height="26" rx="4" fill="rgba(0,163,224,0.12)" stroke="var(--color-accent,#00A3E0)" stroke-width="1.5"/>
+          <text class="svg-label-sm" x="220" y="132">V₀</text>
+
+          <rect x="525" y="115" width="80" height="26" rx="4" fill="rgba(110,207,246,0.12)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1.5"/>
+          <text class="svg-label-sm" style="fill:var(--color-accent-secondary,#6ECFF6)" x="565" y="132">V₁</text>
+
+          <!-- kvHead formula -->
+          <text class="svg-muted" style="font-size:9px" x="220" y="155">kvHead = queryHead / 4</text>
+          <text class="svg-muted" style="font-size:9px" x="565" y="155">kvHead = queryHead / 4</text>
+        </g>
+
+        <!-- ═══ Fragment 2: Computation pipeline ═══ -->
+        <g class="fragment" data-fragment-index="2">
+          <text class="svg-muted" style="font-size:11px;text-anchor:end" x="42" y="191">per head:</text>
+
+          <!-- Stage 1: dot product -->
+          <rect x="55" y="175" width="120" height="30" rx="5" fill="rgba(0,163,224,0.08)" stroke="var(--color-accent,#00A3E0)" stroke-width="1"/>
+          <text class="svg-label-sm" x="115" y="194">Q&#x1D62; &middot; K&#x2098;</text>
+
+          <!-- Arrow 1→2 -->
+          <line x1="178" y1="190" x2="205" y2="190" stroke="var(--color-text-muted,#94a3b8)" stroke-width="1" marker-end="url(#arrowGQA)"/>
+
+          <!-- Stage 2: scale -->
+          <rect x="208" y="175" width="80" height="30" rx="5" fill="rgba(0,163,224,0.08)" stroke="var(--color-accent,#00A3E0)" stroke-width="1"/>
+          <text class="svg-label-sm" x="248" y="194">scale</text>
+
+          <!-- Arrow 2→3 -->
+          <line x1="291" y1="190" x2="318" y2="190" stroke="var(--color-text-muted,#94a3b8)" stroke-width="1" marker-end="url(#arrowGQA)"/>
+
+          <!-- Stage 3: causal mask + softmax -->
+          <rect x="321" y="175" width="120" height="30" rx="5" fill="rgba(0,163,224,0.08)" stroke="var(--color-accent,#00A3E0)" stroke-width="1"/>
+          <text class="svg-label-sm" x="381" y="194">mask + softmax</text>
+
+          <!-- Arrow 3→4 -->
+          <line x1="444" y1="190" x2="471" y2="190" stroke="var(--color-text-muted,#94a3b8)" stroke-width="1" marker-end="url(#arrowGQA)"/>
+
+          <!-- Stage 4: weighted sum with V -->
+          <rect x="474" y="175" width="130" height="30" rx="5" fill="rgba(0,163,224,0.08)" stroke="var(--color-accent,#00A3E0)" stroke-width="1"/>
+          <text class="svg-label-sm" x="539" y="194">&sum; weight &middot; V&#x2098;</text>
+
+          <!-- Arrow 4→5 -->
+          <line x1="607" y1="190" x2="634" y2="190" stroke="var(--color-text-muted,#94a3b8)" stroke-width="1" marker-end="url(#arrowGQA)"/>
+
+          <!-- Stage 5: head output -->
+          <rect x="637" y="175" width="90" height="30" rx="5" fill="rgba(0,163,224,0.15)" stroke="var(--color-accent,#00A3E0)" stroke-width="2"/>
+          <text class="svg-label-sm" x="682" y="194">out&#x1D62;</text>
+
+          <!-- Note -->
+          <text class="svg-muted" style="font-size:10px" x="392" y="220">each query head runs this independently — K&#x2098;/V&#x2098; shared within group</text>
+        </g>
+
+        <!-- ═══ Fragment 3: Output concatenation + insight ═══ -->
+        <g class="fragment" data-fragment-index="3">
+          <text class="svg-label" style="text-anchor:end" x="42" y="253">output</text>
+
+          <!-- 8 output head boxes at same x positions as Q heads -->
+          <rect x="55" y="238" width="80" height="22" rx="3" fill="rgba(0,163,224,0.15)" stroke="var(--color-accent,#00A3E0)" stroke-width="1"/>
+          <text class="svg-muted" style="font-size:9px" x="95" y="253">out₀</text>
+
+          <rect x="138" y="238" width="80" height="22" rx="3" fill="rgba(0,163,224,0.15)" stroke="var(--color-accent,#00A3E0)" stroke-width="1"/>
+          <text class="svg-muted" style="font-size:9px" x="178" y="253">out₁</text>
+
+          <rect x="221" y="238" width="80" height="22" rx="3" fill="rgba(0,163,224,0.15)" stroke="var(--color-accent,#00A3E0)" stroke-width="1"/>
+          <text class="svg-muted" style="font-size:9px" x="261" y="253">out₂</text>
+
+          <rect x="304" y="238" width="80" height="22" rx="3" fill="rgba(0,163,224,0.15)" stroke="var(--color-accent,#00A3E0)" stroke-width="1"/>
+          <text class="svg-muted" style="font-size:9px" x="344" y="253">out₃</text>
+
+          <rect x="400" y="238" width="80" height="22" rx="3" fill="rgba(110,207,246,0.15)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1"/>
+          <text class="svg-muted" style="font-size:9px" x="440" y="253">out₄</text>
+
+          <rect x="483" y="238" width="80" height="22" rx="3" fill="rgba(110,207,246,0.15)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1"/>
+          <text class="svg-muted" style="font-size:9px" x="523" y="253">out₅</text>
+
+          <rect x="566" y="238" width="80" height="22" rx="3" fill="rgba(110,207,246,0.15)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1"/>
+          <text class="svg-muted" style="font-size:9px" x="606" y="253">out₆</text>
+
+          <rect x="649" y="238" width="80" height="22" rx="3" fill="rgba(110,207,246,0.15)" stroke="var(--color-accent-secondary,#6ECFF6)" stroke-width="1"/>
+          <text class="svg-muted" style="font-size:9px" x="689" y="253">out₇</text>
+
+          <!-- Concatenation label -->
+          <text class="svg-muted" style="font-size:10px" x="392" y="276">concatenated: 8 &times; 128d = 1024 (hiddenDim) &rarr; &times; OutputProjection</text>
+
+          <!-- Insight box -->
+          <rect class="svg-insight-box" x="55" y="292" width="674" height="42" rx="6"/>
+          <text class="svg-text fill-accent" style="font-size:13px" x="392" y="310">K/V cache per token: 4&times; less memory</text>
+          <text class="svg-muted" style="font-size:11px" x="392" y="326">Example: 32 query heads, 8 KV heads, group size = 4</text>
+        </g>
+
+      </svg>
+    </div>
+  </div>
+</section>

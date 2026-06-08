@@ -1,0 +1,110 @@
+<section data-id="elementwise-multiply" data-title="Elementwise Multiplication">
+  <div class="slide-content">
+    <h2><span class="highlight">Elementwise Multiplication</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.6rem;">Same shape required. Multiply <span class="highlight">matching positions</span> — no dot products, no summation.</p>
+
+    <div class="svg-fill">
+      <svg class="svg-diagram" viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Matrix A: 2×2 -->
+      <text class="svg-muted" style="font-size:13px" x="210" y="20">A</text>
+      <text class="svg-muted" style="font-size:12px;font-style:italic" x="210" y="36">2 × 2</text>
+
+      <path class="svg-bracket" d="M 150,50 Q 140,50 140,60 L 140,178 Q 140,188 150,188"/>
+      <path class="svg-bracket" d="M 271,50 Q 281,50 281,60 L 281,178 Q 281,188 271,188"/>
+
+      <rect class="svg-box" x="158" y="55" width="50" height="40"/>
+      <text class="svg-num svg-text-lg" x="183" y="75">1</text>
+      <rect class="svg-box" x="213" y="55" width="50" height="40"/>
+      <text class="svg-num svg-text-lg" x="238" y="75">2</text>
+
+      <rect class="svg-box" x="158" y="105" width="50" height="40"/>
+      <text class="svg-num svg-text-lg" x="183" y="125">3</text>
+      <rect class="svg-box" x="213" y="105" width="50" height="40"/>
+      <text class="svg-num svg-text-lg" x="238" y="125">4</text>
+
+      <!-- Hadamard product operator -->
+      <text class="svg-op svg-text-xl" x="338" y="100">&#x2299;</text>
+
+      <!-- Matrix B: 2×2 -->
+      <text class="svg-muted" style="font-size:13px" x="450" y="20">B</text>
+      <text class="svg-muted" style="font-size:12px;font-style:italic" x="450" y="36">2 × 2</text>
+
+      <path class="svg-bracket" d="M 390,50 Q 380,50 380,60 L 380,178 Q 380,188 390,188"/>
+      <path class="svg-bracket" d="M 511,50 Q 521,50 521,60 L 521,178 Q 521,188 511,188"/>
+
+      <rect class="svg-box" x="398" y="55" width="50" height="40"/>
+      <text class="svg-num svg-text-lg" x="423" y="75">5</text>
+      <rect class="svg-box" x="453" y="55" width="50" height="40"/>
+      <text class="svg-num svg-text-lg" x="478" y="75">6</text>
+
+      <rect class="svg-box" x="398" y="105" width="50" height="40"/>
+      <text class="svg-num svg-text-lg" x="423" y="125">7</text>
+      <rect class="svg-box" x="453" y="105" width="50" height="40"/>
+      <text class="svg-num svg-text-lg" x="478" y="125">8</text>
+
+      <!-- Equals sign -->
+      <text class="svg-op svg-text-xl" x="578" y="100">=</text>
+
+      <!-- Result Matrix C: 2×2 -->
+      <text class="svg-muted" style="font-size:13px" x="690" y="20">C</text>
+      <text class="svg-muted" style="font-size:12px;font-style:italic" x="690" y="36">2 × 2</text>
+
+      <path class="svg-bracket" d="M 630,50 Q 620,50 620,60 L 620,178 Q 620,188 630,188"/>
+      <path class="svg-bracket" d="M 751,50 Q 761,50 761,60 L 761,178 Q 761,188 751,188"/>
+
+      <!-- Step 0: A[0,0] × B[0,0] = 1×5 = 5 -->
+      <g class="fragment current-visible" data-fragment-index="0">
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="156" y="53" width="54" height="44"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="396" y="53" width="54" height="44"/>
+        <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 210,75 C 280,55 330,55 396,75"/>
+        <text class="svg-formula" x="450" y="240">[0,0] &times; [0,0]</text>
+        <text class="svg-formula" x="450" y="260">1 &times; 5 = 5</text>
+      </g>
+      <g class="fragment" data-fragment-index="0">
+        <rect class="svg-result-box" style="stroke-width:2" x="638" y="55" width="50" height="40"/>
+        <text class="svg-num fill-accent" style="font-weight:bold" x="663" y="75">5</text>
+      </g>
+
+      <!-- Step 1: A[0,1] × B[0,1] = 2×6 = 12 -->
+      <g class="fragment current-visible" data-fragment-index="1">
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="211" y="53" width="54" height="44"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="451" y="53" width="54" height="44"/>
+        <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 265,75 C 335,55 385,55 451,75"/>
+        <text class="svg-formula" x="450" y="240">[0,1] &times; [0,1]</text>
+        <text class="svg-formula" x="450" y="260">2 &times; 6 = 12</text>
+      </g>
+      <g class="fragment" data-fragment-index="1">
+        <rect class="svg-result-box" style="stroke-width:2" x="693" y="55" width="50" height="40"/>
+        <text class="svg-num fill-accent" style="font-weight:bold" x="718" y="75">12</text>
+      </g>
+
+      <!-- Step 2: A[1,0] × B[1,0] = 3×7 = 21 -->
+      <g class="fragment current-visible" data-fragment-index="2">
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="156" y="103" width="54" height="44"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="396" y="103" width="54" height="44"/>
+        <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 210,125 C 280,145 330,145 396,125"/>
+        <text class="svg-formula" x="450" y="240">[1,0] &times; [1,0]</text>
+        <text class="svg-formula" x="450" y="260">3 &times; 7 = 21</text>
+      </g>
+      <g class="fragment" data-fragment-index="2">
+        <rect class="svg-result-box" style="stroke-width:2" x="638" y="105" width="50" height="40"/>
+        <text class="svg-num fill-accent" style="font-weight:bold" x="663" y="125">21</text>
+      </g>
+
+      <!-- Step 3: A[1,1] × B[1,1] = 4×8 = 32 -->
+      <g class="fragment current-visible" data-fragment-index="3">
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="211" y="103" width="54" height="44"/>
+        <rect class="svg-cell-ok" style="stroke:var(--color-accent,#00A3E0);stroke-width:1.5;rx:4" x="451" y="103" width="54" height="44"/>
+        <path class="svg-connector" style="stroke-dasharray:4 3;opacity:0.5" d="M 265,125 C 335,145 385,145 451,125"/>
+        <text class="svg-formula" x="450" y="240">[1,1] &times; [1,1]</text>
+        <text class="svg-formula" x="450" y="260">4 &times; 8 = 32</text>
+      </g>
+      <g class="fragment" data-fragment-index="3">
+        <rect class="svg-result-box" style="stroke-width:2" x="693" y="105" width="50" height="40"/>
+        <text class="svg-num fill-accent" style="font-weight:bold" x="718" y="125">32</text>
+      </g>
+      </svg>
+    </div>
+  </div>
+</section>
