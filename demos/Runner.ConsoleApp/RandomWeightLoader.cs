@@ -65,6 +65,7 @@ public class RandomWeightLoader
         {
             NumberdOfQueryHeads = numberOfQueryHeads,
             NumberOfKeyValueHeads = numberOfKeyValueHeads,
+            HeadDimension = headDimension,
             EmbeddedTokens = GenerateRandomMatrix(vocabularySize, hiddenDimension, random),
             Layers = layers,
             OutputEmbedding = GenerateRandomMatrix(hiddenDimension, vocabularySize, random),
