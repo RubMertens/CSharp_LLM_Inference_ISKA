@@ -26,6 +26,16 @@ public class DemoTokenizer
     {"tokens", 14}
 };
 
+    public DemoTokenizer()
+    {
+        // Pad to 250 entries so weight matrices are realistically sized for the demo.
+        while (Vocabulary.Count < 250)
+        {
+            int id = Vocabulary.Count;
+            Vocabulary[$"<unused{id}>"] = id;
+        }
+    }
+
     public int[] Tokenize(string input)
     {
         var tokens = input.Split(' ');

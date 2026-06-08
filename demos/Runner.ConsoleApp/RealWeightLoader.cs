@@ -3,7 +3,6 @@ using System.IO.MemoryMappedFiles;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Runner.ConsoleApp.Math;
-using Runner.ConsoleApp.RandomOneLayer;
 
 namespace Runner.ConsoleApp;
 

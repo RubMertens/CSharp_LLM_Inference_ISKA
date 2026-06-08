@@ -1,7 +1,4 @@
-using System.Drawing;
-using Microsoft.VisualBasic;
 using Runner.ConsoleApp.Math;
-using Runner.ConsoleApp.RandomOneLayer;
 
 namespace Runner.ConsoleApp._2_WithRope;
 

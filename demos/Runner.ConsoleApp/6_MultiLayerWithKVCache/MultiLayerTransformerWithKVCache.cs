@@ -1,5 +1,4 @@
 using Runner.ConsoleApp.Math;
-using Runner.ConsoleApp.RandomOneLayer;
 
 namespace Runner.ConsoleApp._6_MultiLayerWithKVCache;
 

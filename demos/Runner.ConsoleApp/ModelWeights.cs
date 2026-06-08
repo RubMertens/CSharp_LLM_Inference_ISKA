@@ -1,6 +1,6 @@
 using Runner.ConsoleApp.Math;
 
-namespace Runner.ConsoleApp.RandomOneLayer;
+namespace Runner.ConsoleApp;
 
 
 public class ModelWeights

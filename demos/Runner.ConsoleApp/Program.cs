@@ -1,7 +1,7 @@
 using Runner.ConsoleApp;
 using Runner.ConsoleApp._1_SingleLayer;
+using Runner.ConsoleApp._4_MultiLayerWithActivation;
 using Runner.ConsoleApp._5_MultiLayerWithGQA;
-using Runner.ConsoleApp.RandomOneLayer;
 using WithRope = Runner.ConsoleApp._2_WithRope;
 using MultiLayer = Runner.ConsoleApp._3_MultiLayer;
 using Runner.ConsoleApp._6_MultiLayerWithKVCache;
@@ -54,7 +54,21 @@ void RunSingleLayer()
         vocabularySize: tokenizer.VocabularySize,
         hiddenDimension: 64);
     var runner = new Transformer(weights);
-    GenerateGreedy(tokens => runner.PredictNextTokenGreedy(tokens));
+
+    Console.WriteLine("Generating tokens...\n");
+    var tokens = inputIds.ToArray();
+    for (int i = 0; i < maxTokensToGenerate; i++)
+    {
+        var nextTokenId = runner.PredictNextTokenGreedy(tokens);
+        Console.WriteLine($"Predicted next token ID: {nextTokenId}");
+        if (nextTokenId == tokenizer.EndOfSequenceToken || tokens.Length >= maxTokensToGenerate)
+        {
+            Console.WriteLine("End of sequence reached or max token limit hit.");
+            break;
+        }
+        tokens = tokens.Append(nextTokenId).ToArray();
+        Console.WriteLine($"Generated text so far: {tokenizer.Detokenize(tokens)}");
+    }
 }
 
 void RunWithRope()
@@ -63,33 +77,113 @@ void RunWithRope()
         vocabularySize: tokenizer.VocabularySize,
         hiddenDimension: 64);
     var runner = new WithRope.MultiLayerTransformer(weights);
-    GenerateGreedy(tokens => runner.PredictNextTokenGreedy(tokens));
+
+    Console.WriteLine("Generating tokens...\n");
+    var tokens = inputIds.ToArray();
+    for (int i = 0; i < maxTokensToGenerate; i++)
+    {
+        var nextTokenId = runner.PredictNextTokenGreedy(tokens);
+        Console.WriteLine($"Predicted next token ID: {nextTokenId}");
+        if (nextTokenId == tokenizer.EndOfSequenceToken || tokens.Length >= maxTokensToGenerate)
+        {
+            Console.WriteLine("End of sequence reached or max token limit hit.");
+            break;
+        }
+        tokens = tokens.Append(nextTokenId).ToArray();
+        Console.WriteLine($"Generated text so far: {tokenizer.Detokenize(tokens)}");
+    }
 }
 
 void RunMultiLayer()
 {
-    var weights = LoadMultiLayerWeights(numberOfQueryHeads: 1, numberOfKeyValueHeads: 1);
+    var weights = RandomWeightLoader.LoadWeights(
+        vocabularySize: tokenizer.VocabularySize,
+        hiddenDimension: 64,
+        numberOfQueryHeads: 1,
+        numberOfKeyValueHeads: 1,
+        gateDimension: 128,
+        numberOfLayers: 2);
     var runner = new MultiLayer.MultiLayerTransformer(weights);
-    GenerateGreedy(tokens => runner.PredictNextTokenGreedy(tokens));
+
+    Console.WriteLine("Generating tokens...\n");
+    var tokens = inputIds.ToArray();
+    for (int i = 0; i < maxTokensToGenerate; i++)
+    {
+        var nextTokenId = runner.PredictNextTokenGreedy(tokens);
+        Console.WriteLine($"Predicted next token ID: {nextTokenId}");
+        if (nextTokenId == tokenizer.EndOfSequenceToken || tokens.Length >= maxTokensToGenerate)
+        {
+            Console.WriteLine("End of sequence reached or max token limit hit.");
+            break;
+        }
+        tokens = tokens.Append(nextTokenId).ToArray();
+        Console.WriteLine($"Generated text so far: {tokenizer.Detokenize(tokens)}");
+    }
 }
 
 void RunMultiLayerWithActivation()
 {
-    var weights = LoadMultiLayerWeights(numberOfQueryHeads: 1, numberOfKeyValueHeads: 1);
-    var runner = new MultiLayer.MultiLayerTransformerWithActivation(weights);
-    GenerateGreedy(tokens => runner.PredictNextTokenGreedy(tokens));
+    var weights = RandomWeightLoader.LoadWeights(
+        vocabularySize: tokenizer.VocabularySize,
+        hiddenDimension: 64,
+        numberOfQueryHeads: 1,
+        numberOfKeyValueHeads: 1,
+        gateDimension: 128,
+        numberOfLayers: 2);
+    var runner = new MultiLayerTransformerWithActivation(weights);
+
+    Console.WriteLine("Generating tokens...\n");
+    var tokens = inputIds.ToArray();
+    for (int i = 0; i < maxTokensToGenerate; i++)
+    {
+        var nextTokenId = runner.PredictNextTokenGreedy(tokens);
+        Console.WriteLine($"Predicted next token ID: {nextTokenId}");
+        if (nextTokenId == tokenizer.EndOfSequenceToken || tokens.Length >= maxTokensToGenerate)
+        {
+            Console.WriteLine("End of sequence reached or max token limit hit.");
+            break;
+        }
+        tokens = tokens.Append(nextTokenId).ToArray();
+        Console.WriteLine($"Generated text so far: {tokenizer.Detokenize(tokens)}");
+    }
 }
 
 void RunMultiLayerWithGQA()
 {
-    var weights = LoadMultiLayerWeights(numberOfQueryHeads: 8, numberOfKeyValueHeads: 2);
+    var weights = RandomWeightLoader.LoadWeights(
+        vocabularySize: tokenizer.VocabularySize,
+        hiddenDimension: 64,
+        numberOfQueryHeads: 8,
+        numberOfKeyValueHeads: 2,
+        gateDimension: 128,
+        numberOfLayers: 2);
     var runner = new MultiLayerTransformerWithGroupedQueryAttention(weights);
-    GenerateGreedy(tokens => runner.PredictNextTokenGreedy(tokens));
+
+    Console.WriteLine("Generating tokens...\n");
+    var tokens = inputIds.ToArray();
+    for (int i = 0; i < maxTokensToGenerate; i++)
+    {
+        var nextTokenId = runner.PredictNextTokenGreedy(tokens);
+        Console.WriteLine($"Predicted next token ID: {nextTokenId}");
+        if (nextTokenId == tokenizer.EndOfSequenceToken || tokens.Length >= maxTokensToGenerate)
+        {
+            Console.WriteLine("End of sequence reached or max token limit hit.");
+            break;
+        }
+        tokens = tokens.Append(nextTokenId).ToArray();
+        Console.WriteLine($"Generated text so far: {tokenizer.Detokenize(tokens)}");
+    }
 }
 
 void RunMultiLayerWithKVCache()
 {
-    var weights = LoadMultiLayerWeights(numberOfQueryHeads: 8, numberOfKeyValueHeads: 2);
+    var weights = RandomWeightLoader.LoadWeights(
+        vocabularySize: tokenizer.VocabularySize,
+        hiddenDimension: 64,
+        numberOfQueryHeads: 8,
+        numberOfKeyValueHeads: 2,
+        gateDimension: 128,
+        numberOfLayers: 2);
     var runner = new MultiLayerTransformerWithKVCache(weights);
 
     Console.WriteLine("Generating tokens (with KV cache)...\n");
@@ -160,36 +254,6 @@ void RunRealTinyLlama()
 }
 
 // --- Shared helpers ---
-
-ModelWeights LoadMultiLayerWeights(int numberOfQueryHeads, int numberOfKeyValueHeads) =>
-    RandomWeightLoader.LoadWeights(
-        vocabularySize: tokenizer.VocabularySize,
-        hiddenDimension: 64,
-        numberOfQueryHeads: numberOfQueryHeads,
-        numberOfKeyValueHeads: numberOfKeyValueHeads,
-        gateDimension: 128,
-        numberOfLayers: 2);
-
-void GenerateGreedy(Func<int[], int> predict)
-{
-    Console.WriteLine("Generating tokens...\n");
-    var tokens = inputIds.ToArray();
-
-    for (int i = 0; i < maxTokensToGenerate; i++)
-    {
-        var nextTokenId = predict(tokens);
-        Console.WriteLine($"Predicted next token ID: {nextTokenId}");
-
-        if (nextTokenId == tokenizer.EndOfSequenceToken || tokens.Length >= maxTokensToGenerate)
-        {
-            Console.WriteLine("End of sequence reached or max token limit hit.");
-            break;
-        }
-
-        tokens = tokens.Append(nextTokenId).ToArray();
-        Console.WriteLine($"Generated text so far: {tokenizer.Detokenize(tokens)}");
-    }
-}
 
 static string ScenarioName(int scenario) => scenario switch
 {

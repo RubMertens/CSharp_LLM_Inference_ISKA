@@ -1,7 +1,6 @@
 using Runner.ConsoleApp.Math;
-using Runner.ConsoleApp.RandomOneLayer;
 
-namespace Runner.ConsoleApp._3_MultiLayer;
+namespace Runner.ConsoleApp._4_MultiLayerWithActivation;
 
 
 
