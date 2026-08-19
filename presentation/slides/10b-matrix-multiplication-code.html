@@ -1,0 +1,51 @@
+<section data-id="matrix-multiplication-code" data-title="Matrix Multiply in Code">
+  <div class="slide-content">
+    <h2>Matrix Multiply — <span class="highlight">in Code</span></h2>
+
+    <div class="vscode-window"
+         data-src="Runner.ConsoleApp/Math/Matrix.cs"
+         data-member="operator *"
+         data-start-line="50">
+      <pre class="vscode-source">
+public static Matrix operator *(Matrix a, Matrix b)
+{
+    if (a.Columns != b.Rows)
+        throw new InvalidOperationException("Incompatible matrix dimensions for multiplication.");
+
+    Matrix result = new Matrix(a.Rows, b.Columns);
+    for (var i = 0; i &lt; a.Rows; i++)
+    {
+        for (var j = 0; j &lt; b.Columns; j++)
+        {
+            float sum = 0;
+            for (int k = 0; k &lt; a.Columns; k++)
+            {
+                sum += a.Data[i][k] * b.Data[k][j];
+            }
+            result.Data[i][j] = sum;
+        }
+    }
+    return result;
+}
+      </pre>
+      <span class="vscode-inline" data-line="1" data-value="a = 2×3   b = 3×2"></span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-lines="3-4"
+         data-values="3: a.Columns = 3, b.Rows = 3 ✓"
+         data-note="a.Columns == b.Rows or throw"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="7-10"
+         data-values="6: result = 2×2 | 7: i = 0 | 9: j = 0"
+         data-note="Walk every output cell (i, j)"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-lines="11-15"
+         data-stopped="14"
+         data-values="11: sum = 0 | 12: k = 0, 1, 2 | 14: sum = 8 → 20 → 23"
+         data-note="sum += a[i][k] * b[k][j] — the dot product"></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-text="result.Data[i][j] = sum"
+         data-values="16: result[0][0] = 23"
+         data-note="One cell done. Repeat a few billion times."></span>
+    </div>
+  </div>
+</section>
