@@ -73,6 +73,28 @@
 // latest one (data-steps="accumulate" keeps the earlier bands lit instead).
 
 const MONACO_BASE = 'vendor/monaco/vs';
+const STYLESHEET = 'css/vscode.css';
+
+// The module brings its own stylesheet, so a deck only has to import this file (see
+// js/interactive-slides.js) — index.html stays untouched. The first paint waits for the
+// stylesheet, so panels never flash unstyled.
+const stylesReady = (() => {
+  const href = new URL(STYLESHEET, location.href).href;
+  const existing = [...document.styleSheets].some(sheet => sheet.href === href)
+    || document.querySelector(`link[rel="stylesheet"][href="${STYLESHEET}"]`);
+  if (existing) return Promise.resolve();
+  return new Promise((resolve) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = STYLESHEET;
+    link.onload = resolve;
+    link.onerror = () => {
+      console.warn(`[vscode-code] could not load ${STYLESHEET}`);
+      resolve();
+    };
+    document.head.appendChild(link);
+  });
+})();
 
 // C# keywords VS Code paints purple (control flow) rather than blue.
 const CONTROL_KEYWORDS = new Set([
@@ -662,6 +684,7 @@ async function renderWindow(el) {
   el.dataset.theme = theme;
 
   try {
+    await stylesReady;
     const inline = inlineSource(el);
     if (inline === null) {
       throw new Error(el.dataset.src
