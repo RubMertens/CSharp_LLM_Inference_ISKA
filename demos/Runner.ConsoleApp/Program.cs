@@ -14,7 +14,7 @@ var modelDirectory = args.Length > 1
     ? args[1]
     : "/Users/rubenmertens/_projects/iska-llm-runner/demos/model";
 
-var prompt = "This is a test";
+var prompt = "Capital of France?";
 var tokenizer = new DemoTokenizer();
 var inputIds = tokenizer.Tokenize(prompt);
 const int maxTokensToGenerate = 20;
@@ -222,7 +222,7 @@ void RunRealTinyLlama()
     }
 
     var realTokenizer = new RealTokenizer(Path.Combine(modelDirectory, "tokenizer.model"));
-    const string realPrompt = "The capital of France is";
+    const string realPrompt = "Give seahorse emoji";
 
     Console.WriteLine("Loading real TinyLlama weights (this reads ~2.2GB, may take a moment)...");
     var weights = RealWeightLoader.LoadWeights(modelDirectory);

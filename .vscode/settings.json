@@ -1,0 +1,19 @@
+{
+    // Claude Code git worktrees (.claude/worktrees/) are full copies of this repo.
+    // Keep only those out of the explorer, search, file watcher, git repo scan and the
+    // dotnet project loader. Rest of .claude/ stays visible.
+    "files.exclude": {
+        "**/.claude/worktrees": true
+    },
+    "search.exclude": {
+        "**/.claude/worktrees": true
+    },
+    "files.watcherExclude": {
+        "**/.claude/worktrees/**": true
+    },
+    "git.repositoryScanIgnoredFolders": [
+        "node_modules",
+        ".claude/worktrees"
+    ],
+    "dotnet.defaultSolution": "demos/Demos.sln"
+}
