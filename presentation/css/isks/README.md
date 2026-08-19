@@ -24,11 +24,16 @@ isks/
 
 ## Using it
 
-Add the stylesheet in `index.html`, after `theme.css`:
+Add the stylesheet in `index.html`, before `theme.css`:
 
 ```html
 <link rel="stylesheet" href="css/isks/isks.css">
+<link rel="stylesheet" href="css/theme.css">
 ```
+
+Custom properties resolve at use time, so the order does not actually affect
+whether `theme.css` can read the `--isks-*` tokens. It is first because that is
+the readable order once `theme.css` starts referencing them.
 
 `isks.css` `@import`s `isks-tokens.css`, so one link is enough. Everything is
 namespaced `isks-`, so nothing collides with the existing theme, and adding the
@@ -155,3 +160,87 @@ Recorded because each one is a trap someone would otherwise hit again:
 - **The card icons need recolouring.** The deck's own speaker note says icons
   come in black by default and must be set to white or the title triangle's
   amber. See `assets/INDEX.md`.
+
+
+## How this deck uses the pack
+
+`index.html` links `css/isks/isks.css` before `css/theme.css` and carries one
+page-level footer bar (`#isks-bar`). Beyond that, the deck opts in through
+three mechanisms:
+
+**1. Role mapping in `theme.css`.** The pack defines colours; `theme.css`
+assigns them to the deck's existing roles (`--color-text`, `--color-accent`,
+...), so every slide inherited the palette without being touched. Two calls
+worth knowing:
+
+- `--color-accent` is teal-bright, **not** amber. Amber is a shape colour in
+  this identity; at 2.2:1 on white it fails even large-text AA, so it draws
+  rules and bullets but never carries text on a light slide.
+- `.highlight` is navy (12.5:1). On the dark canvases it flips to amber, which
+  is exactly how the pptx sets its subtitles.
+
+**2. `data-layout` on the slide's `<section>`.** `loader.js` carries the
+wrapper's `data-layout` and `class` across (only `innerHTML` is rendered), and
+`engine.js` copies them onto the `.slide` element and mirrors them onto
+`<body data-slide|data-layout>` so page-level chrome can react.
+
+| value | effect |
+|---|---|
+| `isks-dark` | navy-to-teal wash, white headings, amber subtitle; add a `<span class="isks-halftone">` for the dot field |
+| `isks-bare` | hides the footer bar and drops the bar clearance |
+
+The section dividers (`06-section-wiskunde`, `11-section-transformer`) use
+`isks-dark`. The hero and outro are matched by `data-slide` directly.
+
+**3. Bar clearance.** `.slide` reserves `--isks-bar-clearance` at the bottom.
+Anything `position: fixed` inside a slide escapes that and must inset itself
+(see `02b-meme.html`), and viewport-unit heights ignore it entirely -- which is
+what the layout fixes below were about.
+
+### Palette migration
+
+The deck previously used the Info Support corporate palette plus a neon set on
+the hero and outro. Mapping applied:
+
+| was | now | why |
+|---|---|---|
+| `#00A3E0` Info Support blue | `#1C8680` teal-bright | primary cool accent |
+| `#6ECFF6` felblauw | `#29AC8D` band teal | secondary cool |
+| `#4A6A8A` slate | `#4A8480` muted teal | muted text, 4.6:1 |
+| `#C8D8E8` / `#F0F4F8` | `#BFDAD8` / `#EFF6F5` | borders and panels |
+| `#38bdf8` / `#4ade80` / `#fbbf24` | `#003760` / `#1C8680` / `#F0A413` | the three-series charts, pushed apart so they stay tellable |
+| `#ff4d9d` `#a855f7` `#ffe24d` `#4dff9d` `#ff8a3d` | amber, teal-bright, amber tint, teal tint, house red | hero and outro neons |
+
+`svg.css` already referenced tokens with the old hexes only as fallbacks, so
+the diagrams followed automatically; the stale fallbacks were updated to match.
+
+### Two things that had to change, not just recolour
+
+- **Hue rotation.** The hero and outro animated `filter: hue-rotate()` through
+  360deg, which sweeps any palette through the whole colour wheel -- the one
+  thing a brand palette cannot survive. Both now pulse saturation and
+  brightness instead. The motion is unchanged.
+- **Additive mixing.** Their conic washes screen a full-spectrum gradient over
+  the backdrop. Screening amber against teal yields olive, which turned both
+  slides to mush. The washes are now confined to the teal half of the palette
+  and amber lives in the headline. Layer sizes were also capped to
+  `min(150vmax, 2000px)` per the deck's animation budget.
+
+### Layout fixes the bar forced
+
+Three slides sized content against the viewport, which ignores the bar's
+clearance, so their bottom rows ended up underneath it:
+
+- `26-scale` -- `height: 62vh` on the chart row, plus SVGs that kept their
+  aspect-derived height and overflowed. Now `flex: 1; min-height: 0` on the
+  row and `height: 0` on the SVGs, so flex does the sizing.
+- `18-causal-masking` -- `height: 100%` on the two-column, same fix.
+- `02b-meme` -- a `position: fixed; inset: 0` image, now inset to
+  `0 0 var(--isks-bar-h) 0`.
+
+### Known caveat
+
+The hero and outro are built from emoji (unicorns, diamonds, rockets). Emoji
+render with their own fixed colours and cannot be brought into the palette.
+They are the slides' personality, so they were left alone -- but they are the
+one genuinely off-brand element left in the deck.

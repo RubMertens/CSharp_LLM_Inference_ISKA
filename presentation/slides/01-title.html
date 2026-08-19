@@ -129,7 +129,7 @@
       inset: 0;
       z-index: 0;
       background:
-        radial-gradient(120% 120% at 50% 0%, #1a1040 0%, #0b0a1f 45%, #06060f 100%);
+        radial-gradient(120% 120% at 50% 0%, #04405E 0%, #01212F 45%, #000E15 100%);
       pointer-events: none;
     }
 
@@ -137,14 +137,19 @@
     .title-conic-wash {
       position: fixed;
       top: 50%; left: 50%;
-      width: 200vmax; height: 200vmax;
-      margin: -100vmax 0 0 -100vmax;
+      /* capped per the deck's layer-size budget; a 200vmax square is a
+         ~46 MB texture on a phone */
+      width: min(150vmax, 2000px); height: min(150vmax, 2000px);
+      margin: min(-75vmax, -1000px) 0 0 min(-75vmax, -1000px);
       z-index: 0;
       pointer-events: none;
-      opacity: 0.22;
+      opacity: 0.16;
       mix-blend-mode: screen;
+      /* Kept inside the teal half of the palette. Screening amber against
+         teal additively produces olive, which is what turned the whole hero
+         to mush; amber now lives in the headline and accents instead. */
       background: conic-gradient(from 0deg,
-        #ff4d9d, #ff8a3d, #ffe24d, #4dff9d, #38bdf8, #a855f7, #ff4d9d);
+        #1C8680, #29AC8D, #3FBFA3, #29AC8D, #005C75, #1C8680);
       animation: title-wash-spin 28s linear infinite,
                  title-wash-hue 14s ease-in-out infinite;
       will-change: transform, filter;
@@ -153,10 +158,12 @@
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
-    /* slow hue-rotate pulsing on the conic wash */
+    /* Pulses intensity, not hue. A hue-rotate here spun the ISKS palette
+       into arbitrary colours mid-animation, which is what made the hero
+       read as off-brand. Motion is unchanged; only the hue is pinned. */
     @keyframes title-wash-hue {
-      0%,100% { filter: hue-rotate(0deg) saturate(1); }
-      50%     { filter: hue-rotate(180deg) saturate(1.6); }
+      0%,100% { filter: saturate(1) brightness(1); }
+      50%     { filter: saturate(1.5) brightness(1.25); }
     }
 
     /* ===== SVG warp filter host (zero footprint) ===== */
@@ -175,11 +182,11 @@
       opacity: 0.4;
       mix-blend-mode: screen;
       background:
-        radial-gradient(40% 60% at 25% 30%, rgba(168,85,247,0.55), transparent 60%),
-        radial-gradient(45% 55% at 75% 65%, rgba(56,189,248,0.5), transparent 60%),
-        radial-gradient(35% 45% at 55% 20%, rgba(255,77,157,0.45), transparent 60%),
+        radial-gradient(40% 60% at 25% 30%, rgba(28,134,128,0.55), transparent 60%),
+        radial-gradient(45% 55% at 75% 65%, rgba(41,172,141,0.5), transparent 60%),
+        radial-gradient(35% 45% at 55% 20%, rgba(0,92,117,0.5), transparent 60%),
         repeating-linear-gradient(60deg,
-          rgba(168,85,247,0.18) 0 18px, transparent 18px 46px);
+          rgba(28,134,128,0.18) 0 18px, transparent 18px 46px);
       filter: url(#title-warp-filter) blur(2px);
       animation: title-warp-shift 24s ease-in-out infinite;
       will-change: transform, background-position;
@@ -197,8 +204,8 @@
       pointer-events: none;
       opacity: 0.35;
       background-image:
-        linear-gradient(rgba(56,189,248,0.35) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(168,85,247,0.35) 1px, transparent 1px);
+        linear-gradient(rgba(41,172,141,0.35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(28,134,128,0.35) 1px, transparent 1px);
       background-size: 48px 48px;
       -webkit-mask: radial-gradient(120% 80% at 50% 40%, #000 0%, transparent 70%);
       mask: radial-gradient(120% 80% at 50% 40%, #000 0%, transparent 70%);
@@ -235,11 +242,11 @@
       border-radius: 50%;
       background: transparent;
       box-shadow:
-        40px 60px #fff, 180px 120px #bfe9ff, 320px 40px #fff, 500px 200px #ffd6f3,
-        640px 90px #fff, 760px 260px #d6c7ff, 900px 50px #fff, 1040px 180px #bfe9ff,
-        1180px 100px #fff, 120px 320px #fff, 280px 420px #ffd6f3, 460px 360px #fff,
-        620px 460px #d6c7ff, 820px 400px #fff, 980px 500px #bfe9ff, 1140px 360px #fff,
-        220px 560px #fff, 540px 600px #ffd6f3, 880px 640px #fff, 1100px 600px #d6c7ff;
+        40px 60px #fff, 180px 120px #D6F0EC, 320px 40px #fff, 500px 200px #FDE7C2,
+        640px 90px #fff, 760px 260px #BFE3DF, 900px 50px #fff, 1040px 180px #D6F0EC,
+        1180px 100px #fff, 120px 320px #fff, 280px 420px #FDE7C2, 460px 360px #fff,
+        620px 460px #BFE3DF, 820px 400px #fff, 980px 500px #D6F0EC, 1140px 360px #fff,
+        220px 560px #fff, 540px 600px #FDE7C2, 880px 640px #fff, 1100px 600px #BFE3DF;
       animation: title-star-drift 40s linear infinite;
       will-change: transform;
     }
@@ -267,31 +274,31 @@
     .title-blob-1 {
       width: 480px; height: 480px;
       top: -120px; left: -80px;
-      background: radial-gradient(circle, #ff4d9d 0%, transparent 70%);
+      background: radial-gradient(circle, #F0A413 0%, transparent 70%);
       animation: title-blob-drift-a 18s ease-in-out infinite;
     }
     .title-blob-2 {
       width: 520px; height: 520px;
       bottom: -160px; right: -120px;
-      background: radial-gradient(circle, #38bdf8 0%, transparent 70%);
+      background: radial-gradient(circle, #29AC8D 0%, transparent 70%);
       animation: title-blob-drift-b 22s ease-in-out infinite;
     }
     .title-blob-3 {
       width: 400px; height: 400px;
       top: 30%; left: 55%;
-      background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+      background: radial-gradient(circle, #1C8680 0%, transparent 70%);
       animation: title-blob-drift-c 26s ease-in-out infinite;
     }
     .title-blob-4 {
       width: 360px; height: 360px;
       top: 60%; left: 8%;
-      background: radial-gradient(circle, #ffe24d 0%, transparent 70%);
+      background: radial-gradient(circle, #F7C55E 0%, transparent 70%);
       animation: title-blob-drift-a 20s ease-in-out infinite reverse;
     }
     .title-blob-5 {
       width: 440px; height: 440px;
       top: -60px; right: 10%;
-      background: radial-gradient(circle, #4dff9d 0%, transparent 70%);
+      background: radial-gradient(circle, #3FBFA3 0%, transparent 70%);
       animation: title-blob-drift-c 24s ease-in-out infinite reverse;
     }
     @keyframes title-blob-drift-a {
@@ -326,21 +333,21 @@
       animation: title-confetti-fall 9s linear infinite;
     }
     .title-conf::before { content: ""; display: block; width: 100%; height: 100%; }
-    .c1  { left: 6%;  background: #ff4d9d; animation-duration: 8s;  animation-delay: 0s;   border-radius: 2px; }
-    .c2  { left: 14%; background: #38bdf8; animation-duration: 11s; animation-delay: 1.2s; border-radius: 50%; }
-    .c3  { left: 22%; background: #ffe24d; animation-duration: 9s;  animation-delay: 2.4s; }
-    .c4  { left: 30%; background: #4dff9d; animation-duration: 12s; animation-delay: 0.6s; border-radius: 50%; }
-    .c5  { left: 38%; background: #a855f7; animation-duration: 10s; animation-delay: 3.1s; border-radius: 2px; }
-    .c6  { left: 46%; background: #ff8a3d; animation-duration: 8.5s;animation-delay: 1.8s; }
-    .c7  { left: 54%; background: #38bdf8; animation-duration: 11.5s;animation-delay: 0.3s;border-radius: 50%; }
-    .c8  { left: 62%; background: #ff4d9d; animation-duration: 9.5s;animation-delay: 2.7s; border-radius: 2px; }
-    .c9  { left: 70%; background: #ffe24d; animation-duration: 10.5s;animation-delay: 1.0s; }
-    .c10 { left: 78%; background: #4dff9d; animation-duration: 8s;  animation-delay: 3.6s; border-radius: 50%; }
-    .c11 { left: 86%; background: #a855f7; animation-duration: 12s; animation-delay: 0.9s; border-radius: 2px; }
-    .c12 { left: 94%; background: #ff8a3d; animation-duration: 9s;  animation-delay: 2.2s; }
-    .c13 { left: 10%; background: #ffe24d; animation-duration: 11s; animation-delay: 4.0s; border-radius: 50%; }
-    .c14 { left: 50%; background: #ff4d9d; animation-duration: 10s; animation-delay: 4.6s; }
-    .c15 { left: 90%; background: #38bdf8; animation-duration: 9.5s;animation-delay: 5.1s; border-radius: 2px; }
+    .c1  { left: 6%;  background: #F0A413; animation-duration: 8s;  animation-delay: 0s;   border-radius: 2px; }
+    .c2  { left: 14%; background: #29AC8D; animation-duration: 11s; animation-delay: 1.2s; border-radius: 50%; }
+    .c3  { left: 22%; background: #F7C55E; animation-duration: 9s;  animation-delay: 2.4s; }
+    .c4  { left: 30%; background: #3FBFA3; animation-duration: 12s; animation-delay: 0.6s; border-radius: 50%; }
+    .c5  { left: 38%; background: #1C8680; animation-duration: 10s; animation-delay: 3.1s; border-radius: 2px; }
+    .c6  { left: 46%; background: #F04E23; animation-duration: 8.5s;animation-delay: 1.8s; }
+    .c7  { left: 54%; background: #29AC8D; animation-duration: 11.5s;animation-delay: 0.3s;border-radius: 50%; }
+    .c8  { left: 62%; background: #F0A413; animation-duration: 9.5s;animation-delay: 2.7s; border-radius: 2px; }
+    .c9  { left: 70%; background: #F7C55E; animation-duration: 10.5s;animation-delay: 1.0s; }
+    .c10 { left: 78%; background: #3FBFA3; animation-duration: 8s;  animation-delay: 3.6s; border-radius: 50%; }
+    .c11 { left: 86%; background: #1C8680; animation-duration: 12s; animation-delay: 0.9s; border-radius: 2px; }
+    .c12 { left: 94%; background: #F04E23; animation-duration: 9s;  animation-delay: 2.2s; }
+    .c13 { left: 10%; background: #F7C55E; animation-duration: 11s; animation-delay: 4.0s; border-radius: 50%; }
+    .c14 { left: 50%; background: #F0A413; animation-duration: 10s; animation-delay: 4.6s; }
+    .c15 { left: 90%; background: #29AC8D; animation-duration: 9.5s;animation-delay: 5.1s; border-radius: 2px; }
     @keyframes title-confetti-fall {
       0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
       8%   { opacity: 0.9; }
@@ -473,18 +480,18 @@
       will-change: background-position, transform;
     }
     .title-badge-a {
-      background: linear-gradient(90deg, #ff4d9d, #a855f7, #38bdf8, #ff4d9d);
-      box-shadow: 0 0 22px rgba(168,85,247,0.8);
+      background: linear-gradient(90deg, #F0A413, #1C8680, #29AC8D, #F0A413);
+      box-shadow: 0 0 22px rgba(28,134,128,0.8);
       animation-delay: 0s, 0s;
     }
     .title-badge-b {
-      background: linear-gradient(90deg, #ff8a3d, #ffe24d, #ff4d9d, #ff8a3d);
-      box-shadow: 0 0 22px rgba(255,138,61,0.8);
+      background: linear-gradient(90deg, #F04E23, #F7C55E, #F0A413, #F04E23);
+      box-shadow: 0 0 22px rgba(240,78,35,0.8);
       animation-delay: 0s, -1s;
     }
     .title-badge-c {
-      background: linear-gradient(90deg, #38bdf8, #4dff9d, #a855f7, #38bdf8);
-      box-shadow: 0 0 22px rgba(56,189,248,0.8);
+      background: linear-gradient(90deg, #29AC8D, #3FBFA3, #1C8680, #29AC8D);
+      box-shadow: 0 0 22px rgba(41,172,141,0.8);
       animation-delay: 0s, -2s;
     }
     @keyframes title-badge-shift {
@@ -527,20 +534,21 @@
     .title-ltr {
       display: inline-block;
       background: linear-gradient(115deg,
-        #ff4d9d 0%, #ff8a3d 18%, #ffe24d 36%,
-        #4dff9d 54%, #38bdf8 72%, #a855f7 90%, #ff4d9d 100%);
+        #F0A413 0%, #F04E23 18%, #F7C55E 36%,
+        #3FBFA3 54%, #29AC8D 72%, #1C8680 90%, #F0A413 100%);
       background-size: 300% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       color: transparent;
+      /* No hue-rotate: it swept the letters through the full colour wheel,
+         which is the one thing the ISKS palette cannot survive. The gradient
+         still slides and the letters still wave. */
       animation:
         title-holo-slide 6s linear infinite,
-        title-holo-hue 8s linear infinite,
         title-ltr-wave 2.2s ease-in-out infinite;
       animation-delay:
         calc(var(--i) * -0.12s),
-        calc(var(--i) * -0.1s),
         calc(var(--i) * 0.08s);
       will-change: transform, background-position;
     }
@@ -548,17 +556,13 @@
       0%   { background-position: 0% 50%; }
       100% { background-position: 300% 50%; }
     }
-    @keyframes title-holo-hue {
-      0%   { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(360deg); }
-    }
     @keyframes title-ltr-wave {
       0%,100% { transform: translateY(0) scale(1); }
       50%     { transform: translateY(-0.16em) scale(1.12); }
     }
     @keyframes title-holo-glow {
-      0%,100% { filter: drop-shadow(0 0 14px rgba(168,85,247,0.45)); }
-      50%     { filter: drop-shadow(0 0 30px rgba(56,189,248,0.85)); }
+      0%,100% { filter: drop-shadow(0 0 14px rgba(28,134,128,0.45)); }
+      50%     { filter: drop-shadow(0 0 30px rgba(41,172,141,0.85)); }
     }
 
     /* ===== emoji orbiting the headline: outer span spins, inner counter-spins upright ===== */
@@ -606,9 +610,9 @@
       width: clamp(220px, 36vw, 460px);
       border-radius: 999px;
       margin-top: 0.5rem;
-      background: linear-gradient(90deg, transparent, #ff4d9d, #ffe24d, #4dff9d, #38bdf8, #a855f7, transparent);
+      background: linear-gradient(90deg, transparent, #F0A413, #F7C55E, #3FBFA3, #29AC8D, #1C8680, transparent);
       background-size: 200% 100%;
-      box-shadow: 0 0 22px rgba(56,189,248,0.9);
+      box-shadow: 0 0 22px rgba(41,172,141,0.9);
       animation: title-underline-sweep 3s linear infinite,
                  title-underline-pulse 2s ease-in-out infinite;
       will-change: background-position, transform;
@@ -652,7 +656,7 @@
       border-radius: 18px;
       padding: 8px;
       background: conic-gradient(from 0deg,
-        #ff4d9d, #ff8a3d, #ffe24d, #4dff9d, #38bdf8, #a855f7, #ff4d9d);
+        #F0A413, #F04E23, #F7C55E, #3FBFA3, #29AC8D, #1C8680, #F0A413);
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
       -webkit-mask-composite: xor;
       mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -669,7 +673,7 @@
       border-radius: 24px;
       padding: 3px;
       background: conic-gradient(from 180deg,
-        #38bdf8, #a855f7, #ff4d9d, #ffe24d, #4dff9d, #38bdf8);
+        #29AC8D, #1C8680, #F0A413, #F7C55E, #3FBFA3, #29AC8D);
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
       -webkit-mask-composite: xor;
       mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -685,8 +689,8 @@
     }
     /* glow cycles colors around card — does NOT touch the QR pixels */
     @keyframes title-qr-pulse {
-      0%,100% { box-shadow: 0 0 34px rgba(56,189,248,0.6), 0 0 70px rgba(168,85,247,0.4); }
-      50%     { box-shadow: 0 0 52px rgba(255,77,157,0.8), 0 0 110px rgba(56,189,248,0.55); }
+      0%,100% { box-shadow: 0 0 34px rgba(41,172,141,0.6), 0 0 70px rgba(28,134,128,0.4); }
+      50%     { box-shadow: 0 0 52px rgba(240,164,19,0.8), 0 0 110px rgba(41,172,141,0.55); }
     }
     .title-qr-code {
       display: block;
@@ -699,7 +703,7 @@
       color: var(--color-text-muted);
       text-decoration: none;
       letter-spacing: 0.02em;
-      background: linear-gradient(90deg, #38bdf8, #4dff9d, #a855f7, #ff4d9d, #38bdf8);
+      background: linear-gradient(90deg, #29AC8D, #3FBFA3, #1C8680, #F0A413, #29AC8D);
       background-size: 200% 100%;
       -webkit-background-clip: text;
       background-clip: text;
