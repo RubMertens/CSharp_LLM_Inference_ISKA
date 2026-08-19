@@ -1,0 +1,653 @@
+/*
+ * ISKS 2026 "Built to Last" -- slide components
+ *
+ * Rebuilds the pptx layouts as CSS so slide text stays live, crisp and
+ * selectable instead of baked into a raster. Geometry and colour come
+ * from isks-tokens.css; see README.md for markup snippets per layout.
+ *
+ * Performance contract (deck is opened on phones from a QR code):
+ *   - no animation here at all; every layer is a static paint
+ *   - the halftone field is two masked dot layers, not an SVG filter
+ *   - the full-resolution pptx rasters are never referenced; only the
+ *     optimised assets/web/ variants are
+ */
+
+@import url("isks-tokens.css");
+
+/* ============================================================
+   CANVAS
+   ============================================================
+   The engine renders each slide into a padded flex container.
+   .isks-canvas is absolutely positioned so the pptx percentage
+   geometry lands unmodified, ignoring that padding.
+   ============================================================ */
+
+.isks-canvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--isks-font);
+  color: var(--isks-body);
+  background: var(--isks-bg);
+}
+
+/* Dark variant: the signature navy -> teal wash with halftone. */
+.isks-canvas--dark {
+  color: var(--isks-on-dark);
+  background: var(--isks-gradient-h);
+}
+
+.isks-canvas--dark .isks-title,
+.isks-canvas--dark .isks-body {
+  color: var(--isks-on-dark);
+}
+
+/* ============================================================
+   HALFTONE DOT FIELD
+   ============================================================
+   Two masked layers approximate the pptx halftone, where dot area
+   shrinks linearly with x. One layer carries the large dots and
+   fades out early; the other carries small dots and survives
+   further right. Pitch is in vw so tiles stay square at any aspect.
+   ============================================================ */
+
+/* Two dot sizes, each on its own layer with its own horizontal mask,
+   step down the measured shrink: 0.72 x pitch at x=0, 0.51 at 24%,
+   0.42 at 36%, gone by 54%. A single layer with only an opacity ramp
+   reads as a hard edge rather than a halftone.
+
+   The container itself carries NO mask. A mask on the parent also
+   clips its own ::before/::after, which would collapse the two bands
+   back into one. Every mask below therefore lives on a leaf layer.
+
+   Layer radii are fractions of --isks-dot-radius, so overriding that
+   one token rescales the whole field (the footer bar does exactly
+   that). */
+.isks-halftone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.isks-halftone::before,
+.isks-halftone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: var(--isks-dot-pitch) var(--isks-dot-pitch);
+  background-position: center;
+}
+
+/* large dots, holding the left edge and handing over by ~30% */
+.isks-halftone::before {
+  background-image: radial-gradient(
+    circle at center,
+    var(--isks-dot-color) 0 var(--isks-dot-radius),
+    transparent calc(var(--isks-dot-radius) + 1%)
+  );
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 8%, transparent 30%);
+          mask-image: linear-gradient(90deg, #000 0%, #000 8%, transparent 30%);
+}
+
+/* small dots, fading in behind them and carrying the tail out */
+.isks-halftone::after {
+  background-image: radial-gradient(
+    circle at center,
+    var(--isks-dot-color) 0 calc(var(--isks-dot-radius) * 0.60),
+    transparent calc(var(--isks-dot-radius) * 0.60 + 1%)
+  );
+  -webkit-mask-image: linear-gradient(90deg, transparent 12%, #000 var(--isks-dot-fade-start), transparent var(--isks-dot-fade-end));
+          mask-image: linear-gradient(90deg, transparent 12%, #000 var(--isks-dot-fade-start), transparent var(--isks-dot-fade-end));
+}
+
+/* Mirrored variant, for dots entering from the right. */
+.isks-halftone--right {
+  transform: scaleX(-1);
+}
+
+/* ============================================================
+   FOOTER BAR
+   ============================================================
+   Present on every content layout (slideLayout2/3/5): full width,
+   top edge at 90.08%, height 10.22% of the slide.
+
+   .isks-bar composes the bar from live parts so the wordmarks stay
+   crisp. .isks-bar--image swaps in the original pptx raster.
+   ============================================================ */
+
+/* Every child position below is measured off the 4400x252 bar
+   artwork and expressed as a % of the bar box, so the composed bar
+   is interchangeable with the raster. */
+.isks-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--isks-bar-y);
+  bottom: 0;
+  overflow: hidden;
+  background: var(--isks-gradient-h);
+}
+
+/* The bar's halftone is a finer grid than the background's: smaller
+   pitch, smaller dots, one size only rather than a shrink ramp. */
+.isks-bar > .isks-halftone {
+  z-index: 0;
+  --isks-dot-pitch: var(--isks-bar-dot-pitch);
+  --isks-dot-radius: var(--isks-bar-dot-radius);
+}
+
+.isks-bar > .isks-halftone::before {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 10%, transparent var(--isks-bar-dot-fade));
+          mask-image: linear-gradient(90deg, #000 0%, #000 10%, transparent var(--isks-bar-dot-fade));
+}
+
+/* no second dot size in the bar artwork */
+.isks-bar > .isks-halftone::after {
+  display: none;
+}
+
+.isks-bar__logo,
+.isks-bar__rule,
+.isks-bar__event,
+.isks-bar__lockup {
+  position: absolute;
+  z-index: 1;
+}
+
+/* logo: x 3.66% -> 13.55%, y 17.46% -> 82.14% of the bar */
+.isks-bar__logo {
+  left: 3.66%;
+  top: 17.46%;
+  height: 64.7%;
+  width: auto;
+}
+
+/* amber rule: x 15.57%, 0.30% wide, y 11.90% -> 87.70% */
+.isks-bar__rule {
+  left: 15.57%;
+  top: 11.90%;
+  width: 0.30%;
+  min-width: 2px;
+  height: 75.8%;
+  background: var(--isks-amber);
+}
+
+/* "ISKS / 2026": left 18.30%, cap height 25% of the bar, the two
+   lines 37.3% of the bar height apart -> line-height 1.07 */
+.isks-bar__event {
+  left: 18.30%;
+  top: 11%;
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--isks-fs-bar);
+  line-height: 1.07;
+  letter-spacing: 0;
+  color: var(--isks-white);
+}
+
+.isks-bar__event > span {
+  display: block;
+  color: var(--isks-amber);
+}
+
+/* lockup: x 89.75% -> 94.82%, y 12.70% -> 85.71% */
+.isks-bar__lockup {
+  right: 5.18%;
+  top: 12.70%;
+  height: 73%;
+  width: auto;
+}
+
+/* Raster fallback: the bar exactly as it ships in the pptx. */
+.isks-bar--image {
+  background-image: var(--isks-asset-bar);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.isks-bar--image > * {
+  display: none;
+}
+
+/* ============================================================
+   SECTION TITLE
+   ============================================================
+   Teal, Arial bold, 40pt, left edge at 11.96% / top at 12.98%.
+   The amber triangle bullet sits at 7.73% / 16.21% in a 4.09%-wide
+   frame, rotated 135deg -- reproduced here as a clip-path so it
+   scales cleanly and costs nothing to paint.
+   ============================================================ */
+
+.isks-title {
+  position: absolute;
+  left: var(--isks-title-x);
+  top: var(--isks-title-y);
+  width: var(--isks-title-w);
+  margin: 0;
+  font-size: var(--isks-fs-title);
+  font-weight: var(--isks-weight-title);
+  line-height: var(--isks-lh);
+  color: var(--isks-heading);
+  letter-spacing: 0;
+}
+
+/* Amber triangle bullet. Isosceles triangle in a 2:1 frame, rotated
+   135deg, matching prstGeom="triangle" + rot="8100000". */
+.isks-bullet {
+  position: absolute;
+  left: var(--isks-bullet-x);
+  top: var(--isks-bullet-y);
+  width: var(--isks-bullet-size);
+  aspect-ratio: 498905 / 254396;   /* the pptx frame, verbatim */
+  background: var(--isks-amber);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  transform: rotate(135deg);
+}
+
+/* ============================================================
+   BODY CONTENT
+   ============================================================ */
+
+.isks-body {
+  position: absolute;
+  left: var(--isks-content-x);
+  top: var(--isks-content-y);
+  width: var(--isks-content-w);
+  max-height: var(--isks-content-h);
+  font-size: var(--isks-fs-body);
+  line-height: var(--isks-lh-body);
+  color: var(--isks-body);
+}
+
+.isks-body--dense {
+  font-size: var(--isks-fs-body-sm);
+}
+
+/* Two-column split from slideLayout2: 39.40% | gap | 42.08%. */
+.isks-body--split {
+  width: auto;
+  right: var(--isks-content-x);
+  display: grid;
+  grid-template-columns: var(--isks-col-left-w) 1fr;
+  gap: calc(var(--isks-col-right-x) - var(--isks-content-x) - var(--isks-col-left-w));
+}
+
+/* Bullets use the master's Arial bullet char, recoloured amber so the
+   brand accent carries into body copy. */
+.isks-body ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.isks-body li {
+  position: relative;
+  padding-left: 1.1em;
+  margin-bottom: 0.5em;
+}
+
+.isks-body li::before {
+  content: "\2022";
+  position: absolute;
+  left: 0;
+  color: var(--isks-amber);
+  font-weight: 700;
+}
+
+.isks-body strong {
+  color: inherit;
+  font-weight: 700;
+}
+
+/* ============================================================
+   GRADIENT CARDS  (slideLayout5)
+   ============================================================
+   Four panels, 19.65% x 40.87%, top 31.34%, 2.22% gutters, filled
+   with the vertical navy -> teal ramp. White centred copy, 18pt.
+   ============================================================ */
+
+.isks-cards {
+  position: absolute;
+  left: 7.63%;
+  right: 7.12%;               /* 100 - (73.23 + 19.65) */
+  top: var(--isks-card-y);
+  height: var(--isks-card-h);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--isks-card-gap);
+}
+
+.isks-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  padding: 6% 8%;
+  text-align: center;
+  color: var(--isks-on-dark);
+  font-size: var(--isks-fs-body-sm);
+  line-height: var(--isks-lh-body);
+  background: var(--isks-gradient-v);
+}
+
+/* The deck's own speaker note for this layout: icons go in the cards, and
+   must be recoloured off the default black to white or to the same amber as
+   the title triangle. Both are provided; white is the default.
+   An <img> icon needs the asset already in the right colour -- the filter
+   only helps an inline <svg> or a monochrome mask. */
+.isks-card__icon {
+  width: 40%;
+  height: auto;
+  max-height: 32%;
+  object-fit: contain;
+  color: var(--isks-white);
+  fill: currentColor;
+}
+
+.isks-card__icon--amber {
+  color: var(--isks-amber);
+}
+
+.isks-card__title {
+  font-weight: 700;
+}
+
+/* ============================================================
+   TITLE SLIDE  (slideLayout1)
+   ============================================================
+   Full-bleed photographic background, white bold headline at
+   4.86% / 31.66%, amber subtitle at 58.14%.
+   ============================================================ */
+
+.isks-hero {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--isks-font);
+  color: var(--isks-on-dark);
+  background: var(--isks-navy) var(--isks-asset-title-bg) center / cover no-repeat;
+}
+
+.isks-hero__title {
+  position: absolute;
+  left: var(--isks-hero-x);
+  top: var(--isks-hero-y);
+  width: var(--isks-hero-w);
+  margin: 0;
+  font-size: var(--isks-fs-hero);
+  font-weight: 700;
+  line-height: var(--isks-lh);
+  color: var(--isks-white);
+}
+
+.isks-hero__subtitle {
+  position: absolute;
+  left: var(--isks-hero-x);
+  top: var(--isks-hero-sub-y);
+  width: 44.75%;
+  margin: 0;
+  font-size: var(--isks-fs-subtitle);
+  line-height: var(--isks-lh-body);
+  color: var(--isks-amber-text);
+}
+
+/* Speaker byline, third text block on the layout: white, 24pt. */
+.isks-hero__byline {
+  position: absolute;
+  left: 12.15%;
+  top: 77.95%;
+  width: 38.27%;
+  margin: 0;
+  font-size: var(--isks-fs-subtitle);
+  line-height: var(--isks-lh-body);
+  color: var(--isks-white);
+}
+
+/* Circular speaker portrait with amber ring, 6.05% wide at 4.86%/75.66%. */
+.isks-hero__portrait {
+  position: absolute;
+  left: var(--isks-hero-x);
+  top: 75.66%;
+  width: 6.05%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 0.25vw solid var(--isks-amber);
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   BRAND MOTIFS
+   ============================================================ */
+
+/* The amber diagonal from the title slide. Measured on the source
+   asset: 68.0% of width at the top edge, 41.3% at the bottom,
+   0.89% thick -- roughly 26deg off vertical. */
+.isks-diagonal {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--isks-amber);
+  clip-path: polygon(67.99% 0, 68.88% 0, 42.19% 100%, 41.30% 100%);
+}
+
+/* The lighter teal band across the lower left of the title slide:
+   top 73.5%, height 15%, fading out by 34% of the width. */
+.isks-band {
+  position: absolute;
+  left: 0;
+  top: 73.54%;
+  width: 40%;
+  height: 14.99%;
+  pointer-events: none;
+  background: linear-gradient(90deg, #29AC8D 0%, rgba(41, 172, 141, 0) 90%);
+}
+
+/* Standalone Info Support brand triangle: long edge to the upper
+   right, per the house style. Colour it with `background`. */
+.isks-triangle {
+  background: var(--isks-amber);
+  clip-path: polygon(0 100%, 100% 0, 100% 100%);
+}
+
+/* ============================================================
+   COLOUR UTILITIES
+   ============================================================ */
+
+.isks-amber-text { color: var(--isks-amber); }
+.isks-teal-text  { color: var(--isks-teal); }
+.isks-navy-text  { color: var(--isks-navy); }
+
+.isks-lockup {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+/* ============================================================
+   PHONE
+   ============================================================
+   The pptx geometry assumes 16:9 landscape. On a narrow portrait
+   viewport the absolute placement collapses, so switch the content
+   layouts to a simple stacked flow and drop the heavier layers.
+   ============================================================ */
+
+@media (max-width: 820px) {
+  .isks-canvas {
+    display: flex;
+    flex-direction: column;
+    padding: 6vw 6vw calc(var(--isks-bar-h) + 4vw);
+  }
+
+  .isks-title,
+  .isks-body,
+  .isks-cards {
+    position: static;
+    left: auto;
+    top: auto;
+    right: auto;
+    width: auto;
+    max-height: none;
+    height: auto;
+  }
+
+  .isks-title {
+    padding-left: 1.4em;
+    margin-bottom: 0.6em;
+  }
+
+  /* Move the triangle bullet inline with the wrapped title. */
+  .isks-bullet {
+    position: absolute;
+    left: 6vw;
+    top: 7vw;
+    width: 4.2vw;
+  }
+
+  .isks-body--split {
+    display: block;
+  }
+
+  .isks-body--split > * + * {
+    margin-top: 1em;
+  }
+
+  .isks-cards {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    gap: 3vw;
+  }
+
+  .isks-card {
+    padding: 4vw;
+  }
+
+  /* One dot size instead of two; the shrink step is invisible at this
+     size and costs another full-slide paint. Pitch opens up so the
+     grid stays legible on a narrow viewport, and the single remaining
+     layer fades across the whole width rather than a third of it. */
+  .isks-halftone::after {
+    display: none;
+  }
+
+  .isks-halftone {
+    --isks-dot-pitch: 4.2vw;
+  }
+
+  .isks-halftone::before {
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 10%, transparent 70%);
+            mask-image: linear-gradient(90deg, #000 0%, #000 10%, transparent 70%);
+  }
+
+  .isks-bar > .isks-halftone {
+    --isks-dot-pitch: 3.4vw;
+  }
+
+  /* The hero text blocks stack rather than sitting on the photo's
+     left panel, which is off-frame at portrait aspect. The photo is
+     dropped entirely here: cropped to portrait its composition puts
+     the artwork behind the headline. The brand gradient carries the
+     slide instead, and skipping the image saves ~300 KB on the one
+     slide every phone visitor loads first. */
+  .isks-hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.6em;
+    padding: 8vw;
+    background: var(--isks-gradient-h);
+  }
+
+  .isks-hero__title,
+  .isks-hero__subtitle,
+  .isks-hero__byline,
+  .isks-hero__portrait {
+    position: static;
+    left: auto;
+    top: auto;
+    width: auto;
+  }
+
+  .isks-hero__portrait {
+    width: 22vw;
+  }
+
+  /* The bar's children are placed as percentages of the bar box, which
+     only works while the bar keeps the source artwork's very wide, short
+     aspect. At phone width the bar is proportionally far taller, so those
+     percentages collide (the logo grows into the event text). Fall back to
+     a flex row sized off the bar's height instead. */
+  .isks-bar {
+    display: flex;
+    align-items: center;
+    gap: 4%;
+    padding: 0 4%;
+  }
+
+  .isks-bar__logo,
+  .isks-bar__rule,
+  .isks-bar__event,
+  .isks-bar__lockup {
+    position: static;
+    left: auto;
+    right: auto;
+    top: auto;
+  }
+
+  /* Sized by width, not height: as flex items these images take their
+     natural width (900px and 400px) as the flex base size, which
+     overflows the bar and pushes the lockup off the right edge. */
+  .isks-bar__logo {
+    flex: 0 0 auto;
+    width: 24vw;
+    height: auto;
+  }
+
+  .isks-bar__rule {
+    flex: 0 0 auto;
+    width: 2px;
+    height: 52%;
+  }
+
+  .isks-bar__event {
+    flex: 0 0 auto;
+    font-size: 3.4vw;
+  }
+
+  .isks-bar__lockup {
+    flex: 0 0 auto;
+    width: 13vw;
+    height: auto;
+    margin-left: auto;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================
+   Nothing in this file animates, so there is nothing to stop.
+   The block exists so future additions inherit the contract:
+   keep every colour, drop every movement.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .isks-canvas *,
+  .isks-hero * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   PRINT / OVERVIEW
+   ============================================================
+   The engine's overview mode scales whole slides down with a
+   transform, so the vw-based halftone pitch would shrink with it.
+   Fixing the pitch in px there keeps the texture readable.
+   ============================================================ */
+
+.slide-overview-item .isks-halftone {
+  --isks-dot-pitch: 6px;
+}
