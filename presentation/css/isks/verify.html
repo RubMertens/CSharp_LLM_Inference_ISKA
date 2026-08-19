@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ISKS style pack — fidelity check</title>
+<link rel="stylesheet" href="isks.css">
+<style>
+  body { margin: 0; background: #111; font: 12px/1.4 Arial, sans-serif; color: #ddd; }
+  h3 { margin: 14px 0 4px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #7ee; }
+  .strip { position: relative; width: 100vw; }
+  /* The bar asset is 4400x252; at 100vw its height is 5.727vw. The bar
+     in a slide is 10.22% of slide height, which on 16:9 is the same
+     5.749vw -- so this strip reproduces the in-slide size. */
+  .strip--bar { height: 5.727vw; }
+  /* Direct-child only: must not hit the bar's own logo/lockup images. */
+  .strip--bar > img { display: block; width: 100%; height: 100%; }
+  .strip--bar .isks-bar { top: 0; }
+  /* Background asset is 16:9. */
+  .strip--bg { aspect-ratio: 16 / 9; }
+  .strip--bg > img { display: block; width: 100%; }
+</style>
+</head>
+<body>
+
+<h3>Footer bar — original pptx raster (image2.png)</h3>
+<div class="strip strip--bar"><img src="assets/isks-bar.png" alt=""></div>
+
+<h3>Footer bar — composed in CSS</h3>
+<div class="strip strip--bar">
+  <div class="isks-bar">
+    <span class="isks-halftone"></span>
+    <img class="isks-bar__logo" src="assets/web/infosupport-40jaar-logo-white.png" alt="">
+    <span class="isks-bar__rule"></span>
+    <p class="isks-bar__event">ISKS<span>2026</span></p>
+    <img class="isks-bar__lockup" src="assets/web/isks-built-to-last-solid.png" alt="">
+  </div>
+</div>
+
+<h3>Background — original pptx raster (image3.png)</h3>
+<div class="strip strip--bg"><img src="assets/isks-gradient-halftone-background.png" alt=""></div>
+
+<h3>Background — gradient + halftone in CSS</h3>
+<div class="strip strip--bg">
+  <div class="isks-canvas isks-canvas--dark">
+    <span class="isks-halftone"></span>
+  </div>
+</div>
+
+</body>
+</html>

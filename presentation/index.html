@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inference Runner - Engineering Demo</title>
+  <link rel="stylesheet" href="css/isks/isks.css">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/svg.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-light.min.css">
@@ -23,6 +24,18 @@
   </svg>
   <div id="progress"></div>
   <div id="presentation"></div>
+
+  <!-- ISKS footer bar. One page-level element rather than per-slide markup;
+       the engine mirrors the current slide onto <body data-slide|data-layout>
+       so CSS can hide it on the hero and outro. -->
+  <div class="isks-bar" id="isks-bar">
+    <span class="isks-halftone"></span>
+    <img class="isks-bar__logo" src="css/isks/assets/web/infosupport-40jaar-logo-white.png" alt="Info Support, 40 jaar">
+    <span class="isks-bar__rule"></span>
+    <p class="isks-bar__event">ISKS<span>2026</span></p>
+    <img class="isks-bar__lockup" src="css/isks/assets/web/isks-built-to-last-solid.png" alt="Built to Last">
+  </div>
+
   <span id="slide-counter"></span>
   <div class="nav-hint">
     <kbd>←</kbd>
