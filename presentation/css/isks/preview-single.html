@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISKS style pack — one slide</title>
+<link rel="stylesheet" href="isks.css">
+<style>
+  /* Stand-in for the engine: one slide filling the viewport. */
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  .slide { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+
+<!-- This is the markup a slide file wraps in <section data-id=...>.
+     Copy it as-is; only the text changes. -->
+<div class="slide">
+  <div class="isks-canvas">
+    <span class="isks-bullet"></span>
+    <h2 class="isks-title">Why build it yourself?</h2>
+    <div class="isks-body">
+      <ul>
+        <li>A transformer is roughly <strong>six operations</strong> in a loop.</li>
+        <li>Every one of them fits on a slide.</li>
+        <li>The mystery is in the weights, not the code.</li>
+      </ul>
+    </div>
+    <div class="isks-bar">
+      <span class="isks-halftone"></span>
+      <img class="isks-bar__logo" src="assets/web/infosupport-40jaar-logo-white.png" alt="Info Support, 40 jaar">
+      <span class="isks-bar__rule"></span>
+      <p class="isks-bar__event">ISKS<span>2026</span></p>
+      <img class="isks-bar__lockup" src="assets/web/isks-built-to-last-solid.png" alt="Built to Last">
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

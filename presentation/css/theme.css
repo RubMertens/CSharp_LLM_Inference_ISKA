@@ -1,21 +1,50 @@
+/* Deck theme, mapped onto the ISKS 2026 palette.
+   Colour definitions live in css/isks/isks-tokens.css; this block only
+   assigns them to roles. See css/isks/colors.md for provenance. */
 :root {
-  --color-bg: #FFFFFF;
-  --color-bg-subtle: #F0F4F8;
-  --color-text: #003865;
-  --color-text-muted: #4A6A8A;
-  --color-heading: #003865;
-  --color-accent: #00A3E0;
-  --color-accent-glow: rgba(0, 163, 224, 0.35);
-  --color-code-bg: #F0F4F8;
-  --color-code-text: #003865;
-  --color-border: #C8D8E8;
-  --color-accent-secondary: #6ECFF6;
-  --color-danger: #F04E23;
+  --color-bg: var(--isks-white);
+  --color-bg-subtle: #EFF6F5;              /* teal-tinted panel */
+  --color-text: var(--isks-teal);
+  --color-text-muted: #4A8480;             /* desaturated teal, 4.6:1 on white */
+  --color-heading: var(--isks-teal);
+
+  /* Accent is teal-bright, not amber. Amber is a *shape* colour in this
+     identity -- bullets, rules, the triangle -- and only becomes a text
+     colour on the dark panels, which is how the pptx uses it. At 2.2:1 on
+     white it fails even large-text AA, so it must not carry meaning here. */
+  --color-accent: var(--isks-teal-bright);
+  --color-accent-glow: rgba(28, 134, 128, 0.35);
+  --color-accent-secondary: #29AC8D;
+
+  /* Emphasis inside body copy on white. Navy reads at 12.5:1 and stays in
+     palette; on dark canvases this is overridden to amber further down. */
+  --color-highlight: var(--isks-navy);
+
+  --color-code-bg: #F2F7F7;
+  --color-code-text: #044F4C;
+  --color-border: #BFDAD8;
+  --color-danger: var(--isks-orange);
+
+  /* Categorical set for diagrams that use colour to tell channels apart
+     (Q/K/V, attention heads). Ordered for maximum separation; every one is
+     a real ISKS colour and legible on white. */
+  --cat-1: var(--isks-teal);               /* #066F6B */
+  --cat-2: var(--isks-amber);              /* #F0A413 */
+  --cat-3: var(--isks-navy);               /* #003760 */
+  --cat-4: var(--isks-orange);             /* #F04E23 */
+  --cat-5: var(--isks-teal-bright);        /* #1C8680 */
+  --cat-6: var(--isks-mid);                /* #005C75 */
+
   --svg-glow-duration: 2.5s;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Arial, per the pptx: declared explicitly on every text placeholder and
+     on the master, not inherited from the (unused) theme font scheme. */
+  --font-sans: var(--isks-font);
   --font-mono: "SF Mono", "Cascadia Code", "Fira Code", Consolas, "DejaVu Sans Mono", monospace;
   --slide-padding: clamp(0.5rem, 1.5vw, 1.5rem);
   --transition-speed: 0.4s;
+
+  /* Room at the bottom of every content slide for the ISKS footer bar. */
+  --isks-bar-clearance: calc(var(--isks-bar-h) + 1.5vh);
 }
 
 *,
@@ -52,7 +81,9 @@ html, body {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding: clamp(2rem, 4vh, 3.5rem) var(--slide-padding) var(--slide-padding);
+  /* Bottom padding clears the ISKS footer bar. Slides that opt out of the
+     bar (data-layout="isks-bare") get the plain padding back below. */
+  padding: clamp(2rem, 4vh, 3.5rem) var(--slide-padding) var(--isks-bar-clearance);
   background: var(--color-bg);
   opacity: 0;
   visibility: hidden;
@@ -119,7 +150,8 @@ html, body {
 
 #slide-counter {
   position: fixed;
-  bottom: 1.2rem;
+  /* lifted clear of the ISKS footer bar */
+  bottom: calc(var(--isks-bar-h) + 0.5rem);
   right: 1.5rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -131,7 +163,7 @@ html, body {
 
 .nav-hint {
   position: fixed;
-  bottom: 1.2rem;
+  bottom: calc(var(--isks-bar-h) + 0.5rem);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -280,10 +312,32 @@ pre code {
   flex-direction: column;
 }
 
+/* Headings sit above a short amber rule rather than a full-width hairline.
+   Amber is the ISKS accent, and as a rule it is decoration, not text, so
+   its weak contrast on white does not matter here. */
 .slide-content h2 {
   margin-bottom: 0.7em;
-  padding-bottom: 0.3em;
-  border-bottom: 2px solid var(--color-accent-glow);
+  padding-bottom: 0.35em;
+  border-bottom: none;
+  position: relative;
+}
+
+.slide-content h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: clamp(40px, 4.5vw, 72px);
+  height: 4px;
+  background: var(--isks-amber);
+}
+
+/* Centred headings need the rule centred too. */
+.center > h2::after,
+.slide-content.center h2::after,
+.slide-title h2::after {
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .two-column {
@@ -337,8 +391,14 @@ pre code {
 }
 
 .highlight {
-  color: var(--color-accent);
-  font-weight: 600;
+  color: var(--color-highlight);
+  font-weight: 700;
+}
+
+/* On the dark ISKS canvases amber is the correct emphasis colour -- plenty
+   of contrast there, and it is how the pptx sets subtitles. */
+.slide[data-layout~="isks-dark"] .highlight {
+  color: var(--isks-amber);
 }
 
 .card {
@@ -581,4 +641,148 @@ pre code {
     opacity: 1;
     transform: none;
   }
+}
+
+/* ============================================================
+   ISKS INTEGRATION
+   ============================================================
+   Deck-level wiring for the css/isks/ pack. The pack itself stays
+   generic; everything specific to this deck lives here.
+   ============================================================ */
+
+/* The pack positions .isks-bar absolutely inside an .isks-canvas. As
+   page-level chrome it needs to be fixed to the viewport instead, above
+   the slides but below the overview overlay. */
+#isks-bar {
+  position: fixed;
+  z-index: 80;
+}
+
+/* Slides that carry their own full-bleed treatment: hero and outro. The
+   bar would sit on top of their artwork, and the pptx title layout has no
+   bar either. */
+body[data-slide="title"] #isks-bar,
+body[data-slide="questions"] #isks-bar,
+body[data-layout~="isks-bare"] #isks-bar {
+  display: none;
+}
+
+/* Those slides also get their padding back, since nothing needs clearing. */
+.slide[data-id="title"],
+.slide[data-id="questions"],
+.slide[data-layout~="isks-bare"] {
+  padding-bottom: var(--slide-padding);
+}
+
+/* Chrome is unreadable over the dark hero/outro; dim it rather than hide
+   it so the slide counter is still there if the presenter looks for it. */
+body[data-slide="title"] #slide-counter,
+body[data-slide="questions"] #slide-counter,
+body[data-layout~="isks-bare"] #slide-counter {
+  color: rgba(255, 255, 255, 0.85);
+  bottom: 1.2rem;
+}
+
+body[data-slide="title"] .nav-hint,
+body[data-slide="questions"] .nav-hint,
+body[data-layout~="isks-bare"] .nav-hint {
+  bottom: 1.2rem;
+}
+
+/* --- Dark section-divider canvas -------------------------------------- */
+
+/* data-layout="isks-dark" turns a slide into the signature navy-to-teal
+   wash with the halftone field. Used by the section dividers. */
+.slide[data-layout~="isks-dark"] {
+  background: var(--isks-gradient-h);
+  color: var(--isks-on-dark);
+}
+
+.slide[data-layout~="isks-dark"] h1,
+.slide[data-layout~="isks-dark"] h2,
+.slide[data-layout~="isks-dark"] h3,
+.slide[data-layout~="isks-dark"] p,
+.slide[data-layout~="isks-dark"] strong {
+  color: var(--isks-on-dark);
+}
+
+.slide[data-layout~="isks-dark"] .subtitle {
+  color: var(--isks-amber-text);
+}
+
+/* The gradient h1 treatment reads as muddy on the dark wash. */
+.slide[data-layout~="isks-dark"] .slide-title h1 {
+  background: none;
+  -webkit-text-fill-color: var(--isks-white);
+  color: var(--isks-white);
+}
+
+/* Bar sits on the dark wash too, so its own gradient would blend into the
+   slide. A hairline separates them. */
+body[data-layout~="isks-dark"] #isks-bar {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* A dark slide's halftone comes from a <span class="isks-halftone"> in the
+   slide markup, reusing the pack rather than duplicating its two dot
+   layers here. It must sit behind the content. */
+.slide[data-layout~="isks-dark"] > .isks-halftone {
+  z-index: 0;
+}
+
+.slide[data-layout~="isks-dark"] > *:not(.isks-halftone) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Section dividers set their headline much larger than a normal h1. The
+   old markup hardcoded 12rem, which overflows narrow viewports; clamp it. */
+.slide[data-layout~="isks-dark"] .slide-title h1 {
+  font-size: clamp(2.6rem, 10.5vw, 11rem);
+  line-height: var(--isks-lh);
+  letter-spacing: -0.03em;
+}
+
+.slide[data-layout~="isks-dark"] .slide-title .subtitle {
+  font-size: var(--isks-fs-subtitle);
+}
+
+/* Amber rule above and below a divider headline, replacing the old
+   fading-gradient hairlines. Solid amber is the ISKS treatment. */
+.isks-rule {
+  display: block;
+  width: clamp(48px, 6vw, 96px);
+  height: 3px;
+  margin: clamp(0.8rem, 2.5vh, 2rem) auto;
+  background: var(--isks-amber);
+}
+
+/* Chrome over any dark canvas: the muted teal counter and the light kbd
+   chips both vanish against the navy wash. */
+body[data-layout~="isks-dark"] #slide-counter {
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 0.75;
+}
+
+body[data-layout~="isks-dark"] .nav-hint kbd,
+body[data-slide="title"] .nav-hint kbd,
+body[data-slide="questions"] .nav-hint kbd,
+body[data-layout~="isks-bare"] .nav-hint kbd {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+body[data-layout~="isks-dark"] .nav-hint,
+body[data-slide="title"] .nav-hint,
+body[data-slide="questions"] .nav-hint,
+body[data-layout~="isks-bare"] .nav-hint {
+  opacity: 0.5;
+}
+
+body[data-layout~="isks-dark"] .nav-hint-swipe,
+body[data-slide="title"] .nav-hint-swipe,
+body[data-slide="questions"] .nav-hint-swipe,
+body[data-layout~="isks-bare"] .nav-hint-swipe {
+  color: rgba(255, 255, 255, 0.9);
 }

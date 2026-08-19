@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISKS 2026 style pack — preview</title>
+<link rel="stylesheet" href="isks.css">
+<style>
+  /* Preview chrome only. Not part of the style pack. */
+  body {
+    margin: 0;
+    background: #1b1f24;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .panel {
+    position: relative;
+    width: 100vw;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-bottom: 2px solid #000;
+  }
+  .panel > .isks-canvas,
+  .panel > .isks-hero { position: absolute; inset: 0; }
+  .label {
+    position: absolute;
+    z-index: 50;
+    top: 0; left: 0;
+    padding: 4px 10px;
+    font: 700 11px/1 Arial, sans-serif;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: #000;
+  }
+  .ref {
+    width: 100vw;
+    display: block;
+    border-bottom: 2px solid #000;
+  }
+  .sheet {
+    padding: 3vw;
+    color: #e8e8e8;
+  }
+  .sheet h2 { font-size: 1.4rem; margin: 0 0 1rem; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+  .sw { width: 150px; font-size: 11px; }
+  .sw i { display: block; height: 70px; border-radius: 4px; }
+  .sw b { display: block; margin-top: 6px; font-family: monospace; font-size: 12px; }
+  .sw span { color: #9aa4ae; }
+
+  /* On a narrow viewport a real slide is still a full viewport tall, not
+     a 16:9 letterbox. Match that here or the footer bar gets squeezed
+     into ~24px and the preview lies about the phone layout. */
+  @media (max-width: 820px) {
+    .panel { aspect-ratio: auto; height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ 1. reference: the original pptx title slide ============ -->
+<img class="ref" src="assets/web/isks-title-background.jpg" alt="Original pptx title slide background">
+
+<!-- ============ 2. title slide, rebuilt ============ -->
+<div class="panel">
+  <span class="label">layout 1 — title slide (rebuilt)</span>
+  <div class="isks-hero">
+    <h1 class="isks-hero__title">Running an LLM<br>on the CLR</h1>
+    <p class="isks-hero__subtitle">Inference from first principles, in C#</p>
+    <p class="isks-hero__byline">Ruben Mertens</p>
+  </div>
+</div>
+
+<!-- ============ 3. content slide, single column ============ -->
+<div class="panel">
+  <span class="label">layout 3 — section title + body</span>
+  <div class="isks-canvas">
+    <span class="isks-bullet"></span>
+    <h2 class="isks-title">Why build it yourself?</h2>
+    <div class="isks-body">
+      <ul>
+        <li>A transformer is roughly <strong>six operations</strong> in a loop.</li>
+        <li>Every one of them fits on a slide.</li>
+        <li>The mystery is in the weights, not the code.</li>
+      </ul>
+    </div>
+    <div class="isks-bar">
+      <span class="isks-halftone"></span>
+      <img class="isks-bar__logo" src="assets/web/infosupport-40jaar-logo-white.png" alt="Info Support, 40 jaar">
+      <span class="isks-bar__rule"></span>
+      <p class="isks-bar__event">ISKS<span>2026</span></p>
+      <img class="isks-bar__lockup" src="assets/web/isks-built-to-last-solid.png" alt="Built to Last">
+    </div>
+  </div>
+</div>
+
+<!-- ============ 4. content slide, two column ============ -->
+<div class="panel">
+  <span class="label">layout 2 — two column</span>
+  <div class="isks-canvas">
+    <span class="isks-bullet"></span>
+    <h2 class="isks-title">Tokens in, tokens out</h2>
+    <div class="isks-body isks-body--split isks-body--dense">
+      <div>
+        <ul>
+          <li>Byte-pair encoding splits text into subwords.</li>
+          <li>Each subword indexes a row of the embedding matrix.</li>
+          <li>That row is the only thing the model ever sees.</li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li>The final layer scores every token in the vocabulary.</li>
+          <li>Sampling picks one. Append, repeat.</li>
+          <li>No state survives between calls but the KV cache.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="isks-bar">
+      <span class="isks-halftone"></span>
+      <img class="isks-bar__logo" src="assets/web/infosupport-40jaar-logo-white.png" alt="Info Support, 40 jaar">
+      <span class="isks-bar__rule"></span>
+      <p class="isks-bar__event">ISKS<span>2026</span></p>
+      <img class="isks-bar__lockup" src="assets/web/isks-built-to-last-solid.png" alt="Built to Last">
+    </div>
+  </div>
+</div>
+
+<!-- ============ 5. four gradient cards ============ -->
+<div class="panel">
+  <span class="label">layout 5 — four gradient cards</span>
+  <div class="isks-canvas">
+    <span class="isks-bullet"></span>
+    <h2 class="isks-title">The pipeline</h2>
+    <div class="isks-cards">
+      <div class="isks-card"><span class="isks-card__title">Tokenize</span><span>Text to ids</span></div>
+      <div class="isks-card"><span class="isks-card__title">Embed</span><span>Ids to vectors</span></div>
+      <div class="isks-card"><span class="isks-card__title">Attend</span><span>Mix the context</span></div>
+      <div class="isks-card"><span class="isks-card__title">Sample</span><span>Pick a token</span></div>
+    </div>
+    <div class="isks-bar">
+      <span class="isks-halftone"></span>
+      <img class="isks-bar__logo" src="assets/web/infosupport-40jaar-logo-white.png" alt="Info Support, 40 jaar">
+      <span class="isks-bar__rule"></span>
+      <p class="isks-bar__event">ISKS<span>2026</span></p>
+      <img class="isks-bar__lockup" src="assets/web/isks-built-to-last-solid.png" alt="Built to Last">
+    </div>
+  </div>
+</div>
+
+<!-- ============ 6. reference: original background asset ============ -->
+<img class="ref" src="assets/isks-gradient-halftone-background.png" alt="Original pptx gradient + halftone background">
+
+<!-- ============ 7. dark canvas, CSS-only rebuild of that background ============ -->
+<div class="panel">
+  <span class="label">dark canvas — gradient + halftone, CSS only</span>
+  <div class="isks-canvas isks-canvas--dark">
+    <span class="isks-halftone"></span>
+    <span class="isks-bullet"></span>
+    <h2 class="isks-title">Built to last</h2>
+    <div class="isks-body">
+      <p>No raster, no SVG filter. One gradient plus two dot layers.</p>
+    </div>
+    <img class="isks-lockup" src="assets/web/isks-built-to-last-white.png"
+         alt="Built to Last" style="position:absolute;right:6%;top:34%;width:20%">
+  </div>
+</div>
+
+<!-- ============ 8. motifs ============ -->
+<div class="panel">
+  <span class="label">motifs — amber diagonal, teal band, triangle</span>
+  <div class="isks-canvas isks-canvas--dark">
+    <span class="isks-halftone"></span>
+    <span class="isks-band"></span>
+    <span class="isks-diagonal"></span>
+    <span class="isks-triangle" style="position:absolute;left:74%;top:16%;width:8%;aspect-ratio:1"></span>
+  </div>
+</div>
+
+<!-- ============ 9. palette + type ============ -->
+<div class="sheet">
+  <h2>Palette</h2>
+  <div class="swatches">
+    <div class="sw"><i style="background:#066F6B"></i><b>#066F6B</b><span>teal — titles, body</span></div>
+    <div class="sw"><i style="background:#F0A413"></i><b>#F0A413</b><span>amber — shapes, rules</span></div>
+    <div class="sw"><i style="background:#F0A314"></i><b>#F0A314</b><span>amber — subtitle text</span></div>
+    <div class="sw"><i style="background:#003760"></i><b>#003760</b><span>navy — gradient start</span></div>
+    <div class="sw"><i style="background:#005C75"></i><b>#005C75</b><span>mid — gradient 50%</span></div>
+    <div class="sw"><i style="background:#1C8680"></i><b>#1C8680</b><span>bright teal — end, dots</span></div>
+    <div class="sw"><i style="background:#29AC8D"></i><b>#29AC8D</b><span>band teal (title slide)</span></div>
+    <div class="sw"><i style="background:#F04E23"></i><b>#F04E23</b><span>house red — stripe motif</span></div>
+    <div class="sw"><i style="background:#DD4111"></i><b>#DD4111</b><span>lockup offset shadow</span></div>
+    <div class="sw"><i style="background:#FFFFFF"></i><b>#FFFFFF</b><span>white — slide bg</span></div>
+  </div>
+
+  <h2>Gradients</h2>
+  <div class="swatches">
+    <div class="sw" style="width:320px">
+      <i style="background:linear-gradient(90deg,#003760,#005C75 50%,#1C8680)"></i>
+      <b>--isks-gradient-h</b><span>full-bleed background</span>
+    </div>
+    <div class="sw">
+      <i style="height:140px;background:linear-gradient(180deg,#003760,#005C75 50%,#1C8680)"></i>
+      <b>--isks-gradient-v</b><span>card fill</span>
+    </div>
+  </div>
+
+  <h2>Type scale — Arial, 90% line spacing</h2>
+  <div style="background:#fff;padding:2vw;border-radius:6px">
+    <p style="font:700 var(--isks-fs-hero)/0.9 Arial;color:#003760;margin:0 0 .4em">55pt hero — title slide</p>
+    <p style="font:700 var(--isks-fs-title)/0.9 Arial;color:#066F6B;margin:0 0 .4em">40pt title — section heading</p>
+    <p style="font:var(--isks-fs-subtitle)/1.35 Arial;color:#F0A314;margin:0 0 .4em">24pt subtitle — amber</p>
+    <p style="font:var(--isks-fs-body)/1.35 Arial;color:#066F6B;margin:0 0 .4em">20pt body — default content copy</p>
+    <p style="font:var(--isks-fs-body-sm)/1.35 Arial;color:#066F6B;margin:0">18pt dense body — two column and cards</p>
+  </div>
+</div>
+
+</body>
+</html>
