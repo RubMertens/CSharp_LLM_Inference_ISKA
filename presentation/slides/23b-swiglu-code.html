@@ -1,16 +1,14 @@
 <section data-id="swiglu-code" data-title="SwiGLU in Code">
   <div class="slide-content">
     <h2>Feed-Forward + SwiGLU — <span class="highlight">in Code</span></h2>
-    <p style="color: var(--color-text-muted); margin-bottom: 0.8rem;">Two projections up, one gate, one projection back down. Steps build up as you click.</p>
 
-    <div class="two-column" style="gap: 1.2rem;">
-      <div>
-        <div class="vscode-window"
-             data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
-             data-lines="61-67"
-             data-member="Forward"
-             data-start-line="61">
-          <pre class="vscode-source">
+    <div class="two-column" style="gap: 1rem;">
+      <div class="vscode-window"
+           data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
+           data-lines="61-67"
+           data-member="Forward"
+           data-start-line="61">
+        <pre class="vscode-source">
 //gate and up projction are larger than hidden dimension, to allow for more complex interactions in the feedforward network
 Matrix gate= normalizedEmbeddings * layer.GateProjection;
 Matrix up = normalizedEmbeddings * layer.UpProjection;
@@ -18,38 +16,35 @@ Matrix activated = SigmoidLinearUnit(gate);
 Matrix gated = activated.ElementwiseMultiply(up);
 // brings the dimension back down to hidden dimension so it can be added to the residual and passed to the next layer
 Matrix feedForwardOutput = gated * layer.DownProjection;
-          </pre>
-          <span class="vscode-inline" data-line="1" data-value="normalizedEmbeddings = 4×8"></span>
-          <span class="vscode-step fragment" data-fragment-index="0"
-                data-lines="2-3"
-                data-values="2: gate = 4×32 | 3: up = 4×32"
-                data-note="gate and up: same input, wider output"></span>
-          <span class="vscode-step fragment" data-fragment-index="1"
-                data-lines="4"
-                data-stopped
-                data-values="4: activated = 4×32"
-                data-note="SiLU squashes the gate"></span>
-          <span class="vscode-step fragment" data-fragment-index="2"
-                data-lines="5"
-                data-stopped
-                data-values="5: gated = 4×32"
-                data-note="element-wise multiply — the gate decides what passes"></span>
-          <span class="vscode-step fragment" data-fragment-index="3"
-                data-lines="7"
-                data-stopped
-                data-values="7: feedForwardOutput = 4×8"
-                data-note="down-project back to hidden dimension, ready for the residual"></span>
-        </div>
-        <p class="code-caption">Forward pass, feed-forward block</p>
+        </pre>
+        <span class="vscode-inline" data-line="1" data-value="normalizedEmbeddings = 4×8"></span>
+        <span class="vscode-step fragment" data-fragment-index="0"
+           data-lines="2-3"
+           data-values="2: gate = 4×32 | 3: up = 4×32"
+           data-note="gate and up: same input, wider output"></span>
+        <span class="vscode-step fragment" data-fragment-index="1"
+           data-lines="4"
+           data-stopped
+           data-values="4: activated = 4×32"
+           data-note="SiLU squashes the gate"></span>
+        <span class="vscode-step fragment" data-fragment-index="2"
+           data-lines="5"
+           data-stopped
+           data-values="5: gated = 4×32"
+           data-note="element-wise multiply — the gate decides what passes"></span>
+        <span class="vscode-step fragment" data-fragment-index="3"
+           data-lines="7"
+           data-stopped
+           data-values="7: feedForwardOutput = 4×8"
+           data-note="down-project back to hidden dimension, ready for the residual"></span>
       </div>
 
-      <div>
-        <div class="vscode-window"
-             data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
-             data-member="SigmoidLinearUnit"
-             data-highlight-text="float sigmoid"
-             data-start-line="154">
-          <pre class="vscode-source">
+      <div class="vscode-window"
+           data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
+           data-member="SigmoidLinearUnit"
+           data-highlight-text="float sigmoid"
+           data-start-line="154">
+        <pre class="vscode-source">
 public static Matrix SigmoidLinearUnit(Matrix input)
 {
     Matrix result = new(input.Rows, input.Columns);
@@ -65,12 +60,10 @@ public static Matrix SigmoidLinearUnit(Matrix input)
     }
     return result;
 }
-          </pre>
-          <span class="vscode-inline" data-text="float x =" data-value="x = -1.4"></span>
-          <span class="vscode-inline" data-text="float sigmoid" data-value="1 / (1 + e^1.4) = 0.20"></span>
-          <span class="vscode-inline" data-text="result[row][i] = x * sigmoid" data-value="-1.4 × 0.20 = -0.28"></span>
-        </div>
-        <p class="code-caption">SiLU: <code>x · σ(x)</code> — smooth, and negatives don't die at zero</p>
+        </pre>
+        <span class="vscode-inline" data-text="float x =" data-value="x = -1.4"></span>
+        <span class="vscode-inline" data-text="float sigmoid" data-value="1 / (1 + e^1.4) = 0.20"></span>
+        <span class="vscode-inline" data-text="result[row][i] = x * sigmoid" data-value="-1.4 × 0.20 = -0.28"></span>
       </div>
     </div>
   </div>

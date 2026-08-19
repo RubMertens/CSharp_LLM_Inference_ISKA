@@ -34,12 +34,16 @@
 // Attributes — presentation:
 //   data-theme="light|dark"   VS Code Light Modern (default) or Dark Modern colours
 //   data-numbers="file|snippet|off"   gutter numbering, default file
-//   data-font-size="0.7rem"   maximum size; the fit pass shrinks it as needed
+//   data-font-size="0.7rem"   starting size; the fit pass grows or shrinks it to fill
+//                             the slide
 //   data-max-height="60vh"    ceiling for the code area
 //   data-wrap="on|off"        soft-wrap long lines, default on
 //   data-highlight="3-5,9"    always-on highlighted lines (snippet-relative)
 //   data-highlight-text="sum +="   highlight every line containing this text
 //   data-dim="on|off"         dim non-highlighted lines while a step is active
+//   data-steps="replace|accumulate"   one band at a time (default) or build them up
+//   data-notes="on|off"       render data-note under the code, default off — the
+//                             speaker says it out loud
 //   data-source-ref="on|off"  file:line-range strip under the code, default on with data-src
 //
 // Optional editor chrome, all off by default — the panel is about the code, not about
@@ -62,8 +66,11 @@
 //   data-lines / data-text    which lines the step covers (snippet-relative / by content)
 //   data-values="9: sum = 23 | 11: returns 23"   fake debugger inline values
 //   data-stopped[="9"]        amber stopped line + gutter arrow
-//   data-note                 narration strip under the code
+//   data-note                 speaker cue; only rendered with data-notes="on"
 //   .vscode-inline            one standalone inline value (add .fragment to stage it)
+//
+// Steps are plain fragments: the engine reveals them in order and the panel shows the
+// latest one (data-steps="accumulate" keeps the earlier bands lit instead).
 
 const MONACO_BASE = 'vendor/monaco/vs';
 
@@ -267,12 +274,14 @@ function highlight(code, lang, monaco) {
 }
 
 // Slides have a fixed height; shrink the font as the snippet gets longer.
+// A code slide is the code: start big and let fitSlide() pull it back if the snippet
+// is long. These are maxima, not final sizes.
 function autoFontSize(lineCount) {
-  if (lineCount <= 12) return '0.92rem';
-  if (lineCount <= 18) return '0.78rem';
-  if (lineCount <= 24) return '0.66rem';
-  if (lineCount <= 32) return '0.56rem';
-  return '0.48rem';
+  if (lineCount <= 12) return '1.15rem';
+  if (lineCount <= 18) return '0.95rem';
+  if (lineCount <= 24) return '0.8rem';
+  if (lineCount <= 32) return '0.68rem';
+  return '0.56rem';
 }
 
 const CSHARP_ICON = `<svg class="vscode-tab-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -398,17 +407,23 @@ function buildWindow(el, { code, startLine, endLine }, monaco) {
 // bottom, minus whatever sits below it.
 const FIT_RESERVE = 24;    // room for the nav hint / slide counter
 const FIT_MIN_FONT = 0.42; // rem — smaller than this is unreadable on a projector
+const FIT_MAX_FONT = 1.7;  // rem — beyond this a short snippet just looks silly
 
-// Lowest content edge on the slide, ignoring rows inside a code area (those are
-// clipped by their own scroll container and would report past its bottom).
-function contentBottom(slide) {
-  let bottom = 0;
+// How much slide is used up *below* a code area, in its own column — a caption or a
+// note strip under it, but not a panel sitting beside it. Rows inside a code area are
+// skipped: they are clipped by their own scroll container and would report past its
+// bottom.
+function contentBelow(slide, rect) {
+  let bottom = rect.bottom;
   for (const el of slide.querySelectorAll('*')) {
     if (el.closest('.vscode-code')) continue;
-    const rect = el.getBoundingClientRect();
-    if (rect.height > 0 && rect.bottom > bottom) bottom = rect.bottom;
+    const r = el.getBoundingClientRect();
+    if (r.height <= 0) continue;
+    const sameColumn = r.left < rect.right && r.right > rect.left;
+    if (!sameColumn || r.top < rect.bottom - 1) continue;
+    if (r.bottom > bottom) bottom = r.bottom;
   }
-  return bottom;
+  return bottom - rect.bottom;
 }
 
 function fitSlide(slide) {
@@ -416,7 +431,7 @@ function fitSlide(slide) {
   const boxes = [...slide.querySelectorAll('.vscode-window[data-vs-state="ready"] .vscode-code')];
   if (boxes.length === 0) return;
 
-  // Reset to the authored size first, so repeated fits can't ratchet the font down.
+  // Reset to the authored size first, so repeated fits can't ratchet the font up or down.
   for (const box of boxes) {
     const win = box.closest('.vscode-window');
     if (win.dataset.vsFontBase) win.style.setProperty('--vs-font-size', win.dataset.vsFontBase);
@@ -426,7 +441,7 @@ function fitSlide(slide) {
 
   const room = (box) => {
     const rect = box.getBoundingClientRect();
-    const tail = Math.max(0, contentBottom(slide) - rect.bottom);   // captions, lists, notes below
+    const tail = contentBelow(slide, rect);   // source strip, note, caption under it
     return slide.getBoundingClientRect().bottom - FIT_RESERVE - rect.top - tail;
   };
 
@@ -435,16 +450,35 @@ function fitSlide(slide) {
 
   for (const box of ordered) {
     const win = box.closest('.vscode-window');
+    const size = () => parseFloat(win.style.getPropertyValue('--vs-font-size'));
+    const setSize = (rem) => win.style.setProperty('--vs-font-size', `${rem.toFixed(3)}rem`);
 
-    // Prefer shrinking the font — a snippet you can read in full beats one that
-    // scrolls. The authored size is treated as a maximum, not a fixed value.
-    for (let pass = 0; pass < 10; pass++) {
-      const available = room(box);
-      if (box.scrollHeight <= available + 1) break;
-      const current = parseFloat(win.style.getPropertyValue('--vs-font-size'));
-      const next = current * 0.93;
+    // Grow into the space first: a code slide is the code, so it should be as large as
+    // the slide allows. Wrapping is measured each step, since a bigger font wraps more.
+    for (let pass = 0; pass < 14; pass++) {
+      const next = size() * 1.06;
+      if (next > FIT_MAX_FONT) break;
+      const before = size();
+      setSize(next);
+      if (box.scrollHeight > room(box)) { setSize(before); break; }
+    }
+
+    // Fine step, so 6% granularity doesn't leave a band of empty slide.
+    for (let pass = 0; pass < 6; pass++) {
+      const next = size() * 1.02;
+      if (next > FIT_MAX_FONT) break;
+      const before = size();
+      setSize(next);
+      if (box.scrollHeight > room(box)) { setSize(before); break; }
+    }
+
+    // Then shrink if it still doesn't fit — a snippet you can read in full beats one
+    // that scrolls.
+    for (let pass = 0; pass < 14; pass++) {
+      if (box.scrollHeight <= room(box) + 1) break;
+      const next = size() * 0.94;
       if (!(next >= FIT_MIN_FONT)) break;
-      win.style.setProperty('--vs-font-size', `${next.toFixed(3)}rem`);
+      setSize(next);
     }
 
     // Floor reached and still too tall: clamp and let it scroll.
@@ -493,7 +527,16 @@ function applyHighlights(el) {
   const total = rows.length;
   const codeLines = rows.map(r => r.querySelector('.vscode-text').textContent);
 
-  const active = visibleMarkers(el, '.vscode-step');
+  // Steps are ordinary fragments, so the engine advances through them without needing
+  // a bullet list to drive it. Only the latest revealed step is active unless the
+  // panel asks for the bands to build up.
+  const revealed = visibleMarkers(el, '.vscode-step');
+  const accumulate = (el.dataset.steps ?? 'replace') === 'accumulate';
+  const latest = revealed.length
+    ? revealed.reduce((a, b) =>
+      (Number(b.dataset.fragmentIndex ?? 0) >= Number(a.dataset.fragmentIndex ?? 0) ? b : a))
+    : null;
+  const active = accumulate ? revealed : (latest ? [latest] : []);
 
   const wanted = new Set();
   const stopped = new Set();
@@ -543,8 +586,9 @@ function applyHighlights(el) {
 
   const noteEl = el.querySelector('.vscode-note');
   if (noteEl) {
-    noteEl.textContent = note;
-    noteEl.hidden = !note;
+    const show = (el.dataset.notes ?? 'off') === 'on';
+    noteEl.textContent = show ? note : '';
+    noteEl.hidden = !show || !note;
   }
 
   // Scroll a clamped window only when the active band is actually out of view —

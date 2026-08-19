@@ -45,12 +45,12 @@
 
   --vs-font-size: 0.8rem;
   --vs-line-height: 1.55;
-  --vs-max-height: 56vh;
+  --vs-max-height: 82vh;
 
   display: block;
   width: 100%;
-  max-width: min(100%, 1120px);
-  margin: 0.6rem auto;
+  max-width: 100%;
+  margin: 0.4rem auto;
   background: var(--vs-editor-bg);
   border: 1px solid var(--vs-border);
   border-radius: 10px;

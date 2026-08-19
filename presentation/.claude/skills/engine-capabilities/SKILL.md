@@ -113,8 +113,8 @@ Two options. Prefer **code panels** for anything from the demo project.
 `js/vscode-code.js` turns any `<div class="vscode-window">` into a code panel:
 syntax-highlighted C#, real file line numbers, and a walkthrough layer (line
 highlights, fake debugger inline values, a stopped-line marker) driven by the
-engine's fragments. No editor furniture — it is about the code, not about looking
-like an editor.
+engine's fragments. No editor furniture and no narration text — the panel fills the
+slide, and the speaker does the talking.
 
 The code lives **in the slide**, written there by `npm run code:embed` from
 `../demos`. So a deck is self-contained: nothing is fetched at render time, nothing
@@ -167,6 +167,8 @@ and no source pointer.
 | `data-highlight="3-5,9"` | — | always-on highlighted lines (snippet-relative) |
 | `data-highlight-text="sum +="` | — | highlight every line containing this text |
 | `data-dim` | `on` | dim non-highlighted lines while a step is active |
+| `data-steps` | `replace` | one band at a time; `accumulate` keeps earlier bands lit |
+| `data-notes` | `off` | render `data-note` under the code (a speaker cue, normally spoken) |
 | `data-source-ref` | `on` with `data-src` | `path:line-range` strip under the code, linking to the file |
 
 Editor chrome exists but is **off** by default: `data-chrome="minimal|full"` (tab strip
@@ -174,10 +176,16 @@ Editor chrome exists but is **off** by default: `data-chrome="minimal|full"` (ta
 `data-statusbar="on"`, `data-breadcrumbs="on"`. Turn them on only if a slide is
 specifically about the editor.
 
-**Auto-fit.** After render, each slide's panels are measured against the room actually
-left below them. A panel that is too tall first has its font shrunk (down to
-0.42rem); only if that isn't enough is the code area clamped, and then step highlights
-scroll themselves into view. Authoring a font size is rarely worth it.
+**Auto-fit.** After render, each panel is measured against the room actually left
+below it *in its own column*, then the font is grown (up to 1.7rem) or shrunk (down to
+0.42rem) so the snippet fills that space; only if the floor isn't enough is the code
+area clamped and left to scroll, with step highlights scrolling themselves into view.
+`data-font-size` is just the starting point — authoring one is rarely worth it.
+
+Practical consequence: a short method renders huge, a 30+ line one renders small. If a
+snippet is too long to read from the back row, cut it down (`data-lines`, or a tighter
+`data-member`) or split it across two slides — anchor the steps with `data-text` so
+they survive the re-cut.
 
 **Pointing at the source.** A window with `data-src` prints
 `demos/path/to/File.cs:from-to` under the code. It becomes a link when the deck knows
@@ -188,42 +196,31 @@ on a slide opens the first panel's source, which beats hunting for it mid-talk.
 
 ### Fragment-driven code walkthrough
 
-Add `.vscode-step` markers as children. They're invisible; the engine reveals them like
-any other fragment and the panel follows — highlight the step's lines, dim the rest,
-show `data-note` in a strip under the code.
+Add `.vscode-step` markers as children. They're invisible plain fragments: the engine
+reveals them in order, and the panel highlights the latest one's lines and dims the
+rest. Nothing else is needed on the slide — no bullet list to drive the stepping.
 
 ```html
-<div class="code-split">
-  <ol class="code-steps">
-    <li class="fragment" data-fragment-index="0">Guard the lengths.</li>
-    <li class="fragment" data-fragment-index="1">Multiply pairs, accumulate.</li>
-  </ol>
-  <div>
-    <div class="vscode-window" data-src="…" data-member="operator *" data-start-line="28">
-      <pre class="vscode-source">…</pre>
-      <span class="vscode-step fragment current-visible" data-fragment-index="0"
-            data-lines="3-4" data-note="equal length or nothing to pair up"></span>
-      <span class="vscode-step fragment current-visible" data-fragment-index="1"
-            data-text="sum +=" data-note="accumulate into sum"></span>
-    </div>
-    <p class="code-caption">Optional caption under the panel</p>
-  </div>
+<div class="vscode-window" data-src="…" data-member="operator *" data-start-line="28">
+  <pre class="vscode-source">…</pre>
+  <span class="vscode-step fragment" data-fragment-index="0" data-lines="3-4"></span>
+  <span class="vscode-step fragment" data-fragment-index="1" data-text="sum +="></span>
 </div>
 ```
 
 Rules:
 - `data-lines` on a step is **snippet-relative** (1 = first shown line); `data-text`
   matches whole lines and survives edits to the demo code — prefer it.
-- `current-visible` steps replace each other (one highlight at a time). Plain
-  `.fragment` steps accumulate.
-- Pair every step with a **persistent** fragment at the same `data-fragment-index`
-  (a `.code-steps` bullet). The engine only advances on non-`current-visible`
-  fragments, so a panel whose only fragments are `current-visible` won't step.
-- Captions belong inside the code column (`.code-split > div`), not as a sibling of
-  `.code-split` — a stray third grid child lands in the wrong column.
+- Steps are plain `.fragment` markers. (`current-visible` also works, but is no longer
+  needed: the panel already shows one band at a time.)
+- `data-steps="accumulate"` on the panel keeps earlier bands lit instead.
 
-Layout helpers: `.code-split` (prose | code grid), `.code-steps` (numbered narration
-list), `.code-caption` (muted line under a panel).
+Two panels side by side: wrap them in `.two-column`. Each is fitted against its own
+column, so they size independently.
+
+Still available but unused by the deck: `.code-split` (prose | code grid),
+`.code-steps` (numbered narration list), `.code-caption` (muted line under a panel).
+The code slides deliberately carry none of that text — it is spoken.
 
 ### Fake debugger inline values
 

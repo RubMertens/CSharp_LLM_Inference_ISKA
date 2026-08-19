@@ -16,8 +16,10 @@ else is a plain static file.
 
 ## Code slides
 
-Code slides carry their code inline, extracted from `../demos` by a tool — the deck is
-self-contained, and drift is caught by a check rather than hoped away:
+Code slides are code and nothing else: the panel fills the slide, steps highlight one
+band at a time, and the narration is spoken rather than printed. The code itself is
+inline, extracted from `../demos` by a tool, so the deck is self-contained and drift is
+caught by a check rather than hoped away:
 
 ```bash
 npm run code:embed -- --write # write/refresh the code in the slides

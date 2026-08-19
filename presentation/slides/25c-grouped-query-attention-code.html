@@ -1,23 +1,13 @@
 <section data-id="grouped-query-attention-code" data-title="GQA in Code">
   <div class="slide-content">
     <h2>Grouped Query Attention — <span class="highlight">in Code</span></h2>
-    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">32 query heads, 4 key/value heads. Every 8 queries share one K/V head.</p>
 
-    <div class="code-split">
-      <ol class="code-steps">
-        <li class="fragment" data-fragment-index="0"><code>groupSize</code> = query heads ÷ KV heads. Here: 8.</li>
-        <li class="fragment" data-fragment-index="1">Integer division maps a query head to its <span class="highlight">shared</span> KV head.</li>
-        <li class="fragment" data-fragment-index="2">Offsets slice one head out of the big vector — no copies, just ranges.</li>
-        <li class="fragment" data-fragment-index="3">From there it's the same attention as before: score, softmax, weighted sum.</li>
-      </ol>
-
-      <div>
-        <div class="vscode-window"
-             data-src="Runner.ConsoleApp/5_MultiLayerWithGQA/MultiLayerTransformerWithGroupedQueryAttention.cs"
-             data-lines="123-152"
-             data-member="GroupedQueryAttention"
-             data-start-line="123">
-          <pre class="vscode-source">
+    <div class="vscode-window"
+         data-src="Runner.ConsoleApp/5_MultiLayerWithGQA/MultiLayerTransformerWithGroupedQueryAttention.cs"
+         data-lines="123-152"
+         data-member="GroupedQueryAttention"
+         data-start-line="123">
+      <pre class="vscode-source">
 var groupSize = weights.NumberdOfQueryHeads / weights.NumberOfKeyValueHeads;
 float scale = MathF.Sqrt(weights.HeadDimension);
 
@@ -48,30 +38,27 @@ for (int queryHead = 0; queryHead &lt; weights.NumberdOfQueryHeads; queryHead++)
         }
 
         var attentionWeights = Softmax(scores);
-          </pre>
-          <span class="vscode-inline" data-line="2" data-value="queryHeads = 32   kvHeads = 4   headDimension = 8"></span>
-          <span class="vscode-step fragment current-visible" data-fragment-index="0"
-                data-text="groupSize = weights.NumberdOfQueryHeads"
-                data-stopped
-                data-values="1: 32 / 4 = 8 | 2: scale = √8 = 2.83"
-                data-note="One KV head per group of queries"></span>
-          <span class="vscode-step fragment current-visible" data-fragment-index="1"
-                data-text="keyValueHead = queryHead / groupSize"
-                data-stopped
-                data-values="4: queryHead = 17 | 6: 17 / 8 = 2"
-                data-note="Query head 17 → KV head 2"></span>
-          <span class="vscode-step fragment current-visible" data-fragment-index="2"
-                data-lines="7-8"
-                data-values="7: queryOffset = 17 × 8 = 136 | 8: keyValueOffset = 2 × 8 = 16"
-                data-note="Offsets into the concatenated heads"></span>
-          <span class="vscode-step fragment current-visible" data-fragment-index="3"
-                data-lines="22-27"
-                data-stopped="27"
-                data-values="22: queries[2][136..144] | 24: keys[1][16..24] | 27: 6.7 / 2.83 = 2.37"
-                data-note="Same query • key / √headDim, on a slice"></span>
-        </div>
-        <p class="code-caption">Fewer K/V heads = smaller cache = the reason long contexts are affordable.</p>
-      </div>
+      </pre>
+      <span class="vscode-inline" data-line="2" data-value="queryHeads = 32   kvHeads = 4   headDimension = 8"></span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-text="groupSize = weights.NumberdOfQueryHeads"
+         data-stopped
+         data-values="1: 32 / 4 = 8 | 2: scale = √8 = 2.83"
+         data-note="One KV head per group of queries"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-text="keyValueHead = queryHead / groupSize"
+         data-stopped
+         data-values="4: queryHead = 17 | 6: 17 / 8 = 2"
+         data-note="Query head 17 → KV head 2"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-lines="7-8"
+         data-values="7: queryOffset = 17 × 8 = 136 | 8: keyValueOffset = 2 × 8 = 16"
+         data-note="Offsets into the concatenated heads"></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-lines="22-27"
+         data-stopped="27"
+         data-values="22: queries[2][136..144] | 24: keys[1][16..24] | 27: 6.7 / 2.83 = 2.37"
+         data-note="Same query • key / √headDim, on a slice"></span>
     </div>
   </div>
 </section>

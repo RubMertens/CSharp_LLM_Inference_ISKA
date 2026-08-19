@@ -29,13 +29,20 @@
     if (params.get('debug')) {
       await new Promise(r => setTimeout(r, 600));
       const slide = document.querySelector('.slide.active');
+      const pres = document.getElementById('presentation');
       const lines = [
-        `slide scrollHeight ${slide.scrollHeight} clientHeight ${slide.clientHeight}`,
+        `viewport ${innerWidth}x${innerHeight} docEl ${document.documentElement.clientHeight}`,
+        `#presentation ${Math.round(pres.getBoundingClientRect().height)}`
+          + ` top ${Math.round(pres.getBoundingClientRect().top)}`,
+        `slide rect top ${Math.round(slide.getBoundingClientRect().top)}`
+          + ` bottom ${Math.round(slide.getBoundingClientRect().bottom)}`
+          + ` scrollHeight ${slide.scrollHeight} clientHeight ${slide.clientHeight}`,
         ...[...slide.querySelectorAll('.vscode-window')].map((w, i) => {
           const code = w.querySelector('.vscode-code');
           return `window ${i}: window ${Math.round(w.getBoundingClientRect().height)}`
             + ` code ${Math.round(code.getBoundingClientRect().height)}`
-            + ` scroll ${code.scrollHeight} max ${code.style.maxHeight || '(css)'}`;
+            + ` scroll ${code.scrollHeight} max ${code.style.maxHeight || '(css)'}`
+            + ` font ${w.style.getPropertyValue('--vs-font-size')}`;
         }),
         ...[...slide.children].map(c => `${c.className || c.tagName}: ${Math.round(c.getBoundingClientRect().height)}`),
       ];

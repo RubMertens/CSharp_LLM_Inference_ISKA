@@ -1,13 +1,12 @@
 <section data-id="qkv-code" data-title="Q, K, V in Code">
   <div class="slide-content">
     <h2>Q, K, V — <span class="highlight">three matrix multiplies</span></h2>
-    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">Query, key and value aren't objects or services. They're the same embeddings, projected three ways.</p>
 
     <div class="vscode-window" style="max-width: min(100%, 980px);"
          data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
          data-lines="27-40"
          data-member="Forward"
-             data-start-line="27">
+         data-start-line="27">
       <pre class="vscode-source">
 // normalize 
 Matrix normalizedEmbeddings = new(sequenceLength, weights.HiddenDimension);
@@ -25,25 +24,19 @@ var values = normalizedEmbeddings * weights.ValueProjection;
 var attentionOutput = SingleHeadSelfAttention(weights.HiddenDimension, sequenceLength, queries, keys, values);
       </pre>
       <span class="vscode-inline" data-line="2" data-value="sequenceLength = 4   hiddenDimension = 8"></span>
-      <span class="vscode-step fragment current-visible" data-fragment-index="0"
-            data-lines="1-6"
-            data-values="5: normalizedEmbeddings = 4×8"
-            data-note="Normalize first — every block starts with RMSNorm"></span>
-      <span class="vscode-step fragment current-visible" data-fragment-index="1"
-            data-lines="10-12"
-            data-stopped="10"
-            data-values="10: 4×8 · 8×8 = 4×8 | 11: keys = 4×8 | 12: values = 4×8"
-            data-note="Same input, three different weight matrices"></span>
-      <span class="vscode-step fragment current-visible" data-fragment-index="2"
-            data-lines="14"
-            data-values="14: attentionOutput = 4×8"
-            data-note="Attention consumes all three"></span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-lines="1-6"
+         data-values="5: normalizedEmbeddings = 4×8"
+         data-note="Normalize first — every block starts with RMSNorm"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="10-12"
+         data-stopped="10"
+         data-values="10: 4×8 · 8×8 = 4×8 | 11: keys = 4×8 | 12: values = 4×8"
+         data-note="Same input, three different weight matrices"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-lines="14"
+         data-values="14: attentionOutput = 4×8"
+         data-note="Attention consumes all three"></span>
     </div>
-
-    <ul class="code-steps" style="max-width: 980px; margin: 0.8rem auto 0;">
-      <li class="fragment" data-fragment-index="0">Normalized embeddings go in.</li>
-      <li class="fragment" data-fragment-index="1">Q, K, V are the <em>learned</em> weights doing the work — three matmuls, nothing else.</li>
-      <li class="fragment" data-fragment-index="2">Attention is the only place these three ever meet.</li>
-    </ul>
   </div>
 </section>
