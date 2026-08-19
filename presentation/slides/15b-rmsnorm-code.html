@@ -1,0 +1,33 @@
+<section data-id="rmsnorm-code" data-title="RMSNorm in Code">
+  <div class="slide-content">
+    <h2>RMSNorm — <span class="highlight">in Code</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">The diagram you just dragged, as 12 lines of C#.</p>
+
+    <div class="code-split">
+      <ol class="code-steps">
+        <li class="fragment" data-fragment-index="0">Sum the squares — total magnitude of the vector.</li>
+        <li class="fragment" data-fragment-index="1">Mean, then square root: the <span class="highlight">root mean square</span>. Epsilon keeps a zero vector safe.</li>
+        <li class="fragment" data-fragment-index="2">Divide every element by it, then scale by the learned weight.</li>
+      </ol>
+
+      <div>
+        <div class="vscode-window"
+             data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+             data-member="RootMeanSquareNormalisation"
+             data-tabs="Vector.cs,Matrix.cs"
+             data-font-size="0.68rem">
+          <span class="vscode-step fragment current-visible" data-fragment-index="0"
+                data-text="sumSquares = input.Data.Sum"
+                data-note="Σ x² over the vector"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="1"
+                data-lines="6-8"
+                data-note="mean → sqrt → rms (1e-5 guards divide-by-zero)"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="2"
+                data-lines="10-14"
+                data-note="x / rms * weight — normalize, then rescale"></span>
+        </div>
+        <p class="code-caption">Note what's missing: no mean subtraction, no variance. That's why it's cheaper than LayerNorm.</p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,47 @@
+<section data-id="swiglu-code" data-title="SwiGLU in Code">
+  <div class="slide-content">
+    <h2>Feed-Forward + SwiGLU — <span class="highlight">in Code</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.8rem;">Two projections up, one gate, one projection back down. Steps build up as you click.</p>
+
+    <div class="two-column" style="gap: 1.2rem;">
+      <div>
+        <div class="vscode-window"
+             data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
+             data-lines="61-67"
+             data-member="Forward"
+             data-tab="MultiLayerTransformerWithActivation.cs"
+             data-font-size="0.66rem"
+             data-minimap="off"
+             data-chrome="minimal"
+             data-statusbar="off">
+          <span class="vscode-step fragment" data-fragment-index="0"
+                data-lines="2-3"
+                data-note="gate and up: same input, wider output"></span>
+          <span class="vscode-step fragment" data-fragment-index="1"
+                data-lines="4"
+                data-note="SiLU squashes the gate"></span>
+          <span class="vscode-step fragment" data-fragment-index="2"
+                data-lines="5"
+                data-note="element-wise multiply — the gate decides what passes"></span>
+          <span class="vscode-step fragment" data-fragment-index="3"
+                data-lines="7"
+                data-note="down-project back to hidden dimension, ready for the residual"></span>
+        </div>
+        <p class="code-caption">Forward pass, feed-forward block</p>
+      </div>
+
+      <div>
+        <div class="vscode-window"
+             data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
+             data-member="SigmoidLinearUnit"
+             data-tab="SigmoidLinearUnit"
+             data-font-size="0.66rem"
+             data-minimap="off"
+             data-chrome="minimal"
+             data-statusbar="off"
+             data-highlight-text="float sigmoid"></div>
+        <p class="code-caption">SiLU: <code>x · σ(x)</code> — smooth, and negatives don't die at zero</p>
+      </div>
+    </div>
+  </div>
+</section>

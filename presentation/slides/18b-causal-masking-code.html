@@ -1,0 +1,34 @@
+<section data-id="causal-masking-code" data-title="Causal Masking in Code">
+  <div class="slide-content">
+    <h2>Causal Masking — <span class="highlight">in Code</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">"Never look at the future" is one <code>if</code>.</p>
+
+    <div class="code-split">
+      <ol class="code-steps">
+        <li class="fragment" data-fragment-index="0">For token <code>lookingFrom</code>, score every token <code>lookingTo</code>.</li>
+        <li class="fragment" data-fragment-index="1">Future token? Score becomes <code>-∞</code>, so softmax gives it exactly <span class="highlight">0%</span> attention.</li>
+        <li class="fragment" data-fragment-index="2">Past and present: query • key, scaled by <code>√headDim</code> to keep the numbers tame.</li>
+      </ol>
+
+      <div>
+        <div class="vscode-window"
+             data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+             data-lines="64-79"
+             data-tab="Transformer.cs"
+             data-member="SingleHeadSelfAttention"
+             data-minimap="off">
+          <span class="vscode-step fragment current-visible" data-fragment-index="0"
+                data-lines="1-3"
+                data-note="Inner loop over every other token"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="1"
+                data-lines="4-10"
+                data-note="lookingTo > lookingFrom → NegativeInfinity"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="2"
+                data-text="queries[lookingFrom] * keys[lookingTo]"
+                data-note="Dot product / √headDim = raw attention score"></span>
+        </div>
+        <p class="code-caption">Drop that <code>if</code> and the model can read the answer it's supposed to predict.</p>
+      </div>
+    </div>
+  </div>
+</section>

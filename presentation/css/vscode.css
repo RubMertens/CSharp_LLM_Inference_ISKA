@@ -1,0 +1,467 @@
+/* VS Code style code windows — chrome + syntax palette.
+ *
+ * Two palettes: "Dark Modern" (default) and "Light Modern", matching the VS Code
+ * defaults so a snippet on a slide reads as the editor the audience just watched.
+ * Token classes are produced by js/vscode-code.js from Monaco's C# tokens.
+ */
+
+.vscode-window {
+  /* Dark Modern */
+  --vs-editor-bg: #1F1F1F;
+  --vs-chrome-bg: #181818;
+  --vs-tab-active-bg: #1F1F1F;
+  --vs-border: #2B2B2B;
+  --vs-accent: #0078D4;
+  --vs-fg: #CCCCCC;
+  --vs-fg-dim: #9D9D9D;
+  --vs-ln: #6E7681;
+  --vs-ln-active: #CCCCCC;
+  --vs-line-hl: rgba(38, 79, 120, 0.55);
+  --vs-line-hl-bar: #0078D4;
+  --vs-status-bg: #181818;
+
+  --vs-tok-plain: #CCCCCC;
+  --vs-tok-keyword: #569CD6;
+  --vs-tok-control: #C586C0;
+  --vs-tok-type: #4EC9B0;
+  --vs-tok-method: #DCDCAA;
+  --vs-tok-var: #9CDCFE;
+  --vs-tok-prop: #9CDCFE;
+  --vs-tok-string: #CE9178;
+  --vs-tok-escape: #D7BA7D;
+  --vs-tok-number: #B5CEA8;
+  --vs-tok-comment: #6A9955;
+  --vs-tok-punct: #CCCCCC;
+  --vs-tok-op: #D4D4D4;
+  --vs-tok-attr: #4EC9B0;
+  --vs-tok-directive: #C586C0;
+  --vs-bracket-0: #FFD700;
+  --vs-bracket-1: #DA70D6;
+  --vs-bracket-2: #179FFF;
+
+  --vs-font-size: 0.8rem;
+  --vs-line-height: 1.55;
+  --vs-max-height: 56vh;
+
+  display: block;
+  width: 100%;
+  max-width: min(100%, 1120px);
+  margin: 0.6rem auto;
+  background: var(--vs-editor-bg);
+  border: 1px solid var(--vs-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px -18px rgba(0, 20, 45, 0.55), 0 2px 6px rgba(0, 20, 45, 0.18);
+  font-family: var(--font-mono);
+  color: var(--vs-fg);
+  text-align: left;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.vscode-window[data-theme="light"] {
+  /* Light Modern */
+  --vs-editor-bg: #FFFFFF;
+  --vs-chrome-bg: #F8F8F8;
+  --vs-tab-active-bg: #FFFFFF;
+  --vs-border: #E5E5E5;
+  --vs-accent: #005FB8;
+  --vs-fg: #3B3B3B;
+  --vs-fg-dim: #616161;
+  --vs-ln: #6E7681;
+  --vs-ln-active: #171184;
+  --vs-line-hl: rgba(0, 95, 184, 0.12);
+  --vs-line-hl-bar: #005FB8;
+  --vs-status-bg: #F8F8F8;
+
+  --vs-tok-plain: #000000;
+  --vs-tok-keyword: #0000FF;
+  --vs-tok-control: #AF00DB;
+  --vs-tok-type: #267F99;
+  --vs-tok-method: #795E26;
+  --vs-tok-var: #001080;
+  --vs-tok-prop: #001080;
+  --vs-tok-string: #A31515;
+  --vs-tok-escape: #EE0000;
+  --vs-tok-number: #098658;
+  --vs-tok-comment: #008000;
+  --vs-tok-punct: #000000;
+  --vs-tok-op: #000000;
+  --vs-tok-attr: #267F99;
+  --vs-tok-directive: #AF00DB;
+  --vs-bracket-0: #0431FA;
+  --vs-bracket-1: #319331;
+  --vs-bracket-2: #7B3814;
+}
+
+/* ---------- chrome ---------- */
+
+.vscode-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  height: 2.2em;
+  padding: 0 0.8em;
+  background: var(--vs-chrome-bg);
+  border-bottom: 1px solid var(--vs-border);
+  font-size: 0.62rem;
+}
+
+.vscode-lights {
+  display: flex;
+  gap: 0.42em;
+  flex: none;
+}
+
+.vscode-lights i {
+  width: 0.72em;
+  height: 0.72em;
+  border-radius: 50%;
+  display: block;
+}
+
+.vscode-lights .red { background: #FF5F57; }
+.vscode-lights .yellow { background: #FEBC2E; }
+.vscode-lights .green { background: #28C840; }
+
+.vscode-title {
+  flex: 1;
+  text-align: center;
+  color: var(--vs-fg-dim);
+  font-family: var(--font-sans);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vscode-tabs {
+  display: flex;
+  align-items: stretch;
+  background: var(--vs-chrome-bg);
+  border-bottom: 1px solid var(--vs-border);
+  font-size: 0.62rem;
+  overflow: hidden;
+}
+
+.vscode-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.55em 0.9em;
+  color: var(--vs-fg-dim);
+  border-right: 1px solid var(--vs-border);
+  white-space: nowrap;
+}
+
+.vscode-tab.active {
+  background: var(--vs-tab-active-bg);
+  color: var(--vs-fg);
+  box-shadow: inset 0 2px 0 0 var(--vs-accent);
+}
+
+.vscode-tab-icon {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+}
+
+.vscode-tab-close {
+  font-style: normal;
+  opacity: 0.5;
+  margin-left: 0.3em;
+}
+
+.vscode-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.4em 0.9em;
+  background: var(--vs-editor-bg);
+  color: var(--vs-fg-dim);
+  font-size: 0.55rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.vscode-crumb.current { color: var(--vs-fg); }
+.vscode-crumb-sep { opacity: 0.55; }
+
+/* ---------- editor ---------- */
+
+.vscode-body {
+  display: flex;
+  align-items: stretch;
+  background: var(--vs-editor-bg);
+  min-height: 0;
+}
+
+.vscode-code {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0.55em 0 0.75em;
+  max-height: var(--vs-max-height);
+  overflow: auto;
+  background: var(--vs-editor-bg);
+  border: none;
+  border-radius: 0;
+  font-size: var(--vs-font-size);
+  line-height: var(--vs-line-height);
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+}
+
+.vscode-code code {
+  display: block;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  color: var(--vs-fg);
+  font-family: inherit;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+.vscode-line {
+  display: flex;
+  align-items: flex-start;
+  border-left: 2px solid transparent;
+  transition: background-color 0.25s ease, opacity 0.25s ease;
+}
+
+.vscode-ln {
+  position: sticky;
+  left: 0;
+  flex: none;
+  min-width: 3.4ch;
+  padding: 0 1.1ch 0 0.9ch;
+  text-align: right;
+  color: var(--vs-ln);
+  background: var(--vs-editor-bg);
+  user-select: none;
+}
+
+.vscode-text {
+  flex: 1;
+  padding-right: 1.2em;
+  /* Soft wrap by default: a slide can't scroll sideways mid-talk. Continuation
+     lines line up with the text column, same as VS Code's word wrap. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.vscode-window[data-wrap="off"] .vscode-text {
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.vscode-line.hl {
+  background: var(--vs-line-hl);
+  border-left-color: var(--vs-line-hl-bar);
+}
+
+.vscode-line.hl .vscode-ln {
+  color: var(--vs-ln-active);
+  background: var(--vs-line-hl);
+}
+
+.vscode-line.dim {
+  opacity: 0.42;
+  filter: saturate(0.6);
+}
+
+.vscode-error { color: #F14C4C; }
+
+/* ---------- minimap ---------- */
+
+.vscode-minimap {
+  flex: none;
+  width: 4.2em;
+  padding: 0.6em 0.35em;
+  background: var(--vs-editor-bg);
+  border-left: 1px solid var(--vs-border);
+  overflow: hidden;
+}
+
+.vscode-minimap i {
+  display: block;
+  /* Bar pitch tracks the code font so the map stays proportional at any size. */
+  height: calc(var(--vs-font-size) * 0.34);
+  margin-bottom: calc(var(--vs-font-size) * 0.7);
+  background: var(--vs-fg);
+  opacity: 0.32;
+  border-radius: 1px;
+}
+
+/* ---------- status bar ---------- */
+
+.vscode-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.3em 0.9em;
+  background: var(--vs-status-bg);
+  border-top: 1px solid var(--vs-border);
+  color: var(--vs-fg-dim);
+  font-family: var(--font-sans);
+  font-size: 0.52rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.vscode-status-left,
+.vscode-status-right {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.vscode-status-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  margin-right: 0.3em;
+}
+
+/* Narration line for the active walkthrough step. */
+.vscode-note {
+  padding: 0.5em 1em;
+  background: var(--color-bg-subtle);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  line-height: 1.4;
+}
+
+.vscode-note::before {
+  content: "▸ ";
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+/* Step markers are invisible; only their fragment state matters. */
+.vscode-step {
+  display: none !important;
+}
+
+/* Fallback source kept in the markup for no-JS / no-Monaco viewing. */
+.vscode-window > pre.vscode-source {
+  display: none;
+}
+
+/* ---------- syntax ---------- */
+
+.vscode-code .tok-plain { color: var(--vs-tok-plain); }
+.vscode-code .tok-keyword { color: var(--vs-tok-keyword); }
+.vscode-code .tok-control { color: var(--vs-tok-control); }
+.vscode-code .tok-type { color: var(--vs-tok-type); }
+.vscode-code .tok-method { color: var(--vs-tok-method); }
+.vscode-code .tok-var { color: var(--vs-tok-var); }
+.vscode-code .tok-prop { color: var(--vs-tok-prop); }
+.vscode-code .tok-string { color: var(--vs-tok-string); }
+.vscode-code .tok-str-escape { color: var(--vs-tok-escape); }
+.vscode-code .tok-number { color: var(--vs-tok-number); }
+.vscode-code .tok-comment { color: var(--vs-tok-comment); font-style: normal; }
+.vscode-code .tok-punct { color: var(--vs-tok-punct); }
+.vscode-code .tok-op { color: var(--vs-tok-op); }
+.vscode-code .tok-attr { color: var(--vs-tok-attr); }
+.vscode-code .tok-directive { color: var(--vs-tok-directive); }
+.vscode-code .tok-bracket-0 { color: var(--vs-bracket-0); }
+.vscode-code .tok-bracket-1 { color: var(--vs-bracket-1); }
+.vscode-code .tok-bracket-2 { color: var(--vs-bracket-2); }
+
+/* ---------- layout helpers ---------- */
+
+/* Code beside prose: <div class="code-split"><div>…notes…</div><div class="vscode-window">…</div></div> */
+.code-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 1.5rem;
+  width: 100%;
+  align-items: start;
+}
+
+.code-split .vscode-window {
+  margin-top: 0;
+}
+
+/* Numbered narration beside a code window; pair each <li class="fragment"> with a
+ * matching .vscode-step marker at the same data-fragment-index. */
+.code-steps {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: code-step;
+  margin: 0;
+}
+
+/* Not flex: a flex container would turn every inline <code>/<em>/<span> run into a
+   separate flex item and shred the line breaks. */
+.code-steps li {
+  counter-increment: code-step;
+  position: relative;
+  padding-left: 2.3em;
+  margin-bottom: 0.85em;
+  font-size: 0.92em;
+  line-height: 1.45;
+}
+
+.code-steps li::before {
+  content: counter(code-step);
+  position: absolute;
+  left: 0;
+  top: 0.18em;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  background: var(--color-accent-glow);
+  color: var(--color-heading);
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.code-steps code {
+  font-size: 0.82em;
+}
+
+.code-caption {
+  margin-top: 0.4rem;
+  color: var(--color-text-muted);
+  font-size: 0.7em;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .code-split {
+    grid-template-columns: 1fr;
+  }
+
+  .vscode-minimap,
+  .vscode-breadcrumbs {
+    display: none;
+  }
+}
+
+@media print {
+  .vscode-window {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .vscode-code {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .vscode-line.dim {
+    opacity: 1;
+    filter: none;
+  }
+}

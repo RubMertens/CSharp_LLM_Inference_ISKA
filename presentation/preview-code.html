@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code window preview</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/vscode.css">
+  <style>
+    /* Standalone harness — no slide engine, so scrolling is fine here. */
+    html, body { height: auto; overflow: auto; }
+    body { padding: 2rem; }
+    h1 { font-size: 1.4rem; margin-bottom: 0.3rem; }
+    h2 { font-size: 0.95rem; margin: 2rem 0 0.5rem; color: var(--color-text-muted); }
+    .hint { color: var(--color-text-muted); font-size: 0.8rem; }
+    .panel { max-width: 1100px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Code window preview</h1>
+    <p class="hint">
+      Authoring harness for <code>.vscode-window</code>. Press <kbd>→</kbd> / <kbd>←</kbd> to walk the steps
+      (this page fakes what the slide engine does to <code>.vscode-step</code> markers).
+      <code>?step=2</code> jumps straight to a step — handy for screenshots.
+    </p>
+
+    <h2>Walkthrough steps + minimap + full chrome</h2>
+    <div class="vscode-window"
+         data-src="Runner.ConsoleApp/Math/Vector.cs"
+         data-member="operator *"
+         data-tabs="Program.cs">
+      <span class="vscode-step fragment current-visible" data-fragment-index="0"
+            data-lines="3-4" data-note="Guard: equal length or nothing to pair up"></span>
+      <span class="vscode-step fragment current-visible" data-fragment-index="1"
+            data-lines="6-10" data-note="Multiply pairs, accumulate into sum"></span>
+      <span class="vscode-step fragment current-visible" data-fragment-index="2"
+            data-text="return sum" data-note="A single float — the whole dot product"></span>
+    </div>
+
+    <h2>Light theme, static highlight, no chrome</h2>
+    <div class="vscode-window" data-theme="light"
+         data-src="Runner.ConsoleApp.Completed/Math/RmsNorm.cs"
+         data-chrome="minimal"
+         data-highlight-text="ss +="
+         data-minimap="off"></div>
+
+    <h2>Inline source (no data-src), snippet numbering</h2>
+    <div class="vscode-window" data-tab="scratch.cs" data-minimap="off" data-statusbar="off"><pre class="vscode-source">
+// inline source must escape markup: &lt; becomes &amp;lt;
+[Obsolete("use Forward instead")]
+public static Vector&lt;float&gt; Scale(Vector&lt;float&gt; v, float k = 1.5f)
+{
+    var label = $"scale {k:F2} of {v.Length} dims";
+    var path = @"C:\models\qwen3-0.6b";
+    Console.WriteLine(label + path);
+    return v * k;   // operator overload
+}
+</pre></div>
+  </div>
+
+  <script type="module" src="js/vscode-code.js"></script>
+  <script type="module">
+    // Minimal stand-in for the engine's fragment machinery.
+    const markers = () => [...document.querySelectorAll('.vscode-step')];
+
+    function apply(step) {
+      for (const m of markers()) {
+        const on = Number(m.dataset.fragmentIndex) === step;
+        m.classList.toggle('fragment-visible', on);
+        m.classList.toggle('fragment-hidden', !on);
+      }
+    }
+
+    let step = Number(new URLSearchParams(location.search).get('step') ?? -1);
+    const max = () => Math.max(0, ...markers().map(m => Number(m.dataset.fragmentIndex)));
+
+    addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') step = Math.min(step + 1, max());
+      else if (e.key === 'ArrowLeft') step = Math.max(step - 1, -1);
+      else return;
+      apply(step);
+    });
+
+    // markers exist only after the windows render
+    new MutationObserver(() => { if (step >= 0) apply(step); })
+      .observe(document.body, { childList: true, subtree: true });
+    if (step >= 0) apply(step);
+  </script>
+</body>
+</html>

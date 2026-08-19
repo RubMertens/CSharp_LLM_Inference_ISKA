@@ -1,0 +1,37 @@
+<section data-id="kv-cache-code" data-title="KV Cache in Code">
+  <div class="slide-content">
+    <h2>KV Cache — <span class="highlight">in Code</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">Prefill runs the whole prompt once. Every token after that is <em>one</em> vector through the stack.</p>
+
+    <div class="code-split">
+      <ol class="code-steps">
+        <li class="fragment" data-fragment-index="0">Position comes from the cache — its length <em>is</em> the token count so far.</li>
+        <li class="fragment" data-fragment-index="1">Project a single vector, not a matrix. No sequence loop anywhere.</li>
+        <li class="fragment" data-fragment-index="2">RoPE at this position, then append K and V to the cache. Write once, reuse forever.</li>
+        <li class="fragment" data-fragment-index="3">Attend the one query against everything cached. Per-token cost stops growing quadratically.</li>
+      </ol>
+
+      <div class="vscode-window"
+           data-src="Runner.ConsoleApp/6_MultiLayerWithKVCache/MultiLayerTransformerWithKVCache.cs"
+           data-lines="65-86"
+           data-member="DecodeNext"
+           data-tab="MultiLayerTransformerWithKVCache.cs"
+           data-tabs="MultiLayerTransformerWithGQA.cs"
+           data-font-size="0.62rem"
+           data-minimap="off">
+        <span class="vscode-step fragment current-visible" data-fragment-index="0"
+              data-text="int position = _keyCache"
+              data-note="Cache count = current position"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="1"
+              data-lines="6-10"
+              data-note="Vector × Matrix, once per layer"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="2"
+              data-lines="12-16"
+              data-note="Rotate, then append to the K/V cache"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="3"
+              data-lines="18-21"
+              data-note="One query against the full cached history"></span>
+      </div>
+    </div>
+  </div>
+</section>

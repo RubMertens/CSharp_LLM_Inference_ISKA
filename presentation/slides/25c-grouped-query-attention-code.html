@@ -1,0 +1,39 @@
+<section data-id="grouped-query-attention-code" data-title="GQA in Code">
+  <div class="slide-content">
+    <h2>Grouped Query Attention — <span class="highlight">in Code</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">32 query heads, 4 key/value heads. Every 8 queries share one K/V head.</p>
+
+    <div class="code-split">
+      <ol class="code-steps">
+        <li class="fragment" data-fragment-index="0"><code>groupSize</code> = query heads ÷ KV heads. Here: 8.</li>
+        <li class="fragment" data-fragment-index="1">Integer division maps a query head to its <span class="highlight">shared</span> KV head.</li>
+        <li class="fragment" data-fragment-index="2">Offsets slice one head out of the big vector — no copies, just ranges.</li>
+        <li class="fragment" data-fragment-index="3">From there it's the same attention as before: score, softmax, weighted sum.</li>
+      </ol>
+
+      <div>
+        <div class="vscode-window"
+             data-src="Runner.ConsoleApp/5_MultiLayerWithGQA/MultiLayerTransformerWithGroupedQueryAttention.cs"
+             data-lines="123-152"
+             data-member="GroupedQueryAttention"
+             data-tab="MultiLayerTransformerWithGroupedQueryAttention.cs"
+             data-font-size="0.58rem"
+             data-minimap="off">
+          <span class="vscode-step fragment current-visible" data-fragment-index="0"
+                data-text="groupSize = weights.NumberdOfQueryHeads"
+                data-note="One KV head per group of queries"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="1"
+                data-text="keyValueHead = queryHead / groupSize"
+                data-note="Query head 17 → KV head 2"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="2"
+                data-lines="7-8"
+                data-note="Offsets into the concatenated heads"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="3"
+                data-lines="22-27"
+                data-note="Same query • key / √headDim, on a slice"></span>
+        </div>
+        <p class="code-caption">Fewer K/V heads = smaller cache = the reason long contexts are affordable.</p>
+      </div>
+    </div>
+  </div>
+</section>

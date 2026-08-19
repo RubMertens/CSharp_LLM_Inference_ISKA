@@ -1,0 +1,32 @@
+<section data-id="dot-product-code" data-title="Dot Product in Code">
+  <div class="slide-content">
+    <h2>Dot Product — <span class="highlight">in Code</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">Straight out of the runner we're building. No library, no magic.</p>
+
+    <div class="code-split">
+      <ol class="code-steps">
+        <li class="fragment" data-fragment-index="0">Both vectors must have the same length — a dot product needs pairs.</li>
+        <li class="fragment" data-fragment-index="1">Multiply element by element, add it all up. One loop.</li>
+        <li class="fragment" data-fragment-index="2">Two vectors in, <span class="highlight">one number</span> out. That number is alignment.</li>
+      </ol>
+
+      <div>
+        <div class="vscode-window"
+             data-src="Runner.ConsoleApp/Math/Vector.cs"
+             data-member="operator *"
+             data-tabs="Program.cs">
+          <span class="vscode-step fragment current-visible" data-fragment-index="0"
+                data-lines="3-4"
+                data-note="Guard: equal length or nothing to pair up"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="1"
+                data-lines="6-10"
+                data-note="Multiply pairs, accumulate into sum"></span>
+          <span class="vscode-step fragment current-visible" data-fragment-index="2"
+                data-text="return sum"
+                data-note="A single float — the whole dot product"></span>
+        </div>
+        <p class="code-caption">C# operator overloading: <code>queries[i] * keys[j]</code> is a dot product.</p>
+      </div>
+    </div>
+  </div>
+</section>

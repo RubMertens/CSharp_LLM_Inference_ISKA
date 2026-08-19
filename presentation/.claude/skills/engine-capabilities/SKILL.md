@@ -106,13 +106,115 @@ Directional slide-in/slide-out with 0.4s CSS transitions. Direction determined b
 
 ## Code Highlighting
 
+Two options. Prefer **code windows** for anything from the demo project.
+
+### Code windows (VS Code look, snippets pulled from ../demos)
+
+`js/vscode-code.js` turns any `<div class="vscode-window">` into a VS Code
+"Dark Modern" window: title bar, tab strip, breadcrumbs, line number gutter,
+minimap, status bar. Snippets are fetched from the real demo sources (`/code/*` →
+`../demos`) and tokenized with Monaco's C# grammar, so slides can't drift from the
+code being demoed. Rendering is static HTML (no editor instance), cached per
+snippet, and re-runs automatically for overview mode and every navigation.
+
+```html
+<div class="vscode-window"
+     data-src="Runner.ConsoleApp/Math/Vector.cs"
+     data-member="operator *"></div>
+```
+
+**Source selection** (first match wins):
+
+| Attribute | Meaning |
+|-----------|---------|
+| `data-lines="12-40"` | line range in the file |
+| `data-region="Name"` | `#region Name` … `#endregion` |
+| `data-member="Forward"` | method / property / operator / type by name, incl. its doc comments |
+| `data-match="regex"` | raw declaration regex (escape hatch) |
+| `data-nth="2"` | pick the 2nd match — for overloads |
+| `data-code="…"` | inline code instead of `data-src` |
+| `<pre class="vscode-source">…</pre>` child | inline code (escape `<` as `&lt;`) |
+
+**Presentation:**
+
+| Attribute | Default | Meaning |
+|-----------|---------|---------|
+| `data-lang` | `csharp` | Monaco language id |
+| `data-tab` | file name | active tab label |
+| `data-tabs="a.cs,b.cs"` | — | extra inactive tabs |
+| `data-theme` | `dark` | `dark` (Dark Modern) or `light` (Light Modern) |
+| `data-chrome` | `full` | `full` / `minimal` (tabs only) / `none` |
+| `data-minimap` | `on` | fake minimap column |
+| `data-statusbar` | `on` | bottom status bar |
+| `data-breadcrumbs` | `on` with a path | path › member breadcrumb row |
+| `data-numbers` | `file` | `file` (real line numbers) / `snippet` / `off` |
+| `data-font-size` | auto by line count | e.g. `0.7rem` |
+| `data-max-height` | `56vh` | code area height before it scrolls |
+| `data-wrap` | `on` | soft-wrap long lines |
+| `data-highlight="3-5,9"` | — | always-on highlighted lines (snippet-relative) |
+| `data-highlight-text="sum +="` | — | highlight every line containing this text |
+| `data-dim` | `on` | dim non-highlighted lines while a step is active |
+
+The window auto-fits: if it would overrun the slide, the code area is clamped and
+scrolls instead (step highlights scroll themselves into view).
+
+### Fragment-driven code walkthrough
+
+Add `.vscode-step` markers as children of the window. They're invisible; the engine
+reveals them like any other fragment and the window follows — highlight the step's
+lines, dim the rest, show `data-note` in a strip under the editor.
+
+```html
+<div class="code-split">
+  <ol class="code-steps">
+    <li class="fragment" data-fragment-index="0">Guard the lengths.</li>
+    <li class="fragment" data-fragment-index="1">Multiply pairs, accumulate.</li>
+  </ol>
+  <div>
+    <div class="vscode-window" data-src="Runner.ConsoleApp/Math/Vector.cs" data-member="operator *">
+      <span class="vscode-step fragment current-visible" data-fragment-index="0"
+            data-lines="3-4" data-note="equal length or nothing to pair up"></span>
+      <span class="vscode-step fragment current-visible" data-fragment-index="1"
+            data-text="sum +=" data-note="accumulate into sum"></span>
+    </div>
+    <p class="code-caption">Optional caption under the window</p>
+  </div>
+</div>
+```
+
+Rules:
+- `data-lines` on a step is **snippet-relative** (1 = first shown line); `data-text`
+  matches whole lines and survives edits to the demo code — prefer it.
+- `current-visible` steps replace each other (one highlight at a time). Plain
+  `.fragment` steps accumulate.
+- Pair every step with a **persistent** fragment at the same `data-fragment-index`
+  (a `.code-steps` bullet). The engine only advances on non-`current-visible`
+  fragments, so a window whose only fragments are `current-visible` won't step.
+- Captions belong inside the code column (`.code-split > div`), not as a sibling of
+  `.code-split` — a stray third grid child lands in the wrong column.
+
+Layout helpers: `.code-split` (prose | code grid), `.code-steps` (numbered
+narration list), `.code-caption` (muted line under a window).
+
+Verify snippets resolve after touching the demo code:
+
+```bash
+npm run check:code            # every window in slides/, plus each step's lines
+npm run check:code -- --show  # print the extracted snippets, numbered
+```
+
+`preview-code.html` (dev server only) is a standalone harness for authoring windows;
+`?step=N` jumps to a step.
+
+### highlight.js (plain code blocks)
+
 highlight.js runs on every `pre code` element after slide render. Use language classes:
 
 ```html
 <pre><code class="language-csharp">var x = 42;</code></pre>
 ```
 
-Loaded languages: C# (`csharp`). Theme: Atom One Dark.
+Loaded languages: C# (`csharp`). Theme: Atom One Light.
 
 ## CSS Layout Classes
 
@@ -152,3 +254,8 @@ Escape toggles a 4-column grid overlay. Each slide shown as button with title. C
 ## Additional Scripts
 
 `rotation-interact.js` — standalone drag-to-rotate SVG interaction for the RoPE rotation slide. Not part of the engine; loads independently.
+
+`vscode-code.js` — code windows (see Code Highlighting). Also independent of the
+engine: it watches `document.body` for added `.vscode-window` elements, so it works
+for slide navigation, overview mode and standalone pages alike. `code-extract.js`
+holds the snippet cutting logic and runs under node too.

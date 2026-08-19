@@ -7,8 +7,12 @@
   "scripts": {
     "start": "node server.js",
     "build": "node build.js",
+    "check:code": "node tools/check-snippets.js",
     "resequence": "node resequence-slides.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "monaco-editor": "^0.52.2"
+  }
 }

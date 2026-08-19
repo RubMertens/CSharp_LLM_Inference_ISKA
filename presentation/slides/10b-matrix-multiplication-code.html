@@ -1,0 +1,33 @@
+<section data-id="matrix-multiplication-code" data-title="Matrix Multiply in Code">
+  <div class="slide-content">
+    <h2>Matrix Multiply — <span class="highlight">in Code</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">Three nested loops. That's the whole GPU industry.</p>
+
+    <div class="code-split">
+      <ol class="code-steps">
+        <li class="fragment" data-fragment-index="0">Columns of A must match rows of B. Everything else is a shape bug.</li>
+        <li class="fragment" data-fragment-index="1">Row <code>i</code> of A against column <code>j</code> of B — one output cell per pair.</li>
+        <li class="fragment" data-fragment-index="2">Inner loop over <code>k</code> is the dot product from the previous slide.</li>
+        <li class="fragment" data-fragment-index="3">Cost is <code>rows × cols × k</code> multiplies. This is where the seconds go.</li>
+      </ol>
+
+      <div class="vscode-window"
+           data-src="Runner.ConsoleApp/Math/Matrix.cs"
+           data-member="operator *"
+           data-tabs="Vector.cs">
+        <span class="vscode-step fragment current-visible" data-fragment-index="0"
+              data-lines="3-4"
+              data-note="a.Columns == b.Rows or throw"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="1"
+              data-lines="7-10"
+              data-note="Walk every output cell (i, j)"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="2"
+              data-lines="11-15"
+              data-note="sum += a[i][k] * b[k][j] — the dot product"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="3"
+              data-text="result.Data[i][j] = sum"
+              data-note="One cell done. Repeat a few billion times."></span>
+      </div>
+    </div>
+  </div>
+</section>

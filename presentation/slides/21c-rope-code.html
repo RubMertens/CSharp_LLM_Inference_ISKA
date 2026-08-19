@@ -1,0 +1,36 @@
+<section data-id="rope-code" data-title="RoPE in Code">
+  <div class="slide-content">
+    <h2>RoPE — <span class="highlight">in Code</span></h2>
+    <p style="color: var(--color-text-muted); margin-bottom: 0.9rem;">Position isn't added to the vector. The vector gets rotated.</p>
+
+    <div class="code-split">
+      <ol class="code-steps">
+        <li class="fragment" data-fragment-index="0">Walk the vector two dimensions at a time — each pair is a 2D plane.</li>
+        <li class="fragment" data-fragment-index="1">Low dimensions rotate fast, high dimensions rotate slow. <code>theta</code> sets the speed.</li>
+        <li class="fragment" data-fragment-index="2">Angle = position × theta. Token 5 turns five times as far as token 1.</li>
+        <li class="fragment" data-fragment-index="3">Rotate the pair. Distance between two tokens now lives in the <span class="highlight">angle between them</span>.</li>
+      </ol>
+
+      <div class="vscode-window"
+           data-src="Runner.ConsoleApp/2_WithRope/TransformerWithRope.cs"
+           data-member="ApplyRoPETo"
+           data-tab="TransformerWithRope.cs"
+           data-font-size="0.6rem"
+           data-minimap="off"
+           data-max-height="58vh">
+        <span class="vscode-step fragment current-visible" data-fragment-index="0"
+              data-lines="12-16"
+              data-note="Pairs: j, j+1"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="1"
+              data-lines="18-20"
+              data-note="theta = 1 / 10000^(j / dimension)"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="2"
+              data-lines="22-25"
+              data-note="angle = position × theta"></span>
+        <span class="vscode-step fragment current-visible" data-fragment-index="3"
+              data-lines="27-28"
+              data-note="Standard 2D rotation applied to the pair"></span>
+      </div>
+    </div>
+  </div>
+</section>
