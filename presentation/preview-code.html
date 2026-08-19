@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code panel preview</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/vscode.css">
+  <style>
+    /* Standalone harness — no slide engine, so scrolling is fine here. */
+    html, body { height: auto; overflow: auto; }
+    body { padding: 2rem; }
+    h1 { font-size: 1.4rem; margin-bottom: 0.3rem; }
+    h2 { font-size: 0.95rem; margin: 2rem 0 0.5rem; color: var(--color-text-muted); }
+    .hint { color: var(--color-text-muted); font-size: 0.8rem; }
+    .panel { max-width: 1100px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Code panel preview</h1>
+    <p class="hint">
+      Authoring harness for <code>.vscode-window</code>. Press <kbd>→</kbd> / <kbd>←</kbd> to walk the steps
+      (this page fakes what the slide engine does to the markers).
+      <code>?step=2</code> jumps straight to a step — handy for screenshots.
+      Code is embedded in the markup; for slides <code>npm run code:embed</code> writes it for you.
+    </p>
+
+    <h2>Default panel — steps, inline values, stopped line, source pointer</h2>
+    <div class="vscode-window"
+         data-src="Runner.ConsoleApp/Math/Vector.cs"
+         data-member="operator *"
+         data-start-line="28">
+      <pre class="vscode-source">
+public static float operator *(Vector a, Vector b)
+{
+    if (a.Length != b.Length)
+        throw new InvalidOperationException("Incompatible vector dimensions for dot product.");
+
+    float sum = 0;
+    for (var i = 0; i &lt; a.Length; i++)
+    {
+        sum += a.Data[i] * b.Data[i];
+    }
+    return sum;
+}
+      </pre>
+      <span class="vscode-inline" data-line="1" data-value="a = [2, 3]   b = [4, 5]"></span>
+      <span class="vscode-step fragment current-visible" data-fragment-index="0"
+            data-lines="3-4"
+            data-values="3: a.Length = 2, b.Length = 2 ✓"
+            data-note="Guard: equal length or nothing to pair up"></span>
+      <span class="vscode-step fragment current-visible" data-fragment-index="1"
+            data-lines="6-10" data-stopped="9"
+            data-values="6: sum = 0 | 7: i = 0, 1 | 9: 2×4 = 8, then 3×5 → sum = 23"
+            data-note="Multiply pairs, accumulate into sum"></span>
+      <span class="vscode-step fragment current-visible" data-fragment-index="2"
+            data-text="return sum"
+            data-values="11: returns 23"
+            data-note="A single float — the whole dot product"></span>
+    </div>
+
+    <h2>Dark colours, static highlight (<code>data-theme="dark"</code>)</h2>
+    <div class="vscode-window" data-theme="dark" data-highlight-text="ss +="
+         data-src="Runner.ConsoleApp.Completed/Math/RmsNorm.cs" data-start-line="5">
+      <pre class="vscode-source">
+public static void RmsNorm(float[] output, float[] x, float[] weight, int size, float eps = 1e-5f)
+{
+    float ss = 0f;
+    for (int j = 0; j &lt; size; j++)
+    {
+        ss += x[j] * x[j];
+    }
+    ss /= size;
+    ss = 1.0f / MathF.Sqrt(ss + eps);
+
+    for (int j = 0; j &lt; size; j++)
+    {
+        output[j] = weight[j] * (ss * x[j]);
+    }
+}
+      </pre>
+    </div>
+
+    <h2>Editor chrome, if a slide ever wants it back (all off by default)</h2>
+    <div class="vscode-window" data-chrome="full" data-minimap="on" data-statusbar="on"
+         data-breadcrumbs="on" data-tab="Vector.cs" data-tabs="Program.cs"
+         data-src="Runner.ConsoleApp/Math/Vector.cs" data-member="operator +" data-start-line="41">
+      <pre class="vscode-source">
+public static Vector operator +(Vector a, Vector b)
+{
+    if (a.Length != b.Length)
+        throw new InvalidOperationException("Incompatible vector dimensions for addition.");
+
+    Vector result = new Vector(a.Length);
+    for (var i = 0; i &lt; a.Length; i++)
+    {
+        result.Data[i] = a.Data[i] + b.Data[i];
+    }
+    return result;
+}
+      </pre>
+    </div>
+
+    <h2>Hand-written snippet (no data-src, so no source pointer)</h2>
+    <div class="vscode-window" data-numbers="snippet"><pre class="vscode-source">
+// inline code must escape markup: &lt; becomes &amp;lt;
+var label = $"scale {k:F2} of {v.Length} dims";
+var path = @"C:\models\qwen3-0.6b";
+return v * k;   // operator overload
+</pre></div>
+  </div>
+
+  <script type="module" src="js/vscode-code.js"></script>
+  <script type="module">
+    // Minimal stand-in for the engine's fragment machinery.
+    const markers = () => [...document.querySelectorAll('.vscode-step, .vscode-inline.fragment')];
+
+    function apply(step) {
+      for (const m of markers()) {
+        const on = Number(m.dataset.fragmentIndex) === step;
+        m.classList.toggle('fragment-visible', on);
+        m.classList.toggle('fragment-hidden', !on);
+      }
+    }
+
+    let step = Number(new URLSearchParams(location.search).get('step') ?? -1);
+    const max = () => Math.max(0, ...markers().map(m => Number(m.dataset.fragmentIndex)));
+
+    addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') step = Math.min(step + 1, max());
+      else if (e.key === 'ArrowLeft') step = Math.max(step - 1, -1);
+      else return;
+      apply(step);
+    });
+
+    // markers only carry state once the panels have rendered
+    new MutationObserver(() => { if (step >= 0) apply(step); })
+      .observe(document.body, { childList: true, subtree: true });
+    if (step >= 0) apply(step);
+  </script>
+</body>
+</html>

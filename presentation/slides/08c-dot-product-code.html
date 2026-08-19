@@ -1,0 +1,40 @@
+<section data-id="dot-product-code" data-title="Dot Product in Code">
+  <div class="slide-content">
+    <h2>Dot Product — <span class="highlight">in Code</span></h2>
+
+    <div class="vscode-window"
+         data-src="Runner.ConsoleApp/Math/Vector.cs"
+         data-member="operator *"
+         data-start-line="28">
+      <pre class="vscode-source">
+public static float operator *(Vector a, Vector b)
+{
+    if (a.Length != b.Length)
+        throw new InvalidOperationException("Incompatible vector dimensions for dot product.");
+
+    float sum = 0;
+    for (var i = 0; i &lt; a.Length; i++)
+    {
+        sum += a.Data[i] * b.Data[i];
+    }
+    return sum;
+}
+      </pre>
+      <!-- example inputs, on screen from the start like a debugger watch -->
+      <span class="vscode-inline" data-line="1" data-value="a = [2, 3]   b = [4, 5]"></span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-lines="3-4"
+         data-values="3: a.Length = 2, b.Length = 2 ✓"
+         data-note="Guard: equal length or nothing to pair up"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="6-10"
+         data-stopped="9"
+         data-values="6: sum = 0 | 7: i = 0, 1 | 9: 2×4 = 8, then 3×5 → sum = 23"
+         data-note="Multiply pairs, accumulate into sum"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-text="return sum"
+         data-values="11: returns 23"
+         data-note="A single float — the whole dot product"></span>
+    </div>
+  </div>
+</section>
