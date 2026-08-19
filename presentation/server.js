@@ -2,7 +2,9 @@ import { createServer } from 'http';
 import { readFileSync, readdirSync } from 'fs';
 import { join, extname, normalize, resolve } from 'path';
 
-const PORT = 8000;
+// PORT=8010 npm start  (or: node server.js 8010) — lets a second copy run alongside
+// one already on 8000.
+const PORT = Number(process.env.PORT ?? process.argv[2] ?? 8000);
 const ROOT = '.';
 
 // Code slides fetch the real demo sources; Monaco is served straight out of
