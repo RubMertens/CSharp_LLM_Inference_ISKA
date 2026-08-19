@@ -81,9 +81,9 @@ html, body {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  /* Bottom padding clears the ISKS footer bar. Slides that opt out of the
-     bar (data-layout="isks-bare") get the plain padding back below. */
-  padding: clamp(2rem, 4vh, 3.5rem) var(--slide-padding) var(--isks-bar-clearance);
+  /* No bar by default, so plain padding all round. Slides that opt into the
+     ISKS footer bar (data-layout="isks-bar") get the clearance below. */
+  padding: clamp(2rem, 4vh, 3.5rem) var(--slide-padding) var(--slide-padding);
   background: var(--color-bg);
   opacity: 0;
   visibility: hidden;
@@ -150,8 +150,7 @@ html, body {
 
 #slide-counter {
   position: fixed;
-  /* lifted clear of the ISKS footer bar */
-  bottom: calc(var(--isks-bar-h) + 0.5rem);
+  bottom: 1.2rem;
   right: 1.5rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -163,7 +162,7 @@ html, body {
 
 .nav-hint {
   position: fixed;
-  bottom: calc(var(--isks-bar-h) + 0.5rem);
+  bottom: 1.2rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -652,26 +651,28 @@ pre code {
 
 /* The pack positions .isks-bar absolutely inside an .isks-canvas. As
    page-level chrome it needs to be fixed to the viewport instead, above
-   the slides but below the overview overlay. */
+   the slides but below the overview overlay.
+
+   Hidden by default: the bar eats ~10% of every slide's height and the
+   content wants that room, so a slide asks for it by name below. */
 #isks-bar {
   position: fixed;
   z-index: 80;
-}
-
-/* Slides that carry their own full-bleed treatment: hero and outro. The
-   bar would sit on top of their artwork, and the pptx title layout has no
-   bar either. */
-body[data-slide="title"] #isks-bar,
-body[data-slide="questions"] #isks-bar,
-body[data-layout~="isks-bare"] #isks-bar {
   display: none;
 }
 
-/* Those slides also get their padding back, since nothing needs clearing. */
-.slide[data-id="title"],
-.slide[data-id="questions"],
-.slide[data-layout~="isks-bare"] {
-  padding-bottom: var(--slide-padding);
+body[data-layout~="isks-bar"] #isks-bar {
+  display: block;
+}
+
+/* Only a slide carrying the bar needs to clear it — content and chrome. */
+.slide[data-layout~="isks-bar"] {
+  padding-bottom: var(--isks-bar-clearance);
+}
+
+body[data-layout~="isks-bar"] #slide-counter,
+body[data-layout~="isks-bar"] .nav-hint {
+  bottom: calc(var(--isks-bar-h) + 0.5rem);
 }
 
 /* Chrome is unreadable over the dark hero/outro; dim it rather than hide
@@ -680,13 +681,6 @@ body[data-slide="title"] #slide-counter,
 body[data-slide="questions"] #slide-counter,
 body[data-layout~="isks-bare"] #slide-counter {
   color: rgba(255, 255, 255, 0.85);
-  bottom: 1.2rem;
-}
-
-body[data-slide="title"] .nav-hint,
-body[data-slide="questions"] .nav-hint,
-body[data-layout~="isks-bare"] .nav-hint {
-  bottom: 1.2rem;
 }
 
 /* --- Dark section-divider canvas -------------------------------------- */
