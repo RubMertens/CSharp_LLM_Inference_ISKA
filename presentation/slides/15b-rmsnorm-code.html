@@ -14,7 +14,26 @@
         <div class="vscode-window"
              data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
              data-member="RootMeanSquareNormalisation"
-             data-tabs="Vector.cs,Matrix.cs">
+             data-start-line="96">
+          <pre class="vscode-source">
+//aka RMSnorm
+public static Vector RootMeanSquareNormalisation(Vector input, Vector normWeight)
+{
+    float sumSquares = input.Data.Sum(x =&gt; x * x);
+
+    const float divideByZeroProtection = 1e-5f;
+    float mean = sumSquares / input.Length;
+    float rootMeanSquare = MathF.Sqrt(mean + divideByZeroProtection);
+
+    Vector result = new(input.Length);
+    for (var i = 0; i &lt; input.Length; i++)
+    {
+        result[i] = input[i] / rootMeanSquare * normWeight[i];
+    }
+
+    return result;
+}
+          </pre>
           <span class="vscode-inline" data-line="2" data-value="input = [2, 3, 1, 4]   normWeight = [1, 0.5, 2, 1]"></span>
           <span class="vscode-step fragment current-visible" data-fragment-index="0"
                 data-text="sumSquares = input.Data.Sum"

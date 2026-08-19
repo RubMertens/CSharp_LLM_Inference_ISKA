@@ -1,74 +1,71 @@
-// VS Code style code windows for slides.
+// Code panels for slides: syntax-highlighted C#, real file line numbers, and a
+// walkthrough layer (line highlights, fake debugger inline values, a stopped-line
+// marker) driven by the engine's fragments.
 //
-// Markup on a slide:
+// The code lives in the slide, inlined by `npm run code:embed` from ../demos. A deck
+// is therefore self-contained: nothing is fetched at render time. The data-src /
+// data-member / data-lines attributes stay as a reference — the embed tool re-extracts
+// from them, `npm run check:code` reports drift, and the panel prints the file and line
+// range with a link to it.
+//
+// Monaco is used as a tokenizer only (no editor instance): slides are recreated on
+// every navigation and cloned wholesale into overview mode, so a static, cached DOM
+// beats N live editors.
+//
+// Markup:
 //
 //   <div class="vscode-window" data-src="Runner.ConsoleApp/Math/Vector.cs"
-//        data-member="operator *"></div>
+//        data-member="operator *" data-start-line="28">
+//     <pre class="vscode-source">
+//   public static float operator *(Vector a, Vector b)
+//   …
+//     </pre>
+//   </div>
 //
-// The component fetches the real demo source (served at /code/… from ../demos),
-// cuts out the requested snippet, tokenizes it with Monaco's C# grammar and
-// renders VS Code "Dark Modern" chrome around it: tab strip, breadcrumbs, line
-// number gutter, minimap, status bar.
+// Attributes — content:
+//   <pre class="vscode-source">…</pre>   the code (escape `<` as `&lt;`)
+//   data-code="…"             inline code as an attribute instead
+//   data-start-line="28"      first line number for the gutter (set by the embed tool)
+//   data-lang="csharp"        Monaco language id
 //
-// Monaco is used as tokenizer only — no editor instance. Slides are recreated on
-// every navigation and cloned wholesale into overview mode, so a static DOM that
-// can be cached and re-inserted beats N live editors.
-//
-// Attributes — source selection (first match wins):
-//   data-lines="12-40"        line range in the file
-//   data-region="Name"        #region Name … #endregion
-//   data-member="Forward"     method / property / operator / type by name
-//   data-match="regex"        raw declaration regex (escape hatch)
-//   data-nth="2"              pick the 2nd match — for overloaded members
-//   data-code="…"             inline code instead of data-src
-//   <pre class="vscode-source">…</pre>   inline code as a child (also the no-JS fallback)
+// Attributes — reference (no fetching; used for the source strip and the tooling):
+//   data-src / data-member / data-region / data-lines / data-match / data-nth
 //
 // Attributes — presentation:
-//   data-lang="csharp"        Monaco language id
-//   data-tab="Vector.cs"      active tab label (default: file name)
-//   data-tabs="Program.cs,…"  extra inactive tabs, shown left of the active one
-//   data-theme="light|dark"   VS Code Light Modern (default) or Dark Modern
-//   data-chrome="full|minimal|none"   titlebar+tabs / tabs only / bare editor
-//   data-minimap="on|off"     default on
-//   data-statusbar="on|off"   default on
-//   data-breadcrumbs="on|off" default on when a path is known
+//   data-theme="light|dark"   VS Code Light Modern (default) or Dark Modern colours
 //   data-numbers="file|snippet|off"   gutter numbering, default file
-//   data-font-size="0.7rem"   override the automatic size
-//   data-max-height="60vh"    scroll container height
+//   data-font-size="0.7rem"   maximum size; the fit pass shrinks it as needed
+//   data-max-height="60vh"    ceiling for the code area
+//   data-wrap="on|off"        soft-wrap long lines, default on
 //   data-highlight="3-5,9"    always-on highlighted lines (snippet-relative)
 //   data-highlight-text="sum +="   highlight every line containing this text
 //   data-dim="on|off"         dim non-highlighted lines while a step is active
-//   data-values="9: sum = 23 | 11: returns 23"   on a .vscode-step: fake debugger
-//                             inline values, shown at the end of those lines while
-//                             the step is active
-//   data-stopped[="9"]        on a .vscode-step: render the band (or just line 9) as
-//                             the debugger's stopped line — amber + gutter arrow
-//   data-source-ref="on|off"  path:line-range strip under the window, linking to the
-//                             real file (VS Code locally, GitHub when deployed);
-//                             default on whenever data-src is set. Press `o` on a
-//                             slide to open the first window's source.
-//   data-wrap="on|off"        soft-wrap long lines, default on
+//   data-source-ref="on|off"  file:line-range strip under the code, default on with data-src
 //
-// Fragment-driven walkthrough — author step markers as children; the engine's
-// fragment system reveals them, the window follows:
+// Optional editor chrome, all off by default — the panel is about the code, not about
+// looking like an editor:
+//   data-chrome="none|minimal|full"   tab strip / title bar + tab strip
+//   data-tab / data-tabs      tab labels, only shown when data-chrome is set
+//   data-minimap="on|off"     fake minimap column
+//   data-statusbar="on|off"   bottom status bar
+//   data-breadcrumbs="on|off" path › member row
 //
-//   <div class="vscode-window" data-src="…" data-member="Forward">
-//     <span class="vscode-step fragment current-visible" data-fragment-index="0"
-//           data-lines="2-4" data-note="normalize the input"></span>
-//     <span class="vscode-step fragment current-visible" data-fragment-index="1"
-//           data-text="Softmax" data-note="attention weights"></span>
-//   </div>
+// Fragment-driven walkthrough — author markers as children; the engine reveals them
+// like any other fragment and the panel follows:
 //
-// Standalone inline values (independent of the steps) are markers too:
+//   <span class="vscode-step fragment current-visible" data-fragment-index="0"
+//         data-lines="6-10" data-stopped="9"
+//         data-values="6: sum = 0 | 9: 2×4 = 8, then 3×5 → sum = 23"
+//         data-note="multiply pairs, accumulate"></span>
+//   <span class="vscode-inline" data-line="1" data-value="a = [2, 3]   b = [4, 5]"></span>
 //
-//   <span class="vscode-inline" data-line="9" data-value="sum = 23"></span>
-//   <span class="vscode-inline fragment" data-fragment-index="2" data-text="return sum"
-//         data-value="returns 23"></span>
-
-import { extractSnippet } from './code-extract.js';
+//   data-lines / data-text    which lines the step covers (snippet-relative / by content)
+//   data-values="9: sum = 23 | 11: returns 23"   fake debugger inline values
+//   data-stopped[="9"]        amber stopped line + gutter arrow
+//   data-note                 narration strip under the code
+//   .vscode-inline            one standalone inline value (add .fragment to stage it)
 
 const MONACO_BASE = 'vendor/monaco/vs';
-const CODE_BASE = 'code';
 
 // C# keywords VS Code paints purple (control flow) rather than blue.
 const CONTROL_KEYWORDS = new Set([
@@ -77,7 +74,6 @@ const CONTROL_KEYWORDS = new Set([
   'yield', 'await', 'lock', 'when', 'using', 'new', 'checked', 'unchecked',
 ]);
 
-const fileCache = new Map();   // path → Promise<string>
 const renderCache = new Map(); // cache key → innerHTML
 
 let monacoPromise = null;
@@ -155,16 +151,6 @@ function linkSources(root = document) {
       a.rel = 'noopener';
     }
   });
-}
-
-async function fetchSource(path) {
-  if (!fileCache.has(path)) {
-    fileCache.set(path, fetch(`${CODE_BASE}/${path}`).then(res => {
-      if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${path}`);
-      return res.text();
-    }));
-  }
-  return fileCache.get(path);
 }
 
 const escapeHtml = (s) => s
@@ -325,7 +311,7 @@ function buildWindow(el, { code, startLine, endLine }, monaco) {
   const path = el.dataset.src ?? '';
   const fileName = path ? path.split('/').pop() : (el.dataset.tab ?? 'snippet.cs');
   const tabLabel = el.dataset.tab ?? fileName;
-  const chrome = el.dataset.chrome ?? 'full';
+  const chrome = el.dataset.chrome ?? 'none';
   const numbers = el.dataset.numbers ?? 'file';
   const codeLines = code.split('\n');
   const html = highlight(code, lang, monaco);
@@ -360,15 +346,15 @@ function buildWindow(el, { code, startLine, endLine }, monaco) {
       <span class="vscode-tab active">${CSHARP_ICON}<span>${escapeHtml(tabLabel)}</span><i class="vscode-tab-close">×</i></span>
     </div>` : '';
 
-  const showCrumbs = (el.dataset.breadcrumbs ?? (path ? 'on' : 'off')) === 'on';
+  const showCrumbs = (el.dataset.breadcrumbs ?? 'off') === 'on';
   const crumbs = showCrumbs
     ? `<div class="vscode-breadcrumbs">${breadcrumbHtml(path, el.dataset.member ?? '')}</div>`
     : '';
 
-  const showMinimap = (el.dataset.minimap ?? 'on') === 'on';
+  const showMinimap = (el.dataset.minimap ?? 'off') === 'on';
   const minimap = showMinimap ? `<div class="vscode-minimap" aria-hidden="true">${minimapHtml(codeLines)}</div>` : '';
 
-  const showStatus = (el.dataset.statusbar ?? 'on') === 'on';
+  const showStatus = (el.dataset.statusbar ?? 'off') === 'on';
   const statusBar = showStatus ? `
     <div class="vscode-statusbar">
       <span class="vscode-status-left">${BRANCH_ICON}<span>main</span></span>
@@ -604,8 +590,9 @@ function inlineSource(el) {
 
 function cacheKey(el) {
   const d = el.dataset;
-  return JSON.stringify([d.src, d.lines, d.region, d.member, d.match, d.nth, d.lang, d.tab, d.tabs,
-    d.chrome, d.numbers, d.minimap, d.statusbar, d.breadcrumbs, d.sourceRef, d.code?.slice(0, 64)]);
+  return JSON.stringify([d.src, d.startLine, d.lang, d.tab, d.tabs, d.chrome, d.numbers,
+    d.minimap, d.statusbar, d.breadcrumbs, d.sourceRef, el.querySelector('pre.vscode-source')?.textContent?.length,
+    d.code?.slice(0, 64)]);
 }
 
 // Replace the generated chrome while leaving the authored .vscode-step markers in
@@ -631,17 +618,19 @@ async function renderWindow(el) {
   el.dataset.theme = theme;
 
   try {
-    let snippet;
     const inline = inlineSource(el);
-    if (inline !== null) {
-      snippet = { code: inline, startLine: 1, endLine: inline.split('\n').length };
-      if (el.dataset.numbers === undefined) el.dataset.numbers = 'snippet';
-    } else if (el.dataset.src) {
-      const src = await fetchSource(el.dataset.src);
-      snippet = extractSnippet(src, el.dataset);
-    } else {
-      throw new Error('needs data-src, data-code or a <pre class="vscode-source"> child');
+    if (inline === null) {
+      throw new Error(el.dataset.src
+        ? `no code embedded for ${el.dataset.src} — run: npm run code:embed -- --write`
+        : 'needs a <pre class="vscode-source"> child or data-code');
     }
+    const startLine = Number(el.dataset.startLine ?? 1);
+    const snippet = {
+      code: inline,
+      startLine,
+      endLine: startLine + inline.split('\n').length - 1,
+    };
+    if (el.dataset.numbers === undefined && !el.dataset.startLine) el.dataset.numbers = 'snippet';
 
     const lineCount = snippet.code.split('\n').length;
     el.style.setProperty('--vs-font-size', el.dataset.fontSize ?? autoFontSize(lineCount));

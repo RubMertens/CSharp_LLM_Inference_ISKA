@@ -11,22 +11,28 @@ npm install     # once — pulls Monaco, used to tokenize C# in code slides
 npm run start   # local server on :8000
 ```
 
-The dev server mounts two extra paths: `/code/*` serves `../demos` (code slides read
-the real demo sources) and `/vendor/monaco/*` serves Monaco out of `node_modules`.
+The dev server serves Monaco out of `node_modules` at `/vendor/monaco/*`; everything
+else is a plain static file.
 
 ## Code slides
 
-Snippets are pulled live from `../demos`, so slides can never drift from the code
-you demo. Verify every snippet still resolves before a talk:
+Code slides carry their code inline, extracted from `../demos` by a tool — the deck is
+self-contained, and drift is caught by a check rather than hoped away:
 
 ```bash
-npm run check:code           # all code windows in slides/
-npm run check:code -- --show # print the extracted snippets
+npm run code:embed -- --write # write/refresh the code in the slides
+npm run code:embed            # dry run: what is missing or has drifted
+npm run check:code            # embedded code vs source, and every walkthrough marker
+npm run check:code -- --show  # also print the embedded code, numbered
 ```
+
+Each panel prints the file and line range its code came from, and links to it — the
+local file in VS Code (`vscode://`) while presenting, the GitHub blob once deployed.
+Press `o` on a slide to open the source of its first panel.
 
 Two dev-only pages (not copied to `dist/`):
 
-- `preview-code.html` — authoring harness for code windows; `?step=N` jumps to a step.
+- `preview-code.html` — authoring harness for code panels; `?step=N` jumps to a step.
 - `probe-slide.html?slide=<data-id>&steps=N` — loads one slide through the real engine
   and advances N fragments, so a headless screenshot can show a mid-walkthrough state.
   Add `&debug=1` for layout measurements.
@@ -39,8 +45,9 @@ See the `engine-capabilities` skill for the full attribute reference.
 npm run build   # static site -> ./dist
 ```
 
-The build copies the demo `.cs` sources to `dist/code/` and the Monaco tokenizer to
-`dist/vendor/monaco/`, so the deployed deck is self-contained (no CDN, works offline).
+The build copies the Monaco tokenizer to `dist/vendor/monaco/`, so the deployed deck is
+self-contained (no CDN, works offline). Demo sources are not copied — the code is
+already in the slides.
 
 ## Deploy
 

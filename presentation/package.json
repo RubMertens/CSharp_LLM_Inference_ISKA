@@ -8,6 +8,7 @@
     "start": "node server.js",
     "build": "node build.js",
     "check:code": "node tools/check-snippets.js",
+    "code:embed": "node tools/embed-snippets.js",
     "resequence": "node resequence-slides.js"
   },
   "author": "",

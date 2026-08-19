@@ -9,10 +9,16 @@
              data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
              data-lines="61-67"
              data-member="Forward"
-             data-tab="MultiLayerTransformerWithActivation.cs"
-             data-minimap="off"
-             data-chrome="minimal"
-             data-statusbar="off">
+             data-start-line="61">
+          <pre class="vscode-source">
+//gate and up projction are larger than hidden dimension, to allow for more complex interactions in the feedforward network
+Matrix gate= normalizedEmbeddings * layer.GateProjection;
+Matrix up = normalizedEmbeddings * layer.UpProjection;
+Matrix activated = SigmoidLinearUnit(gate);
+Matrix gated = activated.ElementwiseMultiply(up);
+// brings the dimension back down to hidden dimension so it can be added to the residual and passed to the next layer
+Matrix feedForwardOutput = gated * layer.DownProjection;
+          </pre>
           <span class="vscode-inline" data-line="1" data-value="normalizedEmbeddings = 4×8"></span>
           <span class="vscode-step fragment" data-fragment-index="0"
                 data-lines="2-3"
@@ -41,11 +47,25 @@
         <div class="vscode-window"
              data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
              data-member="SigmoidLinearUnit"
-             data-tab="SigmoidLinearUnit"
-             data-minimap="off"
-             data-chrome="minimal"
-             data-statusbar="off"
-             data-highlight-text="float sigmoid">
+             data-highlight-text="float sigmoid"
+             data-start-line="154">
+          <pre class="vscode-source">
+public static Matrix SigmoidLinearUnit(Matrix input)
+{
+    Matrix result = new(input.Rows, input.Columns);
+
+    for (int row = 0; row &lt; input.Rows; row++)
+    {
+        for (int i = 0; i &lt; input.Columns; i++)
+        {
+            float x =  input[row][i];
+            float sigmoid = 1 / (1 + MathF.Exp(-x));
+            result[row][i] = x * sigmoid;
+        }
+    }
+    return result;
+}
+          </pre>
           <span class="vscode-inline" data-text="float x =" data-value="x = -1.4"></span>
           <span class="vscode-inline" data-text="float sigmoid" data-value="1 / (1 + e^1.4) = 0.20"></span>
           <span class="vscode-inline" data-text="result[row][i] = x * sigmoid" data-value="-1.4 × 0.20 = -0.28"></span>

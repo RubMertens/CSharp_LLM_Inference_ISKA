@@ -15,9 +15,30 @@
            data-src="Runner.ConsoleApp/6_MultiLayerWithKVCache/MultiLayerTransformerWithKVCache.cs"
            data-lines="65-86"
            data-member="DecodeNext"
-           data-tab="MultiLayerTransformerWithKVCache.cs"
-           data-tabs="MultiLayerTransformerWithGQA.cs"
-           data-minimap="off">
+             data-start-line="65">
+        <pre class="vscode-source">
+Vector normalized = RootMeanSquareNormalisation(embedding, layer.AttentionNormWeight);
+
+int position = _keyCache[layerIndex].Count;
+
+// 1xhiddenDim • hiddenDim x headDim = 1xheadDim
+Vector query = normalized * layer.QueryProjection;
+// 1xhiddenDim • hiddenDim x keyValueDim = 1xkeyValueDim
+Vector key = normalized * layer.KeyProjection;
+// 1xhiddenDim • hiddenDim x keyValueDim = 1xkeyValueDim
+Vector value = normalized * layer.ValueProjection;
+
+query = ApplyRoPETo(query, weights.HeadDimension, position);
+key = ApplyRoPETo(key, weights.HeadDimension, position);
+
+_keyCache[layerIndex].Add(key);
+_valueCache[layerIndex].Add(value);
+
+Vector attentionOut = GroupedQueryAttentionWithCache(
+    query,
+    _keyCache[layerIndex],
+    _valueCache[layerIndex]);
+        </pre>
         <span class="vscode-inline" data-line="1" data-value="token = 995   layerIndex = 0   hiddenDimension = 8"></span>
         <span class="vscode-step fragment current-visible" data-fragment-index="0"
               data-text="int position = _keyCache"

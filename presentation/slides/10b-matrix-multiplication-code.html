@@ -14,7 +14,29 @@
       <div class="vscode-window"
            data-src="Runner.ConsoleApp/Math/Matrix.cs"
            data-member="operator *"
-           data-tabs="Vector.cs">
+             data-start-line="50">
+        <pre class="vscode-source">
+public static Matrix operator *(Matrix a, Matrix b)
+{
+    if (a.Columns != b.Rows)
+        throw new InvalidOperationException("Incompatible matrix dimensions for multiplication.");
+
+    Matrix result = new Matrix(a.Rows, b.Columns);
+    for (var i = 0; i &lt; a.Rows; i++)
+    {
+        for (var j = 0; j &lt; b.Columns; j++)
+        {
+            float sum = 0;
+            for (int k = 0; k &lt; a.Columns; k++)
+            {
+                sum += a.Data[i][k] * b.Data[k][j];
+            }
+            result.Data[i][j] = sum;
+        }
+    }
+    return result;
+}
+        </pre>
         <span class="vscode-inline" data-line="1" data-value="a = 2×3   b = 3×2"></span>
         <span class="vscode-step fragment current-visible" data-fragment-index="0"
               data-lines="3-4"

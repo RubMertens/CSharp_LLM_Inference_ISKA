@@ -7,10 +7,10 @@ import { join, extname, normalize, resolve } from 'path';
 const PORT = Number(process.env.PORT ?? process.argv[2] ?? 8000);
 const ROOT = '.';
 
-// Code slides fetch the real demo sources; Monaco is served straight out of
-// node_modules so nothing has to be copied during development.
+// Monaco is served straight out of node_modules, so nothing has to be copied during
+// development. Slide code is embedded in the slides themselves (npm run code:embed),
+// so there is no source mount.
 const MOUNTS = [
-  { prefix: '/code/', dir: resolve(ROOT, '../demos') },
   { prefix: '/vendor/monaco/', dir: resolve(ROOT, 'node_modules/monaco-editor/min') },
 ];
 
@@ -35,11 +35,11 @@ createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   let path = url.pathname === '/' ? '/index.html' : url.pathname;
 
-  // Tells code slides where the demo sources live, so a window can deep-link into
-  // the file being shown (vscode://file/… on this machine).
+  // Lets a code panel deep-link into the file it is showing (vscode://file/… on this
+  // machine). The panel only needs the path — it never fetches the file.
   if (path === '/code-root.json') {
     res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' });
-    res.end(JSON.stringify({ root: MOUNTS[0].dir }));
+    res.end(JSON.stringify({ root: resolve(ROOT, '../demos'), prefix: 'demos' }));
     return;
   }
 

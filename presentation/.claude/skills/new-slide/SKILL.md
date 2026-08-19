@@ -42,10 +42,10 @@ Create a new slide for the presentation. The user provides a topic/title as argu
   - `.icon-list` — list with emoji icons
   - `.pipeline` with `.stage` and `.arrow` — horizontal flow diagrams
   - `.center` — centered flex column
-- For C# from the demo project, use a **code window** — it renders as VS Code and
-  pulls the snippet from `../demos`, so it never drifts:
+- For C# from the demo project, use a **code panel**: write the reference, then run
+  `npm run code:embed -- --write` to write the code into the slide.
   `<div class="vscode-window" data-src="Runner.ConsoleApp/Math/Vector.cs" data-member="operator *"></div>`
-  (full attribute list + fragment walkthrough pattern in the engine-capabilities skill)
+  (full attribute list, walkthrough steps and inline values in the engine-capabilities skill)
 - For throwaway/pseudo code, `<pre><code class="language-csharp">...</code></pre>` (highlight.js is loaded)
 - Use `.fragment` class on elements to reveal them progressively
 - Use `var(--color-text-muted)` for secondary text, `var(--color-accent)` for emphasis

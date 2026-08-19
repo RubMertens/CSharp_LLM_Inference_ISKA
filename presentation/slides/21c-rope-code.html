@@ -14,8 +14,41 @@
       <div class="vscode-window"
            data-src="Runner.ConsoleApp/2_WithRope/TransformerWithRope.cs"
            data-member="ApplyRoPETo"
-           data-tab="TransformerWithRope.cs"
-           data-minimap="off">
+             data-start-line="58">
+        <pre class="vscode-source">
+// Rotary Position Embedding: encode position by rotating consecutive dimension pairs
+// by an angle proportional to sequence position, so attention naturally captures relative distance
+private static Matrix ApplyRoPETo(Matrix matrix)
+{
+    float sequenceLength = matrix.Rows;
+    float dimension = matrix.Columns;
+
+    Matrix result = new(matrix.Rows, matrix.Columns);
+    //for each of the vectors in the matrix (i.e. the amount of tokens)        
+    for (int position = 0; position &lt; sequenceLength; position++)
+    {
+        //rotate the pairs
+        for (int j = 0; j &lt; dimension; j+=2)
+        {
+            var x1 = matrix[position][j];
+            var x2 = matrix[position][j+1];
+
+            //"low" dimensions rotate fast -&gt; 0 / dimension = small exponent -&gt; 10000^small = close to 1 -&gt; 1/1 = large theta -&gt; fast rotation
+            //"high" dimensions rotate slower -&gt; j / dimension = large exponent -&gt; 10000^large = huge number -&gt; 1/huge = tiny theta -&gt; slow rotation
+            var theta = 1.0F / MathF.Pow(10000.0F, j / dimension);
+
+            //change the angle for the pair based on the position in the sequence
+            var angle = position * theta;
+            var cos = MathF.Cos(angle);
+            var sin = MathF.Sin(angle);
+
+            result[position][j] = x1 * cos - x2 * sin;
+            result[position][j+1] = x1 * sin + x2 * cos;
+        }
+    }
+    return result;
+}
+        </pre>
         <span class="vscode-inline" data-line="5" data-value="sequenceLength = 4   dimension = 8"></span>
         <span class="vscode-step fragment current-visible" data-fragment-index="0"
               data-lines="12-16"

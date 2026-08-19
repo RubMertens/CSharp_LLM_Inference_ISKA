@@ -14,7 +14,21 @@
         <div class="vscode-window"
              data-src="Runner.ConsoleApp/Math/Vector.cs"
              data-member="operator *"
-             data-tabs="Program.cs">
+             data-start-line="28">
+          <pre class="vscode-source">
+public static float operator *(Vector a, Vector b)
+{
+    if (a.Length != b.Length)
+        throw new InvalidOperationException("Incompatible vector dimensions for dot product.");
+
+    float sum = 0;
+    for (var i = 0; i &lt; a.Length; i++)
+    {
+        sum += a.Data[i] * b.Data[i];
+    }
+    return sum;
+}
+          </pre>
           <!-- example inputs, on screen from the start like a debugger watch -->
           <span class="vscode-inline" data-line="1" data-value="a = [2, 3]   b = [4, 5]"></span>
           <span class="vscode-step fragment current-visible" data-fragment-index="0"
