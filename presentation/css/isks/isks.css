@@ -625,20 +625,16 @@
 }
 
 /* ============================================================
-   REDUCED MOTION
+   MOTION
    ============================================================
-   Nothing in this file animates, so there is nothing to stop.
-   The block exists so future additions inherit the contract:
-   keep every colour, drop every movement.
-   ============================================================ */
+   Deliberately no @media (prefers-reduced-motion: reduce) block.
+   The presenter runs the OS "Reduce Motion" setting on, so that
+   query would silently kill the deck. Per the project motion
+   policy, motion always runs. Do not add it back.
 
-@media (prefers-reduced-motion: reduce) {
-  .isks-canvas *,
-  .isks-hero * {
-    animation: none !important;
-    transition: none !important;
-  }
-}
+   Nothing in this file animates anyway -- every layer here is a
+   static paint -- so there is nothing to gate either way.
+   ============================================================ */
 
 /* ============================================================
    PRINT / OVERVIEW

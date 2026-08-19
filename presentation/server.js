@@ -2,8 +2,14 @@ import { createServer } from 'http';
 import { readFileSync, readdirSync } from 'fs';
 import { join, extname } from 'path';
 
-const PORT = 8000;
+// Port from `PORT=8011 npm start`, `node server.js 8011`, or `npm start -- 8011`.
+const PORT = Number(process.env.PORT ?? process.argv[2] ?? 8000);
 const ROOT = '.';
+
+if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
+  console.error(`Bad port: ${process.env.PORT ?? process.argv[2]}`);
+  process.exit(1);
+}
 
 const MIME = {
   '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript',
@@ -40,4 +46,12 @@ createServer((req, res) => {
     res.writeHead(404);
     res.end('Not found');
   }
-}).listen(PORT, () => console.log(`http://localhost:${PORT}`));
+})
+  .on('error', err => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} already in use. Try: npm start -- ${PORT + 1}`);
+      process.exit(1);
+    }
+    throw err;
+  })
+  .listen(PORT, () => console.log(`http://localhost:${PORT}`));
