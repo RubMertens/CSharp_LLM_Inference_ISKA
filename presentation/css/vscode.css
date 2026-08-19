@@ -1,78 +1,28 @@
 /* VS Code style code windows — chrome + syntax palette.
  *
- * Two palettes: "Dark Modern" (default) and "Light Modern", matching the VS Code
- * defaults so a snippet on a slide reads as the editor the audience just watched.
- * Token classes are produced by js/vscode-code.js from Monaco's C# tokens.
+ * Default palette is VS Code "Light Modern", to sit on the deck's white slides.
+ * `data-theme="dark"` switches to "Dark Modern". Token classes are produced by
+ * js/vscode-code.js from Monaco's C# tokens.
  */
 
 .vscode-window {
-  /* Dark Modern */
-  --vs-editor-bg: #1F1F1F;
-  --vs-chrome-bg: #181818;
-  --vs-tab-active-bg: #1F1F1F;
-  --vs-border: #2B2B2B;
-  --vs-accent: #0078D4;
-  --vs-fg: #CCCCCC;
-  --vs-fg-dim: #9D9D9D;
-  --vs-ln: #6E7681;
-  --vs-ln-active: #CCCCCC;
-  --vs-line-hl: rgba(38, 79, 120, 0.55);
-  --vs-line-hl-bar: #0078D4;
-  --vs-status-bg: #181818;
-
-  --vs-tok-plain: #CCCCCC;
-  --vs-tok-keyword: #569CD6;
-  --vs-tok-control: #C586C0;
-  --vs-tok-type: #4EC9B0;
-  --vs-tok-method: #DCDCAA;
-  --vs-tok-var: #9CDCFE;
-  --vs-tok-prop: #9CDCFE;
-  --vs-tok-string: #CE9178;
-  --vs-tok-escape: #D7BA7D;
-  --vs-tok-number: #B5CEA8;
-  --vs-tok-comment: #6A9955;
-  --vs-tok-punct: #CCCCCC;
-  --vs-tok-op: #D4D4D4;
-  --vs-tok-attr: #4EC9B0;
-  --vs-tok-directive: #C586C0;
-  --vs-bracket-0: #FFD700;
-  --vs-bracket-1: #DA70D6;
-  --vs-bracket-2: #179FFF;
-
-  --vs-font-size: 0.8rem;
-  --vs-line-height: 1.55;
-  --vs-max-height: 56vh;
-
-  display: block;
-  width: 100%;
-  max-width: min(100%, 1120px);
-  margin: 0.6rem auto;
-  background: var(--vs-editor-bg);
-  border: 1px solid var(--vs-border);
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 18px 40px -18px rgba(0, 20, 45, 0.55), 0 2px 6px rgba(0, 20, 45, 0.18);
-  font-family: var(--font-mono);
-  color: var(--vs-fg);
-  text-align: left;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-
-.vscode-window[data-theme="light"] {
   /* Light Modern */
   --vs-editor-bg: #FFFFFF;
   --vs-chrome-bg: #F8F8F8;
   --vs-tab-active-bg: #FFFFFF;
-  --vs-border: #E5E5E5;
+  --vs-border: #E0E3E7;
   --vs-accent: #005FB8;
   --vs-fg: #3B3B3B;
   --vs-fg-dim: #616161;
   --vs-ln: #6E7681;
   --vs-ln-active: #171184;
-  --vs-line-hl: rgba(0, 95, 184, 0.12);
+  --vs-line-hl: rgba(0, 95, 184, 0.13);
   --vs-line-hl-bar: #005FB8;
   --vs-status-bg: #F8F8F8;
+  --vs-stop-bg: rgba(255, 199, 44, 0.35);
+  --vs-stop-fg: #B07800;
+  --vs-inline-bg: rgba(0, 56, 101, 0.08);
+  --vs-inline-fg: #4A6A8A;
 
   --vs-tok-plain: #000000;
   --vs-tok-keyword: #0000FF;
@@ -92,6 +42,64 @@
   --vs-bracket-0: #0431FA;
   --vs-bracket-1: #319331;
   --vs-bracket-2: #7B3814;
+
+  --vs-font-size: 0.8rem;
+  --vs-line-height: 1.55;
+  --vs-max-height: 56vh;
+
+  display: block;
+  width: 100%;
+  max-width: min(100%, 1120px);
+  margin: 0.6rem auto;
+  background: var(--vs-editor-bg);
+  border: 1px solid var(--vs-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px -16px rgba(0, 56, 101, 0.28), 0 1px 3px rgba(0, 56, 101, 0.12);
+  font-family: var(--font-mono);
+  color: var(--vs-fg);
+  text-align: left;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.vscode-window[data-theme="dark"] {
+  /* Dark Modern */
+  --vs-editor-bg: #1F1F1F;
+  --vs-chrome-bg: #181818;
+  --vs-tab-active-bg: #1F1F1F;
+  --vs-border: #2B2B2B;
+  --vs-accent: #0078D4;
+  --vs-fg: #CCCCCC;
+  --vs-fg-dim: #9D9D9D;
+  --vs-ln: #6E7681;
+  --vs-ln-active: #CCCCCC;
+  --vs-line-hl: rgba(38, 79, 120, 0.55);
+  --vs-line-hl-bar: #0078D4;
+  --vs-status-bg: #181818;
+  --vs-stop-bg: rgba(255, 199, 44, 0.22);
+  --vs-stop-fg: #FFC72C;
+  --vs-inline-bg: rgba(255, 255, 255, 0.09);
+  --vs-inline-fg: #A0A0A0;
+
+  --vs-tok-plain: #CCCCCC;
+  --vs-tok-keyword: #569CD6;
+  --vs-tok-control: #C586C0;
+  --vs-tok-type: #4EC9B0;
+  --vs-tok-method: #DCDCAA;
+  --vs-tok-var: #9CDCFE;
+  --vs-tok-prop: #9CDCFE;
+  --vs-tok-string: #CE9178;
+  --vs-tok-escape: #D7BA7D;
+  --vs-tok-number: #B5CEA8;
+  --vs-tok-comment: #6A9955;
+  --vs-tok-punct: #CCCCCC;
+  --vs-tok-op: #D4D4D4;
+  --vs-tok-attr: #4EC9B0;
+  --vs-tok-directive: #C586C0;
+  --vs-bracket-0: #FFD700;
+  --vs-bracket-1: #DA70D6;
+  --vs-bracket-2: #179FFF;
 }
 
 /* ---------- chrome ---------- */
@@ -237,7 +245,8 @@
   left: 0;
   flex: none;
   min-width: 3.4ch;
-  padding: 0 1.1ch 0 0.9ch;
+  /* left padding doubles as VS Code's glyph margin — the stopped-line arrow sits there */
+  padding: 0 1.1ch 0 1.9ch;
   text-align: right;
   color: var(--vs-ln);
   background: var(--vs-editor-bg);
@@ -266,6 +275,43 @@
 .vscode-line.hl .vscode-ln {
   color: var(--vs-ln-active);
   background: var(--vs-line-hl);
+}
+
+/* Debugger "stopped here" line: amber band plus the gutter arrow. */
+.vscode-line.stopped,
+.vscode-line.stopped.hl {
+  background: var(--vs-stop-bg);
+  border-left-color: var(--vs-stop-fg);
+}
+
+.vscode-line.stopped .vscode-ln {
+  position: sticky;
+  background: var(--vs-stop-bg);
+  color: var(--vs-stop-fg);
+}
+
+.vscode-line.stopped .vscode-ln::before {
+  content: "▶";
+  position: absolute;
+  left: 0.25ch;
+  color: var(--vs-stop-fg);
+}
+
+/* Fake debug inline values: authored on the slide, rendered where VS Code would
+   print the variable's value while paused. */
+.vscode-inline-value {
+  display: inline-block;
+  margin-left: 1.4em;
+  padding: 0 0.5em;
+  border-radius: 4px;
+  background: var(--vs-inline-bg);
+  color: var(--vs-inline-fg);
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+.vscode-line.dim .vscode-inline-value {
+  opacity: 0.8;
 }
 
 .vscode-line.dim {
@@ -344,8 +390,58 @@
   font-weight: 700;
 }
 
-/* Step markers are invisible; only their fragment state matters. */
-.vscode-step {
+/* Pointer back to the real file: path + line range, clickable when the deck knows
+ * where the sources live (vscode:// locally, GitHub blob when deployed). */
+.vscode-source-ref {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.4em 0.9em;
+  /* Deck-white, so it reads as a caption rather than part of the editor — and stays
+     distinct from the note strip above it. */
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  line-height: 1.4;
+}
+
+.vscode-source-link {
+  color: var(--color-accent);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.vscode-source-link:hover { text-decoration: underline; }
+
+/* No config, no link — still shows where the snippet came from. */
+.vscode-source-link:not([href]) {
+  color: var(--color-text-muted);
+}
+
+.vscode-source-hint {
+  display: none;
+  flex: none;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  white-space: nowrap;
+}
+
+.vscode-source-ref:has(a[href]) .vscode-source-hint {
+  display: inline;
+}
+
+.vscode-source-hint kbd {
+  font-family: var(--font-mono);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0 0.3em;
+}
+
+/* Markers are invisible; only their fragment state matters. */
+.vscode-step,
+.vscode-inline {
   display: none !important;
 }
 
@@ -460,7 +556,44 @@
     overflow: visible;
   }
 
-  .vscode-line.dim {
+  /* Debugger "stopped here" line: amber band plus the gutter arrow. */
+.vscode-line.stopped,
+.vscode-line.stopped.hl {
+  background: var(--vs-stop-bg);
+  border-left-color: var(--vs-stop-fg);
+}
+
+.vscode-line.stopped .vscode-ln {
+  position: sticky;
+  background: var(--vs-stop-bg);
+  color: var(--vs-stop-fg);
+}
+
+.vscode-line.stopped .vscode-ln::before {
+  content: "▶";
+  position: absolute;
+  left: 0.25ch;
+  color: var(--vs-stop-fg);
+}
+
+/* Fake debug inline values: authored on the slide, rendered where VS Code would
+   print the variable's value while paused. */
+.vscode-inline-value {
+  display: inline-block;
+  margin-left: 1.4em;
+  padding: 0 0.5em;
+  border-radius: 4px;
+  background: var(--vs-inline-bg);
+  color: var(--vs-inline-fg);
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+.vscode-line.dim .vscode-inline-value {
+  opacity: 0.8;
+}
+
+.vscode-line.dim {
     opacity: 1;
     filter: none;
   }

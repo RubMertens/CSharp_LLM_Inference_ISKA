@@ -22,7 +22,29 @@
     // let the async code windows render before stepping
     await new Promise(r => setTimeout(r, 4000));
     for (let i = 0; i < steps; i++) engine.next();
-    document.title = `engine probe — stepped ${steps}`;
+    document.title = `slide probe — stepped ${steps}`;
+
+    // ?debug=1 prints layout measurements into the page, so a screenshot can show
+    // why a code window was clamped.
+    if (params.get('debug')) {
+      await new Promise(r => setTimeout(r, 600));
+      const slide = document.querySelector('.slide.active');
+      const lines = [
+        `slide scrollHeight ${slide.scrollHeight} clientHeight ${slide.clientHeight}`,
+        ...[...slide.querySelectorAll('.vscode-window')].map((w, i) => {
+          const code = w.querySelector('.vscode-code');
+          return `window ${i}: window ${Math.round(w.getBoundingClientRect().height)}`
+            + ` code ${Math.round(code.getBoundingClientRect().height)}`
+            + ` scroll ${code.scrollHeight} max ${code.style.maxHeight || '(css)'}`;
+        }),
+        ...[...slide.children].map(c => `${c.className || c.tagName}: ${Math.round(c.getBoundingClientRect().height)}`),
+      ];
+      const box = document.createElement('pre');
+      box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99;background:#003865;color:#fff;'
+        + 'padding:8px;font-size:11px;line-height:1.4;max-width:60vw;white-space:pre-wrap';
+      box.textContent = lines.join('\n');
+      document.body.appendChild(box);
+    }
   </script>
 </body>
 </html>

@@ -17,19 +17,25 @@
            data-member="DecodeNext"
            data-tab="MultiLayerTransformerWithKVCache.cs"
            data-tabs="MultiLayerTransformerWithGQA.cs"
-           data-font-size="0.62rem"
            data-minimap="off">
+        <span class="vscode-inline" data-line="1" data-value="token = 995   layerIndex = 0   hiddenDimension = 8"></span>
         <span class="vscode-step fragment current-visible" data-fragment-index="0"
               data-text="int position = _keyCache"
+              data-stopped
+              data-values="3: _keyCache[0].Count = 12 → position = 12"
               data-note="Cache count = current position"></span>
         <span class="vscode-step fragment current-visible" data-fragment-index="1"
               data-lines="6-10"
+              data-values="6: query = 1×8 (not 12×8) | 8: key = 1×4 | 10: value = 1×4"
               data-note="Vector × Matrix, once per layer"></span>
         <span class="vscode-step fragment current-visible" data-fragment-index="2"
               data-lines="12-16"
+              data-stopped="15"
+              data-values="12: rotated at position 12 | 15: _keyCache[0].Count = 13"
               data-note="Rotate, then append to the K/V cache"></span>
         <span class="vscode-step fragment current-visible" data-fragment-index="3"
               data-lines="18-21"
+              data-values="18: 1 query × 13 cached keys = 13 scores"
               data-note="One query against the full cached history"></span>
       </div>
     </div>

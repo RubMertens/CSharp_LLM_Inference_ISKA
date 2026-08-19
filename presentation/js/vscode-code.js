@@ -27,7 +27,7 @@
 //   data-lang="csharp"        Monaco language id
 //   data-tab="Vector.cs"      active tab label (default: file name)
 //   data-tabs="Program.cs,…"  extra inactive tabs, shown left of the active one
-//   data-theme="dark|light"   VS Code Dark Modern (default) or Light Modern
+//   data-theme="light|dark"   VS Code Light Modern (default) or Dark Modern
 //   data-chrome="full|minimal|none"   titlebar+tabs / tabs only / bare editor
 //   data-minimap="on|off"     default on
 //   data-statusbar="on|off"   default on
@@ -38,6 +38,15 @@
 //   data-highlight="3-5,9"    always-on highlighted lines (snippet-relative)
 //   data-highlight-text="sum +="   highlight every line containing this text
 //   data-dim="on|off"         dim non-highlighted lines while a step is active
+//   data-values="9: sum = 23 | 11: returns 23"   on a .vscode-step: fake debugger
+//                             inline values, shown at the end of those lines while
+//                             the step is active
+//   data-stopped[="9"]        on a .vscode-step: render the band (or just line 9) as
+//                             the debugger's stopped line — amber + gutter arrow
+//   data-source-ref="on|off"  path:line-range strip under the window, linking to the
+//                             real file (VS Code locally, GitHub when deployed);
+//                             default on whenever data-src is set. Press `o` on a
+//                             slide to open the first window's source.
 //   data-wrap="on|off"        soft-wrap long lines, default on
 //
 // Fragment-driven walkthrough — author step markers as children; the engine's
@@ -49,6 +58,12 @@
 //     <span class="vscode-step fragment current-visible" data-fragment-index="1"
 //           data-text="Softmax" data-note="attention weights"></span>
 //   </div>
+//
+// Standalone inline values (independent of the steps) are markers too:
+//
+//   <span class="vscode-inline" data-line="9" data-value="sum = 23"></span>
+//   <span class="vscode-inline fragment" data-fragment-index="2" data-text="return sum"
+//         data-value="returns 23"></span>
 
 import { extractSnippet } from './code-extract.js';
 
@@ -99,6 +114,49 @@ function loadMonaco() {
   return monacoPromise;
 }
 
+// Where the demo sources actually live, so a window can point at the real file:
+// served by the dev server (absolute path → vscode:// link) and written into dist
+// by the build (repo URL → GitHub blob link for the deployed deck).
+let sourceConfig = null;
+
+async function loadSourceConfig() {
+  try {
+    const res = await fetch('code-root.json');
+    if (!res.ok) return null;
+    sourceConfig = await res.json();
+    return sourceConfig;
+  } catch {
+    return null;
+  }
+}
+
+const isLocalHost = () => ['localhost', '127.0.0.1', '[::1]', ''].includes(location.hostname);
+
+function sourceHref(path, from, to) {
+  if (!sourceConfig || !path) return null;
+  const { root, repo, ref = 'main', prefix = '' } = sourceConfig;
+  if (root && isLocalHost()) return `vscode://file${root}/${path}:${from}`;
+  if (repo) return `${repo}/blob/${ref}/${prefix ? `${prefix}/` : ''}${path}#L${from}-L${to}`;
+  if (root) return `vscode://file${root}/${path}:${from}`;
+  return null;
+}
+
+// Refs render without an href; they become links once the config is in.
+function linkSources(root = document) {
+  root.querySelectorAll('.vscode-source-link:not([href])').forEach(a => {
+    const href = sourceHref(a.dataset.path, a.dataset.from, a.dataset.to);
+    if (!href) return;
+    a.href = href;
+    if (href.startsWith('vscode:')) {
+      a.title = 'Open in VS Code';
+    } else {
+      a.title = 'Open on GitHub';
+      a.target = '_blank';
+      a.rel = 'noopener';
+    }
+  });
+}
+
 async function fetchSource(path) {
   if (!fileCache.has(path)) {
     fileCache.set(path, fetch(`${CODE_BASE}/${path}`).then(res => {
@@ -124,6 +182,17 @@ function parseLineSpec(spec, max) {
     const from = Number(m[1]);
     const to = m[2] ? Number(m[2]) : from;
     for (let i = from; i <= Math.min(to, max); i++) if (i >= 1) out.add(i);
+  }
+  return out;
+}
+
+// "9: sum = 23 | 11: returns 23" → Map { 9 => "sum = 23", 11 => "returns 23" }
+function parseValueSpec(spec) {
+  const out = new Map();
+  if (!spec) return out;
+  for (const part of String(spec).split('|')) {
+    const m = part.match(/^\s*(\d+)\s*:\s*(.+?)\s*$/);
+    if (m) out.set(Number(m[1]), m[2]);
   }
   return out;
 }
@@ -251,7 +320,7 @@ function minimapHtml(codeLines) {
   }).join('');
 }
 
-function buildWindow(el, { code, startLine }, monaco) {
+function buildWindow(el, { code, startLine, endLine }, monaco) {
   const lang = el.dataset.lang ?? 'csharp';
   const path = el.dataset.src ?? '';
   const fileName = path ? path.split('/').pop() : (el.dataset.tab ?? 'snippet.cs');
@@ -311,6 +380,18 @@ function buildWindow(el, { code, startLine }, monaco) {
       </span>
     </div>` : '';
 
+  // Pointer back to the real file — the thing you point at when someone asks
+  // "where is this in the repo?".
+  const showRef = (el.dataset.sourceRef ?? (path ? 'on' : 'off')) === 'on';
+  const prefix = sourceConfig?.prefix ? `${sourceConfig.prefix}/` : '';
+  const range = endLine > startLine ? `${startLine}-${endLine}` : `${startLine}`;
+  const sourceRef = showRef ? `
+    <div class="vscode-source-ref">
+      <a class="vscode-source-link" data-path="${escapeHtml(path)}"
+         data-from="${startLine}" data-to="${endLine}">${escapeHtml(prefix + path)}:${range}</a>
+      <span class="vscode-source-hint">press <kbd>o</kbd> to open</span>
+    </div>` : '';
+
   return `
     ${titleBar}
     ${tabBar}
@@ -320,39 +401,100 @@ function buildWindow(el, { code, startLine }, monaco) {
       ${minimap}
     </div>
     ${statusBar}
-    <div class="vscode-note" hidden></div>`;
+    <div class="vscode-note" hidden></div>
+    ${sourceRef}`;
 }
 
 // Slides don't scroll, so a window taller than the space left below the title would
-// push its own status bar off screen. Fitting is per *slide*, not per window: reset
-// every window, then repeatedly clamp the tallest code area until the slide fits.
-// Coordinated this way it stays idempotent — two windows on one slide can't each
-// subtract the full overflow, and a recolour repaint lands on the same result.
-const FIT_RESERVE = 24;   // room for the nav hint / slide counter
+// push its own status bar off screen. Rather than chasing the slide's overflow (which
+// over-shrinks, because a stretched flex item hides where the slack actually is), the
+// room for each code area is computed directly: from its top edge down to the slide's
+// bottom, minus whatever sits below it.
+const FIT_RESERVE = 24;    // room for the nav hint / slide counter
+const FIT_MIN_FONT = 0.42; // rem — smaller than this is unreadable on a projector
+
+// Lowest content edge on the slide, ignoring rows inside a code area (those are
+// clipped by their own scroll container and would report past its bottom).
+function contentBottom(slide) {
+  let bottom = 0;
+  for (const el of slide.querySelectorAll('*')) {
+    if (el.closest('.vscode-code')) continue;
+    const rect = el.getBoundingClientRect();
+    if (rect.height > 0 && rect.bottom > bottom) bottom = rect.bottom;
+  }
+  return bottom;
+}
 
 function fitSlide(slide) {
   if (!slide) return;
   const boxes = [...slide.querySelectorAll('.vscode-window[data-vs-state="ready"] .vscode-code')];
   if (boxes.length === 0) return;
 
-  for (const box of boxes) box.style.maxHeight = '';
+  // Reset to the authored size first, so repeated fits can't ratchet the font down.
+  for (const box of boxes) {
+    const win = box.closest('.vscode-window');
+    if (win.dataset.vsFontBase) win.style.setProperty('--vs-font-size', win.dataset.vsFontBase);
+    else win.dataset.vsFontBase = win.style.getPropertyValue('--vs-font-size');
+    box.style.maxHeight = '';
+  }
 
-  for (let pass = 0; pass < 6; pass++) {
-    // Usable height stops short of the bottom so the nav hint and slide counter
-    // never sit on top of a window.
-    const overflow = slide.scrollHeight - (slide.clientHeight - FIT_RESERVE);
-    if (overflow <= 1) break;
-    const tallest = boxes.reduce((a, b) =>
-      (b.getBoundingClientRect().height > a.getBoundingClientRect().height ? b : a));
-    const height = tallest.getBoundingClientRect().height;
-    const next = Math.max(120, height - overflow);
-    if (next >= height) break;
-    tallest.style.maxHeight = `${next}px`;
+  const room = (box) => {
+    const rect = box.getBoundingClientRect();
+    const tail = Math.max(0, contentBottom(slide) - rect.bottom);   // captions, lists, notes below
+    return slide.getBoundingClientRect().bottom - FIT_RESERVE - rect.top - tail;
+  };
+
+  // Tallest first: shrinking it can give the others their room back.
+  const ordered = [...boxes].sort((a, b) => b.scrollHeight - a.scrollHeight);
+
+  for (const box of ordered) {
+    const win = box.closest('.vscode-window');
+
+    // Prefer shrinking the font — a snippet you can read in full beats one that
+    // scrolls. The authored size is treated as a maximum, not a fixed value.
+    for (let pass = 0; pass < 10; pass++) {
+      const available = room(box);
+      if (box.scrollHeight <= available + 1) break;
+      const current = parseFloat(win.style.getPropertyValue('--vs-font-size'));
+      const next = current * 0.93;
+      if (!(next >= FIT_MIN_FONT)) break;
+      win.style.setProperty('--vs-font-size', `${next.toFixed(3)}rem`);
+    }
+
+    // Floor reached and still too tall: clamp and let it scroll.
+    const available = room(box);
+    if (box.scrollHeight > available + 1 && available >= 120) {
+      box.style.maxHeight = `${Math.round(available)}px`;
+    }
   }
 }
 
 function fitToSlide(el) {
   fitSlide(el.closest('.slide'));
+}
+
+// Markers the engine currently has revealed. A marker without .fragment is always
+// on; a .fragment marker counts only once the engine marks it visible.
+function visibleMarkers(el, selector) {
+  return [...el.querySelectorAll(selector)].filter(m =>
+    !m.classList.contains('fragment-hidden')
+    && (m.classList.contains('fragment-visible') || !m.classList.contains('fragment')));
+}
+
+// VS Code's debugger prints variable values at the end of the line it's stopped on.
+// Same idea, hand-written: the value is authored on the slide, not computed.
+function setInlineValue(row, value) {
+  let chip = row.querySelector('.vscode-inline-value');
+  if (!value) {
+    chip?.remove();
+    return;
+  }
+  if (!chip) {
+    chip = document.createElement('span');
+    chip.className = 'vscode-inline-value';
+    row.querySelector('.vscode-text').appendChild(chip);
+  }
+  if (chip.textContent !== value) chip.textContent = value;
 }
 
 // Highlight bands follow the visible step markers. The engine owns the markers
@@ -365,11 +507,11 @@ function applyHighlights(el) {
   const total = rows.length;
   const codeLines = rows.map(r => r.querySelector('.vscode-text').textContent);
 
-  const steps = [...el.querySelectorAll('.vscode-step')];
-  const active = steps.filter(s => !s.classList.contains('fragment-hidden')
-    && (s.classList.contains('fragment-visible') || !s.classList.contains('fragment')));
+  const active = visibleMarkers(el, '.vscode-step');
 
   const wanted = new Set();
+  const stopped = new Set();
+  const values = new Map();   // line → inline value text
   let note = '';
 
   // static highlights always apply
@@ -378,18 +520,39 @@ function applyHighlights(el) {
   const staticCount = wanted.size;
 
   for (const step of active) {
-    for (const n of parseLineSpec(step.dataset.lines, total)) wanted.add(n);
-    for (const n of linesContaining(codeLines, step.dataset.text)) wanted.add(n);
+    const lines = new Set([
+      ...parseLineSpec(step.dataset.lines, total),
+      ...linesContaining(codeLines, step.dataset.text),
+    ]);
+    for (const n of lines) wanted.add(n);
+    // data-stopped alone marks the whole band; data-stopped="9" marks one line.
+    const stopSpec = step.dataset.stopped;
+    if (stopSpec !== undefined) {
+      const target = stopSpec.trim() ? parseLineSpec(stopSpec, total) : lines;
+      for (const n of target) stopped.add(n);
+    }
+    for (const [line, value] of parseValueSpec(step.dataset.values)) values.set(line, value);
     if (step.dataset.note) note = step.dataset.note;
+  }
+
+  // standalone inline-value markers (fragment-driven or always on)
+  for (const marker of visibleMarkers(el, '.vscode-inline')) {
+    const lines = marker.dataset.line
+      ? parseLineSpec(marker.dataset.line, total)
+      : linesContaining(codeLines, marker.dataset.text);
+    for (const n of lines) values.set(n, marker.dataset.value ?? '');
   }
 
   const stepping = active.length > 0 || staticCount > 0;
   const dim = stepping && (el.dataset.dim ?? 'on') === 'on';
 
   rows.forEach((row, i) => {
-    const hit = wanted.has(i + 1);
+    const line = i + 1;
+    const hit = wanted.has(line);
     row.classList.toggle('hl', hit);
+    row.classList.toggle('stopped', stopped.has(line));
     row.classList.toggle('dim', dim && !hit);
+    setInlineValue(row, values.get(line));
   });
 
   const noteEl = el.querySelector('.vscode-note');
@@ -422,10 +585,10 @@ function applyHighlights(el) {
 }
 
 function watchSteps(el) {
-  const steps = [...el.querySelectorAll('.vscode-step')];
-  if (steps.length === 0) return;
+  const markers = [...el.querySelectorAll('.vscode-step, .vscode-inline')];
+  if (markers.length === 0) return;
   const observer = new MutationObserver(() => applyHighlights(el));
-  for (const step of steps) observer.observe(step, { attributes: true, attributeFilter: ['class'] });
+  for (const marker of markers) observer.observe(marker, { attributes: true, attributeFilter: ['class'] });
 }
 
 function inlineSource(el) {
@@ -442,14 +605,15 @@ function inlineSource(el) {
 function cacheKey(el) {
   const d = el.dataset;
   return JSON.stringify([d.src, d.lines, d.region, d.member, d.match, d.nth, d.lang, d.tab, d.tabs,
-    d.chrome, d.numbers, d.minimap, d.statusbar, d.breadcrumbs, d.code?.slice(0, 64)]);
+    d.chrome, d.numbers, d.minimap, d.statusbar, d.breadcrumbs, d.sourceRef, d.code?.slice(0, 64)]);
 }
 
 // Replace the generated chrome while leaving the authored .vscode-step markers in
 // the DOM — the engine tracks them as fragments and must never lose them.
 function paint(el, html) {
   for (const child of [...el.children]) {
-    if (!child.classList.contains('vscode-step')) child.remove();
+    const authored = child.classList.contains('vscode-step') || child.classList.contains('vscode-inline');
+    if (!authored) child.remove();
   }
   const staging = document.createElement('div');
   staging.innerHTML = html;
@@ -460,9 +624,9 @@ async function renderWindow(el) {
   if (el.dataset.vsState) return;
   el.dataset.vsState = 'pending';
 
-  // keep authored step markers; everything else in the window is generated
-  const steps = [...el.querySelectorAll('.vscode-step')];
-  const theme = el.dataset.theme ?? 'dark';
+  // keep authored step / inline-value markers; everything else is generated
+  const steps = [...el.querySelectorAll('.vscode-step, .vscode-inline')];
+  const theme = el.dataset.theme ?? 'light';
   el.classList.add('vscode-window');
   el.dataset.theme = theme;
 
@@ -496,6 +660,7 @@ async function renderWindow(el) {
     el.dataset.vsState = 'ready';
     applyHighlights(el);
     watchSteps(el);
+    linkSources(el);
     requestAnimationFrame(() => fitToSlide(el));
 
     if (cached === undefined && !monacoInstance) {
@@ -505,6 +670,7 @@ async function renderWindow(el) {
         renderCache.set(key, coloured);
         paint(el, coloured);
         applyHighlights(el);
+        linkSources(el);
         requestAnimationFrame(() => fitToSlide(el));
       });
     }
@@ -541,6 +707,19 @@ function start() {
     resizeTimer = setTimeout(() => {
       document.querySelectorAll('.slide').forEach(fitSlide);
     }, 150);
+  });
+
+  loadSourceConfig().then(cfg => { if (cfg) linkSources(); });
+
+  // `o` opens the source of the current slide's first code window — jumping to the
+  // real file mid-talk beats scrolling for it.
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'o' || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+    const slide = document.querySelector('.slide.active') ?? document;
+    const link = slide.querySelector('.vscode-source-link[href]');
+    if (!link) return;
+    e.preventDefault();
+    link.click();
   });
 
   if ('requestIdleCallback' in window) requestIdleCallback(() => loadMonaco());

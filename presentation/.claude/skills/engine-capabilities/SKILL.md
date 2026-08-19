@@ -111,11 +111,12 @@ Two options. Prefer **code windows** for anything from the demo project.
 ### Code windows (VS Code look, snippets pulled from ../demos)
 
 `js/vscode-code.js` turns any `<div class="vscode-window">` into a VS Code
-"Dark Modern" window: title bar, tab strip, breadcrumbs, line number gutter,
-minimap, status bar. Snippets are fetched from the real demo sources (`/code/*` →
-`../demos`) and tokenized with Monaco's C# grammar, so slides can't drift from the
-code being demoed. Rendering is static HTML (no editor instance), cached per
-snippet, and re-runs automatically for overview mode and every navigation.
+"Light Modern" window: title bar, tab strip, breadcrumbs, line number gutter,
+minimap, status bar, and a strip pointing back at the real file. Snippets are
+fetched from the real demo sources (`/code/*` → `../demos`) and tokenized with
+Monaco's C# grammar, so slides can't drift from the code being demoed. Rendering is
+static HTML (no editor instance), cached per snippet, and re-runs automatically for
+overview mode and every navigation.
 
 ```html
 <div class="vscode-window"
@@ -142,21 +143,32 @@ snippet, and re-runs automatically for overview mode and every navigation.
 | `data-lang` | `csharp` | Monaco language id |
 | `data-tab` | file name | active tab label |
 | `data-tabs="a.cs,b.cs"` | — | extra inactive tabs |
-| `data-theme` | `dark` | `dark` (Dark Modern) or `light` (Light Modern) |
+| `data-theme` | `light` | `light` (Light Modern, matches the deck) or `dark` (Dark Modern) |
 | `data-chrome` | `full` | `full` / `minimal` (tabs only) / `none` |
 | `data-minimap` | `on` | fake minimap column |
 | `data-statusbar` | `on` | bottom status bar |
 | `data-breadcrumbs` | `on` with a path | path › member breadcrumb row |
 | `data-numbers` | `file` | `file` (real line numbers) / `snippet` / `off` |
-| `data-font-size` | auto by line count | e.g. `0.7rem` |
-| `data-max-height` | `56vh` | code area height before it scrolls |
+| `data-font-size` | auto by line count | treated as a **maximum** — the fit pass shrinks it further if needed |
+| `data-max-height` | `56vh` | ceiling for the code area; the fit pass usually sets a tighter one |
+| `data-source-ref` | `on` with a path | `path:line-range` strip under the window, linking to the real file |
 | `data-wrap` | `on` | soft-wrap long lines |
 | `data-highlight="3-5,9"` | — | always-on highlighted lines (snippet-relative) |
 | `data-highlight-text="sum +="` | — | highlight every line containing this text |
 | `data-dim` | `on` | dim non-highlighted lines while a step is active |
 
-The window auto-fits: if it would overrun the slide, the code area is clamped and
-scrolls instead (step highlights scroll themselves into view).
+**Auto-fit.** After render, each slide's windows are measured against the room
+actually left below them. A window that is too tall first has its font shrunk (down
+to 0.42rem); only if that isn't enough is the code area clamped, and then step
+highlights scroll themselves into view. So `data-font-size` is rarely worth setting
+— author the snippet and let it size itself.
+
+**Pointing at the source.** Every window with `data-src` prints
+`path/to/File.cs:from-to` under the editor. It becomes a link when the deck knows
+where the sources live: `code-root.json` (served by the dev server as the absolute
+`../demos` path, written by the build as the GitHub repo URL). Locally it opens
+`vscode://file/…:line`; deployed it opens the GitHub blob at `#L28-L39`. Pressing
+`o` on a slide opens the first window's source — handy mid-talk.
 
 ### Fragment-driven code walkthrough
 
@@ -182,6 +194,33 @@ lines, dim the rest, show `data-note` in a strip under the editor.
 </div>
 ```
 
+### Fake debugger inline values
+
+The most useful teaching layer: the values VS Code prints at the end of a line while
+paused, written by hand on the slide. Nothing is executed.
+
+```html
+<div class="vscode-window" data-src="Runner.ConsoleApp/Math/Vector.cs" data-member="operator *">
+  <!-- always on: the example inputs, like a watch window -->
+  <span class="vscode-inline" data-line="1" data-value="a = [2, 3]   b = [4, 5]"></span>
+
+  <span class="vscode-step fragment current-visible" data-fragment-index="1"
+        data-lines="6-10" data-stopped="9"
+        data-values="6: sum = 0 | 7: i = 0, 1 | 9: 2×4 = 8, then 3×5 → sum = 23"
+        data-note="Multiply pairs, accumulate into sum"></span>
+</div>
+```
+
+| Attribute | On | Meaning |
+|-----------|----|---------|
+| `data-values="9: sum = 23 \| 11: returns 23"` | `.vscode-step` | inline values shown while that step is active; `line: text`, `\|`-separated |
+| `data-stopped` / `data-stopped="9"` | `.vscode-step` | render the band (or just line 9) as the debugger's stopped line — amber + gutter arrow |
+| `.vscode-inline` marker with `data-line`/`data-text` + `data-value` | window child | one inline value, always on, or fragment-driven if it also has `.fragment` |
+
+Values are plain text (escape `<` as `&lt;` in the attribute). Keep numbers consistent
+with the interactive slides — e.g. the RMSNorm code slide reuses `[2, 3, 1, 4]`, so
+Σ = 30 and rms = 2.74 match the diagram the audience just dragged.
+
 Rules:
 - `data-lines` on a step is **snippet-relative** (1 = first shown line); `data-text`
   matches whole lines and survives edits to the demo code — prefer it.
@@ -204,7 +243,9 @@ npm run check:code -- --show  # print the extracted snippets, numbered
 ```
 
 `preview-code.html` (dev server only) is a standalone harness for authoring windows;
-`?step=N` jumps to a step.
+`?step=N` jumps to a step. `probe-slide.html?slide=<data-id>&steps=N&debug=1` loads one
+slide through the real engine, advances N fragments and prints layout measurements —
+that's how to screenshot a mid-walkthrough state or debug the fit.
 
 ### highlight.js (plain code blocks)
 

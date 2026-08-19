@@ -8,16 +8,20 @@
          data-lines="27-40"
          data-tab="Transformer.cs"
          data-member="Forward"
-         data-font-size="0.72rem"
          data-minimap="off">
+      <span class="vscode-inline" data-line="2" data-value="sequenceLength = 4   hiddenDimension = 8"></span>
       <span class="vscode-step fragment current-visible" data-fragment-index="0"
             data-lines="1-6"
+            data-values="5: normalizedEmbeddings = 4×8"
             data-note="Normalize first — every block starts with RMSNorm"></span>
       <span class="vscode-step fragment current-visible" data-fragment-index="1"
             data-lines="10-12"
+            data-stopped="10"
+            data-values="10: 4×8 · 8×8 = 4×8 | 11: keys = 4×8 | 12: values = 4×8"
             data-note="Same input, three different weight matrices"></span>
       <span class="vscode-step fragment current-visible" data-fragment-index="2"
             data-lines="14"
+            data-values="14: attentionOutput = 4×8"
             data-note="Attention consumes all three"></span>
     </div>
 

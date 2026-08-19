@@ -33,6 +33,14 @@ createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   let path = url.pathname === '/' ? '/index.html' : url.pathname;
 
+  // Tells code slides where the demo sources live, so a window can deep-link into
+  // the file being shown (vscode://file/… on this machine).
+  if (path === '/code-root.json') {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' });
+    res.end(JSON.stringify({ root: MOUNTS[0].dir }));
+    return;
+  }
+
   if (path === '/slides.json') {
     res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' });
     res.end(slidesManifest());

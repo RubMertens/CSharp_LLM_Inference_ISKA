@@ -29,6 +29,7 @@ Two dev-only pages (not copied to `dist/`):
 - `preview-code.html` — authoring harness for code windows; `?step=N` jumps to a step.
 - `probe-slide.html?slide=<data-id>&steps=N` — loads one slide through the real engine
   and advances N fragments, so a headless screenshot can show a mid-walkthrough state.
+  Add `&debug=1` for layout measurements.
 
 See the `engine-capabilities` skill for the full attribute reference.
 

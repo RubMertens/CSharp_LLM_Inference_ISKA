@@ -10,21 +10,28 @@
              data-lines="61-67"
              data-member="Forward"
              data-tab="MultiLayerTransformerWithActivation.cs"
-             data-font-size="0.66rem"
              data-minimap="off"
              data-chrome="minimal"
              data-statusbar="off">
+          <span class="vscode-inline" data-line="1" data-value="normalizedEmbeddings = 4×8"></span>
           <span class="vscode-step fragment" data-fragment-index="0"
                 data-lines="2-3"
+                data-values="2: gate = 4×32 | 3: up = 4×32"
                 data-note="gate and up: same input, wider output"></span>
           <span class="vscode-step fragment" data-fragment-index="1"
                 data-lines="4"
+                data-stopped
+                data-values="4: activated = 4×32"
                 data-note="SiLU squashes the gate"></span>
           <span class="vscode-step fragment" data-fragment-index="2"
                 data-lines="5"
+                data-stopped
+                data-values="5: gated = 4×32"
                 data-note="element-wise multiply — the gate decides what passes"></span>
           <span class="vscode-step fragment" data-fragment-index="3"
                 data-lines="7"
+                data-stopped
+                data-values="7: feedForwardOutput = 4×8"
                 data-note="down-project back to hidden dimension, ready for the residual"></span>
         </div>
         <p class="code-caption">Forward pass, feed-forward block</p>
@@ -35,11 +42,14 @@
              data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
              data-member="SigmoidLinearUnit"
              data-tab="SigmoidLinearUnit"
-             data-font-size="0.66rem"
              data-minimap="off"
              data-chrome="minimal"
              data-statusbar="off"
-             data-highlight-text="float sigmoid"></div>
+             data-highlight-text="float sigmoid">
+          <span class="vscode-inline" data-text="float x =" data-value="x = -1.4"></span>
+          <span class="vscode-inline" data-text="float sigmoid" data-value="1 / (1 + e^1.4) = 0.20"></span>
+          <span class="vscode-inline" data-text="result[row][i] = x * sigmoid" data-value="-1.4 × 0.20 = -0.28"></span>
+        </div>
         <p class="code-caption">SiLU: <code>x · σ(x)</code> — smooth, and negatives don't die at zero</p>
       </div>
     </div>
