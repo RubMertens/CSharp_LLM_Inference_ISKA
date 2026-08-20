@@ -161,8 +161,8 @@ and no source pointer.
 |-----------|---------|---------|
 | `data-theme` | `light` | `light` (Light Modern, matches the deck) or `dark` (Dark Modern) |
 | `data-numbers` | `file` | `file` (real line numbers) / `snippet` / `off` |
-| `data-font-size` | auto by line count | treated as a **maximum** — the fit pass shrinks it further if needed |
-| `data-max-height` | `56vh` | ceiling for the code area |
+| `data-font-size` | width-fitted | exact size; opts out of the width fit |
+| `data-max-height` | `82vh` | ceiling for the code area before it scrolls |
 | `data-wrap` | `on` | soft-wrap long lines |
 | `data-highlight="3-5,9"` | — | always-on highlighted lines (snippet-relative) |
 | `data-highlight-text="sum +="` | — | highlight every line containing this text |
@@ -176,16 +176,21 @@ Editor chrome exists but is **off** by default: `data-chrome="minimal|full"` (ta
 `data-statusbar="on"`, `data-breadcrumbs="on"`. Turn them on only if a slide is
 specifically about the editor.
 
-**Auto-fit.** After render, each panel is measured against the room actually left
-below it *in its own column*, then the font is grown (up to 1.7rem) or shrunk (down to
-0.42rem) so the snippet fills that space; only if the floor isn't enough is the code
-area clamped and left to scroll, with step highlights scrolling themselves into view.
-`data-font-size` is just the starting point — authoring one is rarely worth it.
+**Auto-fit is width-first.** The font is scaled so the code fills the panel's *width*
+(90th-percentile line length, so the longest few lines wrap rather than shrinking
+everything), between 0.55rem and 1.8rem. Height is then clamped to the room left in that
+column and the rest scrolls — step highlights scroll themselves into view, with a line of
+context above the band.
 
-Practical consequence: a short method renders huge, a 30+ line one renders small. If a
-snippet is too long to read from the back row, cut it down (`data-lines`, or a tighter
-`data-member`) or split it across two slides — anchor the steps with `data-text` so
-they survive the re-cut.
+That ordering is deliberate: fitting everything vertically instead made long snippets
+unreadable, a 38-line method coming out at half the size of a 12-line one. Large and
+scrolling beats complete and squinting.
+
+`data-font-size` is an **override**: set it and the width fit is skipped, which is the way
+to make a whole snippet visible at once.
+
+Panels scroll with the wheel/trackpad — `js/engine.js` hands a wheel event to a
+scrollable element under the cursor and only navigates once that element is at its end.
 
 **Pointing at the source.** A window with `data-src` prints
 `demos/path/to/File.cs:from-to` under the code. It becomes a link when the deck knows
@@ -221,6 +226,52 @@ column, so they size independently.
 Still available but unused by the deck: `.code-split` (prose | code grid),
 `.code-steps` (numbered narration list), `.code-caption` (muted line under a panel).
 The code slides deliberately carry none of that text — it is spoken.
+
+### Diff transitions (one version becoming the next)
+
+The demo project evolves by copying a transformer and adding one idea, so the most
+useful thing a slide can show is the *difference*. A panel can hold both versions:
+
+```html
+<div class="vscode-window"
+     data-src="Runner.ConsoleApp/2_WithRope/TransformerWithRope.cs"
+     data-member="Forward"
+     data-diff-from="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+     data-diff-ignore="case">
+  <pre class="vscode-source">…unified listing, written by code:embed…</pre>
+  <span class="vscode-step fragment" data-fragment-index="1" data-diff
+        data-note="rotate Q and K — the whole of RoPE at this level"></span>
+</div>
+```
+
+`npm run code:embed -- --write` extracts both sides, diffs them, and writes the unified
+listing plus `data-added`, `data-removed` and `data-before-start-line`. Nothing diffs at
+render time.
+
+| Attribute | On | Meaning |
+|-----------|----|---------|
+| `data-diff-from` | window | the "before" file; the selector defaults to the same member/region/lines as the after side |
+| `data-diff-member` / `-region` / `-lines` / `-match` / `-nth` | window | override the selector for the before side |
+| `data-diff-ignore="case,exact-whitespace"` | window | what counts as noise when matching lines up |
+| `data-diff` | `.vscode-step` | the step where the code changes |
+| `data-diff="on"` | window | show the diff from the outset, no step |
+
+**Both states are truthful.** Before the step the panel *is* the old version: additions
+are out of the flow, the gutter counts the before file, and the source strip names it.
+On the step the additions arrive in green with `+`, removals go red with `−`, and the
+gutter and source strip switch to the after file. So you can point at either version and
+the line numbers are real.
+
+**`data-diff-ignore="case"` is usually needed** for this deck. `1_SingleLayer` uses
+`weights` and `2_WithRope` renamed it to `Weights`, so a raw comparison marks nearly
+every line changed and buries the two that matter. Case-insensitive matching reduces it
+to the real change. Lines match on their whitespace-collapsed form by default; add
+`exact-whitespace` if indentation *is* the point.
+
+`npm run check:code` re-extracts both sides and fails if the embedded listing or the
+`data-added` / `data-removed` marks have drifted.
+
+Example: `slides/21c-rope-diff.html`.
 
 ### Fake debugger inline values
 

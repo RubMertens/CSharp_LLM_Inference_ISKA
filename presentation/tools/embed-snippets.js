@@ -3,6 +3,10 @@
 //   npm run code:embed              report windows that are missing code or have drifted
 //   npm run code:embed -- --write   write the code into the slides
 //
+// A panel with data-diff-from gets the unified diff of the two versions embedded, plus
+// data-added / data-removed line lists — the diff is computed here, once, not at render
+// time.
+//
 // Slides carry their code inline (`<pre class="vscode-source">`), so a deck is
 // self-contained: nothing is fetched at render time, nothing is copied into dist, and
 // it works from a file:// URL. The data-src / data-member / data-lines attributes stay
@@ -12,8 +16,9 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { extractSnippet } from '../js/code-extract.js';
+import { unifiedSnippet } from '../js/code-diff.js';
 import {
-  SLIDES, DEMOS, escapeHtml, findWindows, reference, slideFiles, readSlide,
+  SLIDES, DEMOS, escapeHtml, findWindows, reference, diffReference, slideFiles, readSlide,
 } from './slide-windows.js';
 
 const write = process.argv.includes('--write');
@@ -62,8 +67,34 @@ for (const file of slideFiles()) {
       continue;
     }
 
+    // Transition panel: embed the unified diff instead of the plain snippet.
+    const diffRef = diffReference(win.attrs);
+    let diff = null;
+    if (diffRef) {
+      const beforeFile = join(DEMOS, diffRef.src);
+      if (!existsSync(beforeFile)) {
+        failed++;
+        notes.push(`  ✗ ${diffRef.src} — data-diff-from file not found`);
+        continue;
+      }
+      try {
+        const before = extractSnippet(readFileSync(beforeFile, 'utf8'), diffRef);
+        diff = unifiedSnippet(before.code, snippet.code, { ignore: diffRef.ignore });
+        diff.beforeStartLine = before.startLine;
+        snippet = { ...snippet, code: diff.code };
+      } catch (err) {
+        failed++;
+        notes.push(`  ✗ ${diffRef.src} [diff] — ${err.message}`);
+        continue;
+      }
+    }
+
     const same = win.code !== null && win.code.replace(/\s+$/, '') === snippet.code.replace(/\s+$/, '');
-    if (same && String(snippet.startLine) === ref.startLine) {
+    const marksMatch = !diff
+      || ((win.attrs['data-added'] ?? '') === diff.added
+        && (win.attrs['data-removed'] ?? '') === diff.removed
+        && win.attrs['data-before-start-line'] === String(diff.beforeStartLine));
+    if (same && String(snippet.startLine) === ref.startLine && marksMatch) {
       notes.push(`  ✓ ${ref.src} [${ref.label}] up to date`);
       continue;
     }
@@ -71,6 +102,7 @@ for (const file of slideFiles()) {
     if (win.code === null) added++; else drifted++;
     notes.push(`  ${win.code === null ? '+' : '~'} ${ref.src} [${ref.label}]`
       + ` lines ${snippet.startLine}-${snippet.endLine}`
+      + (diff ? ` (diff vs ${diffRef.src}: +${diff.added || 'none'} / -${diff.removed || 'none'})` : '')
       + (win.code === null ? ' — no code embedded' : ' — differs from the demo source'));
 
     if (!write) continue;
@@ -78,7 +110,14 @@ for (const file of slideFiles()) {
     const tagIndent = html.slice(0, win.tagStart).match(/\n( *)$/)?.[1] ?? '      ';
     const attrIndent = win.tag.match(/\n( *)data-/)?.[1] ?? `${tagIndent}     `;
     const bodyIndent = `${tagIndent}  `;
-    const tag = setAttr(win.tag, 'data-start-line', String(snippet.startLine), attrIndent);
+    let tag = setAttr(win.tag, 'data-start-line', String(snippet.startLine), attrIndent);
+    if (diff) {
+      // Only the side that actually changed gets an attribute.
+      if (diff.added) tag = setAttr(tag, 'data-added', diff.added, attrIndent);
+      if (diff.removed) tag = setAttr(tag, 'data-removed', diff.removed, attrIndent);
+      // So the panel can number and name the before version while it shows it.
+      tag = setAttr(tag, 'data-before-start-line', String(diff.beforeStartLine), attrIndent);
+    }
     const block = `\n${bodyIndent}<pre class="vscode-source">\n${escapeHtml(snippet.code)}\n${bodyIndent}</pre>`;
     const after = win.embedded
       ? win.body.slice(win.embedded[0].length)

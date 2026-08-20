@@ -11,7 +11,10 @@
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { extractSnippet } from '../js/code-extract.js';
-import { DEMOS, findWindows, reference, slideFiles, readSlide } from './slide-windows.js';
+import { unifiedSnippet } from '../js/code-diff.js';
+import {
+  DEMOS, findWindows, reference, diffReference, slideFiles, readSlide,
+} from './slide-windows.js';
 
 const show = process.argv.includes('--show');
 
@@ -60,10 +63,29 @@ for (const file of slideFiles()) {
       + ` lines ${start}-${start + codeLines.length - 1} (${codeLines.length} shown)`);
     if (show) console.log(codeLines.map((l, i) => `      ${String(i + 1).padStart(3)} ${l}`).join('\n'));
 
-    // Has the demo project moved on?
+    // Has the demo project moved on? For a transition panel the embedded listing is the
+    // unified diff of two versions, so both sides have to be re-extracted to compare.
+    const diffRef = diffReference(win.attrs);
     if (ref && existsSync(join(DEMOS, ref.src))) {
       try {
-        const fresh = extractSnippet(readFileSync(join(DEMOS, ref.src), 'utf8'), ref);
+        let fresh = extractSnippet(readFileSync(join(DEMOS, ref.src), 'utf8'), ref);
+        if (diffRef) {
+          if (!existsSync(join(DEMOS, diffRef.src))) throw new Error(`${diffRef.src} not found`);
+          const before = extractSnippet(readFileSync(join(DEMOS, diffRef.src), 'utf8'), diffRef);
+          const unified = unifiedSnippet(before.code, fresh.code, { ignore: diffRef.ignore });
+          fresh = { ...fresh, code: unified.code };
+          const added = win.attrs['data-added'] ?? '';
+          const removed = win.attrs['data-removed'] ?? '';
+          if (added !== unified.added || removed !== unified.removed) {
+            failed++;
+            console.log(`    ✗ diff marks are stale: data-added="${added}" data-removed="${removed}"`
+              + ` but the sources give +${unified.added || 'none'} / -${unified.removed || 'none'}`
+              + ' — npm run code:embed -- --write');
+          } else {
+            console.log(`    · diff vs ${diffRef.src}: +${unified.added || 'none'}`
+              + ` / -${unified.removed || 'none'}`);
+          }
+        }
         if (fresh.code.replace(/\s+$/, '') !== win.code.replace(/\s+$/, '')) {
           failed++;
           console.log('    ✗ embedded code differs from the demo source'

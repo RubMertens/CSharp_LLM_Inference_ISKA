@@ -241,8 +241,26 @@ class PresentationEngine {
     });
   }
 
+  // Something on the slide that scrolls (a code panel) gets the wheel first; the deck
+  // only takes over once that element is at the end in the direction being scrolled.
+  #scrollableUnder(target, deltaY) {
+    let el = target instanceof Element ? target : null;
+    while (el && el !== document.body) {
+      const overflowY = getComputedStyle(el).overflowY;
+      if ((overflowY === 'auto' || overflowY === 'scroll')
+        && el.scrollHeight > el.clientHeight + 2) {
+        const atTop = el.scrollTop <= 0;
+        const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+        if (!((deltaY < 0 && atTop) || (deltaY > 0 && atBottom))) return el;
+      }
+      el = el.parentElement;
+    }
+    return null;
+  }
+
   #bindWheel() {
     document.addEventListener('wheel', (e) => {
+      if (this.#scrollableUnder(e.target, e.deltaY)) return;
       if (this.#wheelCooldown) return;
       e.preventDefault();
       this.#wheelCooldown = true;
