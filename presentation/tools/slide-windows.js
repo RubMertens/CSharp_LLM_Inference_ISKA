@@ -88,6 +88,21 @@ export function readSlide(file) {
   return readFileSync(join(SLIDES, file), 'utf8');
 }
 
+// The "before" side of a transition panel: data-diff-from names the file, and the
+// selector defaults to the same member/region/lines as the after side.
+export function diffReference(attrs) {
+  if (!attrs['data-diff-from']) return null;
+  return {
+    src: attrs['data-diff-from'],
+    lines: attrs['data-diff-lines'] ?? attrs['data-lines'],
+    region: attrs['data-diff-region'] ?? attrs['data-region'],
+    member: attrs['data-diff-member'] ?? attrs['data-member'],
+    match: attrs['data-diff-match'] ?? attrs['data-match'],
+    nth: attrs['data-diff-nth'] ?? attrs['data-nth'],
+    ignore: (attrs['data-diff-ignore'] ?? '').split(',').map(x => x.trim()).filter(Boolean),
+  };
+}
+
 // Reference back to the demo source, if the window carries one.
 export function reference(attrs) {
   if (!attrs['data-src']) return null;

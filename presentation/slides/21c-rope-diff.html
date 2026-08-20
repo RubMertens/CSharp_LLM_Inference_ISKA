@@ -1,0 +1,66 @@
+<section data-id="rope-diff" data-title="Adding RoPE">
+  <div class="slide-content">
+    <h2>Adding RoPE — <span class="highlight">two lines</span></h2>
+
+    <div class="vscode-window"
+         data-src="Runner.ConsoleApp/2_WithRope/TransformerWithRope.cs"
+         data-member="Forward"
+         data-diff-from="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+         data-diff-ignore="case"
+         data-start-line="19"
+         data-added="24-26"
+         data-before-start-line="17">
+      <pre class="vscode-source">
+public Matrix Forward(int[] tokens)
+{
+    var sequenceLength = tokens.Length;
+    //translate the tokens to a sequence of embeddings
+    Matrix embeddings = new(sequenceLength, Weights.HiddenDimension);
+    for (int row = 0; row &lt; sequenceLength; row++)
+    {
+        embeddings[row] = Weights.EmbeddedTokens[tokens[row]];
+    }
+
+    // normalize 
+    Matrix normalizedEmbeddings = new(sequenceLength, Weights.HiddenDimension);
+    for (int row = 0; row &lt; sequenceLength; row++)
+    {
+        normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row], Weights.AttentionNormWeight);
+    }
+
+    // project each token into Q, K, V
+    // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
+    var queries = normalizedEmbeddings * Weights.QueryProjection;
+    var keys = normalizedEmbeddings * Weights.KeyProjection;
+    var values = normalizedEmbeddings * Weights.ValueProjection;
+
+    queries = ApplyRoPETo(queries);
+    keys = ApplyRoPETo(keys);
+
+    var attentionOutput = SingleHeadSelfAttention(Weights.HiddenDimension, sequenceLength, queries, keys, values);
+
+    var projectedAttention = attentionOutput * Weights.OutputProjection;
+
+    Matrix hidden = new(sequenceLength, Weights.HiddenDimension);
+    for (int row = 0; row &lt; sequenceLength; row++)
+    {
+        hidden[row] = embeddings[row] + projectedAttention[row];
+    }
+    var logits = hidden * Weights.OutputEmbedding;
+    return logits;
+}
+      </pre>
+      <span class="vscode-inline" data-text="var queries" data-value="4×8 each"></span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+            data-text="var queries = normalizedEmbeddings"
+            data-note="Q, K, V come out of the projections exactly as before"></span>
+      <span class="vscode-step fragment" data-fragment-index="1" data-diff
+            data-text="ApplyRoPETo"
+            data-values="24: Q and K rotated in place"
+            data-note="Rotate queries and keys — the whole of RoPE at this level"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-text="SingleHeadSelfAttention"
+            data-note="Attention is untouched: it just receives rotated vectors"></span>
+    </div>
+  </div>
+</section>

@@ -222,6 +222,52 @@ Still available but unused by the deck: `.code-split` (prose | code grid),
 `.code-steps` (numbered narration list), `.code-caption` (muted line under a panel).
 The code slides deliberately carry none of that text — it is spoken.
 
+### Diff transitions (one version becoming the next)
+
+The demo project evolves by copying a transformer and adding one idea, so the most
+useful thing a slide can show is the *difference*. A panel can hold both versions:
+
+```html
+<div class="vscode-window"
+     data-src="Runner.ConsoleApp/2_WithRope/TransformerWithRope.cs"
+     data-member="Forward"
+     data-diff-from="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+     data-diff-ignore="case">
+  <pre class="vscode-source">…unified listing, written by code:embed…</pre>
+  <span class="vscode-step fragment" data-fragment-index="1" data-diff
+        data-note="rotate Q and K — the whole of RoPE at this level"></span>
+</div>
+```
+
+`npm run code:embed -- --write` extracts both sides, diffs them, and writes the unified
+listing plus `data-added`, `data-removed` and `data-before-start-line`. Nothing diffs at
+render time.
+
+| Attribute | On | Meaning |
+|-----------|----|---------|
+| `data-diff-from` | window | the "before" file; the selector defaults to the same member/region/lines as the after side |
+| `data-diff-member` / `-region` / `-lines` / `-match` / `-nth` | window | override the selector for the before side |
+| `data-diff-ignore="case,exact-whitespace"` | window | what counts as noise when matching lines up |
+| `data-diff` | `.vscode-step` | the step where the code changes |
+| `data-diff="on"` | window | show the diff from the outset, no step |
+
+**Both states are truthful.** Before the step the panel *is* the old version: additions
+are out of the flow, the gutter counts the before file, and the source strip names it.
+On the step the additions arrive in green with `+`, removals go red with `−`, and the
+gutter and source strip switch to the after file. So you can point at either version and
+the line numbers are real.
+
+**`data-diff-ignore="case"` is usually needed** for this deck. `1_SingleLayer` uses
+`weights` and `2_WithRope` renamed it to `Weights`, so a raw comparison marks nearly
+every line changed and buries the two that matter. Case-insensitive matching reduces it
+to the real change. Lines match on their whitespace-collapsed form by default; add
+`exact-whitespace` if indentation *is* the point.
+
+`npm run check:code` re-extracts both sides and fails if the embedded listing or the
+`data-added` / `data-removed` marks have drifted.
+
+Example: `slides/21c-rope-diff.html`.
+
 ### Fake debugger inline values
 
 The values VS Code prints at the end of a line while paused, written by hand on the

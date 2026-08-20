@@ -31,6 +31,14 @@
 // Attributes — reference (no fetching; used for the source strip and the tooling):
 //   data-src / data-member / data-region / data-lines / data-match / data-nth
 //
+// Attributes — transition between two versions of the code (written by code:embed from
+// data-diff-from; see tools/embed-snippets.js):
+//   data-added="7-8"          lines that the after version adds
+//   data-removed="12"         lines that it drops
+//   data-diff="step|on"       "step" (default when a step carries data-diff) starts on
+//                             the before version and switches on that step; "on" shows
+//                             the diff from the outset
+//
 // Attributes — presentation:
 //   data-theme="light|dark"   VS Code Light Modern (default) or Dark Modern colours
 //   data-numbers="file|snippet|off"   gutter numbering, default file
@@ -66,6 +74,8 @@
 //   data-lines / data-text    which lines the step covers (snippet-relative / by content)
 //   data-values="9: sum = 23 | 11: returns 23"   fake debugger inline values
 //   data-stopped[="9"]        amber stopped line + gutter arrow
+//   data-diff                 on a .vscode-step: this is where the code changes —
+//                             additions appear, removals go red
 //   data-note                 speaker cue; only rendered with data-notes="on"
 //   .vscode-inline            one standalone inline value (add .fragment to stage it)
 //
@@ -347,13 +357,38 @@ function buildWindow(el, { code, startLine, endLine }, monaco) {
   const codeLines = code.split('\n');
   const html = highlight(code, lang, monaco);
   const firstNumber = numbers === 'snippet' ? 1 : startLine;
-  const lastNumber = firstNumber + codeLines.length - 1;
+  const lastNumber = firstNumber + codeLines.length - 1;   // upper bound; diff rows shrink it
   const gutterWidth = `${String(lastNumber).length + 1}ch`;
 
+  // Diff panels number the after version: removals sit between the lines and don't
+  // consume a line number, they get the - mark instead.
+  const added = parseLineSpec(el.dataset.added, codeLines.length);
+  const removed = parseLineSpec(el.dataset.removed, codeLines.length);
+  // Two counters, so a transition panel is numbered correctly on both sides: the after
+  // version skips removals, the before version skips additions.
+  let afterNo = firstNumber;
+  let beforeNo = Number(el.dataset.beforeStartLine ?? firstNumber);
+  const twoSided = Boolean(el.dataset.beforeStartLine) && (added.size > 0 || removed.size > 0);
+
   const rows = html.map((lineHtml, i) => {
-    const num = numbers === 'off' ? '' : String(firstNumber + i);
-    return `<div class="vscode-line" data-line="${i + 1}">`
-      + `<span class="vscode-ln" aria-hidden="true">${num}</span>`
+    const line = i + 1;
+    const isAdd = added.has(line);
+    const isDel = removed.has(line);
+    const kind = isAdd ? ' add' : (isDel ? ' del' : '');
+
+    let gutter = '';
+    if (numbers !== 'off') {
+      const after = isDel ? '' : String(afterNo);
+      const before = isAdd ? '' : String(beforeNo);
+      gutter = twoSided
+        ? `<i class="ln-after">${after}</i><i class="ln-before">${before}</i>`
+        : after;
+    }
+    if (!isDel) afterNo++;
+    if (!isAdd) beforeNo++;
+
+    return `<div class="vscode-line${kind}" data-line="${line}">`
+      + `<span class="vscode-ln" aria-hidden="true">${gutter}</span>`
       + `<span class="vscode-text">${lineHtml}</span>`
       + `</div>`;
   }).join('');
@@ -402,10 +437,21 @@ function buildWindow(el, { code, startLine, endLine }, monaco) {
   const showRef = (el.dataset.sourceRef ?? (path ? 'on' : 'off')) === 'on';
   const prefix = sourceConfig?.prefix ? `${sourceConfig.prefix}/` : '';
   const range = endLine > startLine ? `${startLine}-${endLine}` : `${startLine}`;
+  // A transition panel points at the version it is currently showing.
+  const beforePath = el.dataset.diffFrom;
+  const beforeStart = Number(el.dataset.beforeStartLine ?? 0);
+  const beforeLines = codeLines.length - added.size;
+  const beforeRef = beforePath && beforeStart
+    ? `<a class="vscode-source-link ref-before" data-path="${escapeHtml(beforePath)}"
+         data-from="${beforeStart}" data-to="${beforeStart + beforeLines - 1}"
+         >${escapeHtml(prefix + beforePath)}:${beforeStart}-${beforeStart + beforeLines - 1}</a>`
+    : '';
+
   const sourceRef = showRef ? `
     <div class="vscode-source-ref">
-      <a class="vscode-source-link" data-path="${escapeHtml(path)}"
+      <a class="vscode-source-link ref-after" data-path="${escapeHtml(path)}"
          data-from="${startLine}" data-to="${endLine}">${escapeHtml(prefix + path)}:${range}</a>
+      ${beforeRef}
       <span class="vscode-source-hint">press <kbd>o</kbd> to open</span>
     </div>` : '';
 
@@ -568,6 +614,10 @@ function applyHighlights(el) {
   // Steps are ordinary fragments, so the engine advances through them without needing
   // a bullet list to drive it. Only the latest revealed step is active unless the
   // panel asks for the bands to build up.
+  // A transition panel starts on the "before" version: additions are collapsed and
+  // removals look like ordinary code, until the step that carries data-diff.
+  const diffSteps = [...el.querySelectorAll('.vscode-step[data-diff]')];
+  const diffMode = el.dataset.diff ?? (diffSteps.length ? 'step' : 'on');
   const revealed = visibleMarkers(el, '.vscode-step');
   const accumulate = (el.dataset.steps ?? 'replace') === 'accumulate';
   const latest = revealed.length
@@ -622,6 +672,21 @@ function applyHighlights(el) {
     setInlineValue(row, values.get(line));
   });
 
+  if (el.dataset.added || el.dataset.removed) {
+    const shown = diffMode !== 'step'
+      || visibleMarkers(el, '.vscode-step[data-diff]').length > 0;
+    const was = el.dataset.vsDiffShown === 'yes';
+    el.classList.toggle('diff-shown', shown);
+    el.classList.toggle('diff-before', !shown);
+    // Revealing the additions changes the line count, so the panel has to be re-fitted.
+    if (shown !== was && el.dataset.vsState === 'ready') {
+      el.dataset.vsDiffShown = shown ? 'yes' : 'no';
+      requestAnimationFrame(() => fitToSlide(el));
+    } else {
+      el.dataset.vsDiffShown = shown ? 'yes' : 'no';
+    }
+  }
+
   const noteEl = el.querySelector('.vscode-note');
   if (noteEl) {
     const show = (el.dataset.notes ?? 'off') === 'on';
@@ -672,7 +737,7 @@ function inlineSource(el) {
 
 function cacheKey(el) {
   const d = el.dataset;
-  return JSON.stringify([d.src, d.startLine, d.lang, d.tab, d.tabs, d.chrome, d.numbers,
+  return JSON.stringify([d.src, d.startLine, d.added, d.removed, d.lang, d.tab, d.tabs, d.chrome, d.numbers,
     d.minimap, d.statusbar, d.breadcrumbs, d.sourceRef, el.querySelector('pre.vscode-source')?.textContent?.length,
     d.code?.slice(0, 64)]);
 }

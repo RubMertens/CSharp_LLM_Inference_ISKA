@@ -28,6 +28,11 @@ npm run check:code            # embedded code vs source, and every walkthrough m
 npm run check:code -- --show  # also print the embedded code, numbered
 ```
 
+A panel can also hold two versions of the same code — `data-diff-from` plus a step with
+`data-diff` turns "1_SingleLayer becomes 2_WithRope" into a transition: the additions
+arrive in green, and the gutter and file name switch with them. The diff is computed by
+`code:embed`, never at render time.
+
 Each panel prints the file and line range its code came from, and links to it — the
 local file in VS Code (`vscode://`) while presenting, the GitHub blob once deployed.
 Press `o` on a slide to open the source of its first panel.
