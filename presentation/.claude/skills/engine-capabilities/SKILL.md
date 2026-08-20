@@ -161,8 +161,8 @@ and no source pointer.
 |-----------|---------|---------|
 | `data-theme` | `light` | `light` (Light Modern, matches the deck) or `dark` (Dark Modern) |
 | `data-numbers` | `file` | `file` (real line numbers) / `snippet` / `off` |
-| `data-font-size` | auto by line count | treated as a **maximum** — the fit pass shrinks it further if needed |
-| `data-max-height` | `56vh` | ceiling for the code area |
+| `data-font-size` | width-fitted | exact size; opts out of the width fit |
+| `data-max-height` | `82vh` | ceiling for the code area before it scrolls |
 | `data-wrap` | `on` | soft-wrap long lines |
 | `data-highlight="3-5,9"` | — | always-on highlighted lines (snippet-relative) |
 | `data-highlight-text="sum +="` | — | highlight every line containing this text |
@@ -176,16 +176,21 @@ Editor chrome exists but is **off** by default: `data-chrome="minimal|full"` (ta
 `data-statusbar="on"`, `data-breadcrumbs="on"`. Turn them on only if a slide is
 specifically about the editor.
 
-**Auto-fit.** After render, each panel is measured against the room actually left
-below it *in its own column*, then the font is grown (up to 1.7rem) or shrunk (down to
-0.42rem) so the snippet fills that space; only if the floor isn't enough is the code
-area clamped and left to scroll, with step highlights scrolling themselves into view.
-`data-font-size` is just the starting point — authoring one is rarely worth it.
+**Auto-fit is width-first.** The font is scaled so the code fills the panel's *width*
+(90th-percentile line length, so the longest few lines wrap rather than shrinking
+everything), between 0.55rem and 1.8rem. Height is then clamped to the room left in that
+column and the rest scrolls — step highlights scroll themselves into view, with a line of
+context above the band.
 
-Practical consequence: a short method renders huge, a 30+ line one renders small. If a
-snippet is too long to read from the back row, cut it down (`data-lines`, or a tighter
-`data-member`) or split it across two slides — anchor the steps with `data-text` so
-they survive the re-cut.
+That ordering is deliberate: fitting everything vertically instead made long snippets
+unreadable, a 38-line method coming out at half the size of a 12-line one. Large and
+scrolling beats complete and squinting.
+
+`data-font-size` is an **override**: set it and the width fit is skipped, which is the way
+to make a whole snippet visible at once.
+
+Panels scroll with the wheel/trackpad — `js/engine.js` hands a wheel event to a
+scrollable element under the cursor and only navigates once that element is at its end.
 
 **Pointing at the source.** A window with `data-src` prints
 `demos/path/to/File.cs:from-to` under the code. It becomes a link when the deck knows

@@ -39,10 +39,13 @@
           + ` scrollHeight ${slide.scrollHeight} clientHeight ${slide.clientHeight}`,
         ...[...slide.querySelectorAll('.vscode-window')].map((w, i) => {
           const code = w.querySelector('.vscode-code');
-          return `window ${i}: window ${Math.round(w.getBoundingClientRect().height)}`
+          return `window ${i}: w ${Math.round(w.getBoundingClientRect().width)}`
+            + ` codeW ${code.clientWidth}`
+            + ` window ${Math.round(w.getBoundingClientRect().height)}`
             + ` code ${Math.round(code.getBoundingClientRect().height)}`
             + ` scroll ${code.scrollHeight} max ${code.style.maxHeight || '(css)'}`
-            + ` font ${w.style.getPropertyValue('--vs-font-size')}`;
+            + ` font ${w.style.getPropertyValue('--vs-font-size')}`
+            + `\n  fit: ${w.dataset.vsFit ?? '(none)'}`;
         }),
         ...[...slide.children].map(c => `${c.className || c.tagName}: ${Math.round(c.getBoundingClientRect().height)}`),
       ];

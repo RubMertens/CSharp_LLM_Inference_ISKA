@@ -468,14 +468,15 @@ function buildWindow(el, { code, startLine, endLine }, monaco) {
     ${sourceRef}`;
 }
 
-// Slides don't scroll, so a window taller than the space left below the title would
-// push its own status bar off screen. Rather than chasing the slide's overflow (which
-// over-shrinks, because a stretched flex item hides where the slack actually is), the
-// room for each code area is computed directly: from its top edge down to the slide's
-// bottom, minus whatever sits below it.
+// Sizing is width-first: pick the largest font at which the code fills the panel's
+// width, then clamp the height and let it scroll. Fitting everything vertically instead
+// is what made long snippets unreadable — a 38-line method came out at half the size of
+// a 12-line one. Better to read part of it comfortably than all of it through a squint.
 const FIT_RESERVE = 24;    // minimum breathing room at the bottom of a slide
-const FIT_MIN_FONT = 0.42; // rem — smaller than this is unreadable on a projector
-const FIT_MAX_FONT = 1.7;  // rem — beyond this a short snippet just looks silly
+const FIT_MIN_FONT = 0.55; // rem — a floor, not a target
+const FIT_MAX_FONT = 1.8;  // rem — beyond this a short snippet just looks silly
+const FIT_WIDTH_PERCENTILE = 0.9;   // let the longest ~10% of lines wrap rather than
+                                    // shrink everything for one stray long comment
 
 // How much slide is used up *below* a code area, in its own column — a caption or a
 // note strip under it, but not a panel sitting beside it. Rows inside a code area are
@@ -509,12 +510,48 @@ function bottomChrome(slideRect) {
   return reserve;
 }
 
+// The width the code wants, ignoring the longest outliers.
+//
+// Measured from character counts rather than from layout: the font is monospace, so one
+// probe gives an exact per-character width, and asking the DOM for an unwrapped width
+// doesn't work anyway — the text sits in a flex row, where it reports the width it was
+// given rather than the width it wants.
+function charWidth(box) {
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:inherit';
+  probe.textContent = '0'.repeat(100);
+  box.appendChild(probe);
+  const width = probe.getBoundingClientRect().width / 100;
+  probe.remove();
+  return width;
+}
+
+function naturalTextWidth(box) {
+  const unit = charWidth(box);
+  if (!(unit > 0)) return 0;
+
+  const lengths = [...box.querySelectorAll('.vscode-text')]
+    .map(text => {
+      // Inline value chips are decoration, not code — they shouldn't drive the size.
+      const chips = [...text.querySelectorAll('.vscode-inline-value')]
+        .reduce((sum, chip) => sum + chip.textContent.length, 0);
+      return text.textContent.length - chips;
+    })
+    .filter(n => n > 0)
+    .sort((a, b) => a - b);
+  if (lengths.length === 0) return 0;
+
+  const index = Math.min(lengths.length - 1, Math.floor(lengths.length * FIT_WIDTH_PERCENTILE));
+  const gutter = box.querySelector('.vscode-ln')?.getBoundingClientRect().width ?? 0;
+  return lengths[index] * unit + gutter;
+}
+
 function fitSlide(slide) {
   if (!slide) return;
   const boxes = [...slide.querySelectorAll('.vscode-window[data-vs-state="ready"] .vscode-code')];
   if (boxes.length === 0) return;
 
-  // Reset to the authored size first, so repeated fits can't ratchet the font up or down.
+  // Start from the authored size every time, so repeated fits can't drift.
   for (const box of boxes) {
     const win = box.closest('.vscode-window');
     if (win.dataset.vsFontBase) win.style.setProperty('--vs-font-size', win.dataset.vsFontBase);
@@ -522,54 +559,29 @@ function fitSlide(slide) {
     box.style.maxHeight = '';
   }
 
-  const room = (box) => {
-    const rect = box.getBoundingClientRect();
-    const tail = contentBelow(slide, rect);   // source strip, note, caption under it
-    const slideRect = slide.getBoundingClientRect();
-    return slideRect.bottom - bottomChrome(slideRect) - rect.top - tail;
-  };
-
-  // Tallest first: shrinking it can give the others their room back.
-  const ordered = [...boxes].sort((a, b) => b.scrollHeight - a.scrollHeight);
-
-  for (const box of ordered) {
+  for (const box of boxes) {
     const win = box.closest('.vscode-window');
-    const size = () => parseFloat(win.style.getPropertyValue('--vs-font-size'));
-    const setSize = (rem) => win.style.setProperty('--vs-font-size', `${rem.toFixed(3)}rem`);
+    const base = parseFloat(win.style.getPropertyValue('--vs-font-size'));
 
-    // Grow into the space first: a code slide is the code, so it should be as large as
-    // the slide allows. Wrapping is measured each step, since a bigger font wraps more.
-    for (let pass = 0; pass < 14; pass++) {
-      const next = size() * 1.06;
-      if (next > FIT_MAX_FONT) break;
-      const before = size();
-      setSize(next);
-      if (box.scrollHeight > room(box)) { setSize(before); break; }
+    // 1. Font from width. Monospace, so one measurement and a proportional scale.
+    //    An authored data-font-size is taken literally — it's an override, not a hint.
+    const available = box.clientWidth - 8;
+    const natural = win.dataset.fontSize ? 0 : naturalTextWidth(box);
+    if (natural > 0 && available > 0 && base > 0) {
+      const scaled = base * (available / natural);
+      const size = Math.min(FIT_MAX_FONT, Math.max(FIT_MIN_FONT, scaled));
+      win.style.setProperty('--vs-font-size', `${size.toFixed(3)}rem`);
+      // Left on the element so probe-slide.html?debug=1 can show the reasoning.
+      win.dataset.vsFit = `base ${base} natural ${Math.round(natural)}`
+        + ` avail ${Math.round(available)} -> ${size.toFixed(3)}`;
     }
 
-    // Fine step, so 6% granularity doesn't leave a band of empty slide.
-    for (let pass = 0; pass < 6; pass++) {
-      const next = size() * 1.02;
-      if (next > FIT_MAX_FONT) break;
-      const before = size();
-      setSize(next);
-      if (box.scrollHeight > room(box)) { setSize(before); break; }
-    }
-
-    // Then shrink if it still doesn't fit — a snippet you can read in full beats one
-    // that scrolls.
-    for (let pass = 0; pass < 14; pass++) {
-      if (box.scrollHeight <= room(box) + 1) break;
-      const next = size() * 0.94;
-      if (!(next >= FIT_MIN_FONT)) break;
-      setSize(next);
-    }
-
-    // Floor reached and still too tall: clamp and let it scroll.
-    const available = room(box);
-    if (box.scrollHeight > available + 1 && available >= 120) {
-      box.style.maxHeight = `${Math.round(available)}px`;
-    }
+    // 2. Height: clamp to the room left in this column, scroll the rest. Step
+    //    highlights scroll themselves into view (see applyHighlights).
+    const rect = box.getBoundingClientRect();
+    const slideRect = slide.getBoundingClientRect();
+    const room = slideRect.bottom - bottomChrome(slideRect) - rect.top - contentBelow(slide, rect);
+    if (room >= 120) box.style.maxHeight = `${Math.round(room)}px`;
   }
 }
 
@@ -708,10 +720,11 @@ function applyHighlights(el) {
       const bandBottom = last.getBoundingClientRect().bottom - boxTop;
       const viewTop = codeBox.scrollTop;
       const viewBottom = viewTop + codeBox.clientHeight;
-      // Top-align when the band isn't fully visible; bottom-aligning can push the
-      // first highlighted line out of view when lines wrap.
+      // Top-align when the band isn't fully visible, keeping a line or so of context
+      // above it — landing it flush at the edge reads as if code were missing.
       if (bandTop < viewTop || bandBottom > viewBottom) {
-        codeBox.scrollTo({ top: Math.max(0, bandTop - 8), behavior: 'smooth' });
+        const lead = first.getBoundingClientRect().height * 1.5;
+        codeBox.scrollTo({ top: Math.max(0, bandTop - lead), behavior: 'smooth' });
       }
     }
   }

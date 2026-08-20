@@ -216,6 +216,10 @@
   position: relative;
   flex: 1;
   min-width: 0;
+  /* theme.css caps every <pre> at 80ch — that cap is what kept code panels from using
+     the page width, and made the font-fit shrink to fit 80 characters. */
+  max-width: none;
+  width: auto;
   margin: 0;
   padding: 0.55em 0 0.75em;
   max-height: var(--vs-max-height);
@@ -227,6 +231,22 @@
   line-height: var(--vs-line-height);
   scrollbar-width: thin;
   scroll-behavior: smooth;
+  /* A wheel gesture that runs past the end of the code shouldn't jump the slide. */
+  overscroll-behavior: contain;
+}
+
+/* A scrolling panel should look scrollable, not like the code just stops. */
+.vscode-code::-webkit-scrollbar {
+  width: 10px;
+}
+
+.vscode-code::-webkit-scrollbar-thumb {
+  background: var(--vs-border);
+  border-radius: 5px;
+}
+
+.vscode-code::-webkit-scrollbar-thumb:hover {
+  background: var(--vs-fg-dim);
 }
 
 .vscode-code code {
