@@ -12,7 +12,6 @@
 public Matrix Forward(int[] tokens)
 {
     var sequenceLength = tokens.Length;
-    //translate the tokens to a sequence of embeddings
 
     Matrix embeddings = Embed(tokens);
 
@@ -21,11 +20,8 @@ public Matrix Forward(int[] tokens)
     {
         var residual = embeddings;
 
-        // normalize 
         Matrix normalizedEmbeddings = RMSNorm(embeddings, layer.AttentionNormWeight);
 
-        // project each token into Q, K, V
-        // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
         var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection);
         var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection);
         var values = normalizedEmbeddings * layer.ValueProjection;
@@ -40,7 +36,8 @@ public Matrix Forward(int[] tokens)
     embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
     var logits = embeddings * Weights.OutputEmbedding;
     return logits;  
-}      </pre>
+}      
+</pre>
 
       <!-- always on: the toy's real numbers -->
       <span class="vscode-inline" data-line="1"
@@ -49,60 +46,60 @@ public Matrix Forward(int[] tokens)
       <span class="vscode-step fragment" data-fragment-index="0"
             data-text="Matrix embeddings = Embed(tokens)"
             data-stopped
-            data-values="6: embeddings = 3 &times; 64 — the same table lookup as before"
+            data-values="5: embeddings = 3 &times; 64 — the same table lookup as before"
             data-note="Identical to the single-layer version. It just moved into a helper."></span>
 
       <span class="vscode-step fragment" data-fragment-index="1"
             data-text="foreach (var layer in Weights.Layers)"
             data-stopped
-            data-values="9: Weights.Layers = LayerWeights[2] — two passes"
+            data-values="8: Weights.Layers = LayerWeights[2] — two passes"
             data-note="This is the whole change: the block below now runs once per layer, and the weights come from layer. instead of Weights. Toy: 2 layers. Llama 3 8B: 32. Same loop."></span>
 
       <span class="vscode-step fragment" data-fragment-index="2"
             data-text="var residual = embeddings"
             data-stopped
-            data-values="11: residual = 3 &times; 64 — this layer's input, kept aside"
+            data-values="10: residual = 3 &times; 64 — this layer's input, kept aside"
             data-note="Park the input. Everything this layer computes is a correction added back onto it."></span>
 
       <span class="vscode-step fragment" data-fragment-index="3"
             data-text="Matrix normalizedEmbeddings = RMSNorm"
             data-stopped
-            data-values="14: 3 &times; 64, rescaled per row by layer.AttentionNormWeight (64 floats)"
+            data-values="12: 3 &times; 64, rescaled per row by layer.AttentionNormWeight (64 floats)"
             data-note="Same RMSNorm as before — but the norm weight is this layer's, not the model's."></span>
 
       <span class="vscode-step fragment" data-fragment-index="4"
             data-text="normalizedEmbeddings * layer."
-            data-values="18: queries = 3 &times; 64 | 19: keys = 3 &times; 64 | 20: values = 3 &times; 64"
+            data-values="14: queries = 3 &times; 64 | 15: keys = 3 &times; 64 | 16: values = 3 &times; 64"
             data-note="Three projections out of this layer's weights, each 64 × 64. RoPE on Q and K only — V carries no position."></span>
 
       <span class="vscode-step fragment" data-fragment-index="5"
             data-text="SingleHeadSelfAttention"
             data-stopped
-            data-values="22: attentionOutput = 3 &times; 64 — from a 3 &times; 3 masked score matrix"
+            data-values="18: attentionOutput = 3 &times; 64 — from a 3 &times; 3 masked score matrix"
             data-note="Untouched from the single-layer version. One head, causal mask, softmax, weighted sum of values."></span>
 
       <span class="vscode-step fragment" data-fragment-index="6"
             data-text="attentionOutput * layer.OutputProjection"
             data-stopped
-            data-values="24: projectedAttention = 3 &times; 64 — 64 × 64 projection"
+            data-values="20: projectedAttention = 3 &times; 64 — 64 × 64 projection"
             data-note="Mix the head's output back into the model's width before it rejoins the stream."></span>
 
       <span class="vscode-step fragment" data-fragment-index="7"
             data-text="embeddings = residual + projectedAttention"
             data-stopped
-            data-values="26: embeddings = 3 &times; 64 — layer 1 out, layer 2 in"
+            data-values="22: embeddings = 3 &times; 64 — layer 1 out, layer 2 in"
             data-note="Add the correction to the parked input. That is one layer. Loop back, same code, Layers[1]."></span>
 
       <span class="vscode-step fragment" data-fragment-index="8"
             data-text="RMSNorm(embeddings, Weights.FinalNormWeight)"
             data-stopped
-            data-values="29: 3 &times; 64 — once, after every layer has run"
+            data-values="25: 3 &times; 64 — once, after every layer has run"
             data-note="Out of the loop. One final norm, and this one is Weights. again — per model, not per layer."></span>
 
       <span class="vscode-step fragment" data-fragment-index="9"
             data-text="logits"
-            data-stopped="30"
-            data-values="30: logits = 3 &times; 250 | 31: one score per vocabulary token, per position"
+            data-stopped="26"
+            data-values="26: logits = 3 &times; 250 | 27: one score per vocabulary token, per position"
             data-note="Back out to the vocabulary. Take the last row, argmax it, that is the next token."></span>
     </div>
 

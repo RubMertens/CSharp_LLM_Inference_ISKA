@@ -16,31 +16,13 @@ public class SingleLayerModelWeights
     public required Vector AttentionNormWeight { get; set; }
     public required Vector FeedForwardNormWeight { get; set; }
 
-    /// &lt;summary&gt;
-    /// rows = vocab size, cols = hidden dimension
-    /// &lt;/summary&gt;
     public required Matrix EmbeddedTokens { get; set; }
 
-    /// &lt;summary&gt;
-    /// hiddenDim x hiddenDim
-    /// &lt;/summary&gt;
     public required Matrix QueryProjection { get; set; }
-    /// &lt;summary&gt;
-    /// hiddenDim x hiddenDim
-    /// &lt;/summary&gt;
     public required Matrix KeyProjection { get; set; }
-    /// &lt;summary&gt;
-    /// hiddenDim x hiddenDim
-    /// &lt;/summary&gt;
     public required Matrix ValueProjection { get; set; }
-    /// &lt;summary&gt;
-    /// hiddenDim x hiddenDim — projects attention output back
-    /// &lt;/summary&gt;
     public required Matrix OutputProjection { get; set; }
 
-    /// &lt;summary&gt;
-    /// hiddenDim x vocabSize — projects hidden state to logits
-    /// &lt;/summary&gt;
     public required Matrix OutputEmbedding { get; set; }
 
 }
@@ -52,20 +34,20 @@ public class SingleLayerModelWeights
             data-note="Two norm weights — one scale per dimension, nothing more"></span>
 
       <span class="vscode-step fragment" data-fragment-index="1"
-            data-lines="9-12"
-            data-stopped="12"
-            data-values="12: Matrix 250 × 64 — one row per token"
+            data-lines="9"
+            data-stopped="9"
+            data-values="9: Matrix 250 × 64 — one row per token"
             data-note="The lookup table: token id in, vector out"></span>
 
       <span class="vscode-step fragment" data-fragment-index="2"
-            data-lines="14-29"
-            data-values="17: Matrix 64 × 64 | 21: Matrix 64 × 64 | 25: Matrix 64 × 64 | 29: Matrix 64 × 64"
+            data-lines="11-14"
+            data-values="11: Matrix 64 × 64 | 12: Matrix 64 × 64 | 13: Matrix 64 × 64 | 14: Matrix 64 × 64"
             data-note="Q, K, V and the output projection — all square, all hiddenDim × hiddenDim"></span>
 
       <span class="vscode-step fragment" data-fragment-index="3"
-            data-lines="31-34"
-            data-stopped="34"
-            data-values="34: Matrix 64 × 250 — one score per token"
+            data-lines="16"
+            data-stopped="16"
+            data-values="16: Matrix 64 × 250 — one score per token"
             data-note="Back out to logits: hidden state scored against the whole vocabulary"></span>
 
     

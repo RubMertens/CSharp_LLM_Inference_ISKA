@@ -11,22 +11,18 @@
 public Matrix Forward(int[] tokens)
 {
     var sequenceLength = tokens.Length;
-    //translate the tokens to a sequence of embeddings
     Matrix embeddings = new(sequenceLength, weights.HiddenDimension);
     for (int row = 0; row &lt; sequenceLength; row++)
     {
         embeddings[row] = weights.EmbeddedTokens[tokens[row]];
     }
 
-    // normalize 
     Matrix normalizedEmbeddings = new(sequenceLength, weights.HiddenDimension);
     for (int row = 0; row &lt; sequenceLength; row++)
     {
         normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row], weights.AttentionNormWeight);
     }
 
-    // project each token into Q, K, V
-    // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
     var queries = normalizedEmbeddings * weights.QueryProjection;
     var keys = normalizedEmbeddings * weights.KeyProjection;
     var values = normalizedEmbeddings * weights.ValueProjection;
@@ -48,11 +44,11 @@ public Matrix Forward(int[] tokens)
       <!-- always on: the inputs, and the shape of the rest of the pass -->
       <span class="vscode-inline" data-line="1"
             data-value="tokens = [2, 2, 2]   HiddenDimension = 64   VocabularySize = 250"></span>
-      <span class="vscode-inline" data-line="22" data-value="queries, keys, values — 3 × 64 each"></span>
-      <span class="vscode-inline" data-line="24" data-value="3 × 64"></span>
-      <span class="vscode-inline" data-line="26" data-value="3 × 64"></span>
-      <span class="vscode-inline" data-line="31" data-value="residual: what came in, plus what attention added"></span>
-      <span class="vscode-inline" data-line="33" data-value="logits = 3 × 250 — one score per vocab entry"></span>
+      <span class="vscode-inline" data-line="18" data-value="queries, keys, values — 3 × 64 each"></span>
+      <span class="vscode-inline" data-line="20" data-value="3 × 64"></span>
+      <span class="vscode-inline" data-line="22" data-value="3 × 64"></span>
+      <span class="vscode-inline" data-line="27" data-value="residual: what came in, plus what attention added"></span>
+      <span class="vscode-inline" data-line="29" data-value="logits = 3 × 250 — one score per vocab entry"></span>
 
       <span class="vscode-step fragment" data-fragment-index="0"
             data-lines="3"
@@ -61,15 +57,15 @@ public Matrix Forward(int[] tokens)
             data-note="Three tokens in, three rows through the whole method"></span>
 
       <span class="vscode-step fragment" data-fragment-index="1"
-            data-lines="5-9"
-            data-stopped="8"
-            data-values="5: embeddings = 3 × 64"
+            data-lines="4-8"
+            data-stopped="7"
+            data-values="4: embeddings = 3 × 64"
             data-note="A token id is a row index. No math — a table lookup. All three tokens are &lt;unk&gt;, so all three rows are identical"></span>
 
       <span class="vscode-step fragment" data-fragment-index="2"
-            data-lines="12-16"
-            data-stopped="15"
-            data-values="12: normalizedEmbeddings = 3 × 64"
+            data-lines="10-14"
+            data-stopped="13"
+            data-values="10: normalizedEmbeddings = 3 × 64"
             data-note="Stop here. What is inside that call is the next slide"></span>
       
     </div>

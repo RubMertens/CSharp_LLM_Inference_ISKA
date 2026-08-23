@@ -8,22 +8,18 @@
 public Matrix Forward(int[] tokens)
 {
     var sequenceLength = tokens.Length;
-    //translate the tokens to a sequence of embeddings
     Matrix embeddings = new(sequenceLength, weights.HiddenDimension);
     for (int row = 0; row &lt; sequenceLength; row++)
     {
         embeddings[row] = weights.EmbeddedTokens[tokens[row]];
     }
 
-    // normalize 
     Matrix normalizedEmbeddings = new(sequenceLength, weights.HiddenDimension);
     for (int row = 0; row &lt; sequenceLength; row++)
     {
         normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row], weights.AttentionNormWeight);
     }
 
-    // project each token into Q, K, V
-    // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
     var queries = normalizedEmbeddings * weights.QueryProjection;
     var keys = normalizedEmbeddings * weights.KeyProjection;
     var values = normalizedEmbeddings * weights.ValueProjection;
@@ -45,27 +41,27 @@ public Matrix Forward(int[] tokens)
       <!-- always on: the inputs, and the shape of the rest of the pass -->
       <span class="vscode-inline" data-line="1"
         data-value="tokens = [2, 2, 2]   HiddenDimension = 64   VocabularySize = 250"></span>
-      <span class="vscode-inline" data-line="22" data-value="queries, keys, values — 3 × 64 each"></span>
-      <span class="vscode-inline" data-line="24" data-value="3 × 64"></span>
-      <span class="vscode-inline" data-line="26" data-value="3 × 64"></span>
-      <span class="vscode-inline" data-line="31" data-value="residual: what came in, plus what attention added"></span>
+      <span class="vscode-inline" data-line="18" data-value="queries, keys, values — 3 × 64 each"></span>
+      <span class="vscode-inline" data-line="20" data-value="3 × 64"></span>
+      <span class="vscode-inline" data-line="22" data-value="3 × 64"></span>
+      <span class="vscode-inline" data-line="27" data-value="residual: what came in, plus what attention added"></span>
 
       <span class="vscode-step fragment" data-fragment-index="0"
         data-text="var attentionOutput = SingleHeadSelfAttention(" data-stopped
         data-note="That whole detour was this one line. It hands back the same shape it was given"></span>
 
       <span class="vscode-step fragment" data-fragment-index="1"
-        data-text="attentionOutput * weights.OutputProjection" data-stopped="26"
-        data-values="26: 3 × 64 · 64 × 64 → 3 × 64"
+        data-text="attentionOutput * weights.OutputProjection" data-stopped="22"
+        data-values="22: 3 × 64 · 64 × 64 → 3 × 64"
         data-note="One more learned matrix, mixing the blended head back into the model's own space"></span>
 
-      <span class="vscode-step fragment" data-fragment-index="2" data-lines="28-32" data-stopped="31"
-        data-values="28: hidden = 3 × 64"
+      <span class="vscode-step fragment" data-fragment-index="2" data-lines="24-28" data-stopped="27"
+        data-values="24: hidden = 3 × 64"
         data-note="The residual: the original embedding plus what attention added. Attention edits the meaning, it does not replace it"></span>
 
       <span class="vscode-step fragment" data-fragment-index="3"
-        data-text="hidden * weights.OutputEmbedding" data-stopped="33"
-        data-values="33: 3 × 64 · 64 × 250 → 3 × 250, then returned"
+        data-text="hidden * weights.OutputEmbedding" data-stopped="29"
+        data-values="29: 3 × 64 · 64 × 250 → 3 × 250, then returned"
         data-note="Out of 64 dimensions into the vocabulary — one score per possible token. That is one layer, one pass, done"></span>
     </div>
   </div>
