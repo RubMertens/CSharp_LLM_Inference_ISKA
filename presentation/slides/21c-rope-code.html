@@ -42,21 +42,28 @@ private static Matrix ApplyRoPETo(Matrix matrix)
 }
       </pre>
       <span class="vscode-inline" data-line="5" data-value="sequenceLength = 4   dimension = 8"></span>
+      <!-- Both loops lit together: one over tokens, one over dimension pairs. The
+           nesting is the point, so they get a single band rather than a step each. -->
       <span class="vscode-step fragment" data-fragment-index="0"
-         data-lines="12-16"
-         data-values="10: position = 3 | 13: j = 0 | 15: x1 = 0.8, x2 = -0.2"
-         data-note="Pairs: j, j+1"></span>
+         data-lines="9-14"
+         data-values="10: position = 0, 1, 2, 3 &mdash; one per token | 13: j = 0, 2, 4, 6 &mdash; two dims at a time"
+         data-note="Outer loop walks the tokens, inner loop walks the dimension pairs. Every pair gets its own rotation"></span>
       <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="15-16"
+         data-stopped
+         data-values="15: x1 = 0.8 | 16: x2 = -0.2"
+         data-note="The pair being rotated: two neighbouring dimensions read as one 2D point"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
          data-lines="18-20"
          data-stopped="20"
          data-values="20: 1 / 10000^(0/8) = 1.0"
          data-note="theta = 1 / 10000^(j / dimension)"></span>
-      <span class="vscode-step fragment" data-fragment-index="2"
+      <span class="vscode-step fragment" data-fragment-index="3"
          data-lines="22-25"
          data-stopped="23"
          data-values="23: 3 × 1.0 = 3.0 | 24: cos = -0.99 | 25: sin = 0.14"
          data-note="angle = position × theta"></span>
-      <span class="vscode-step fragment" data-fragment-index="3"
+      <span class="vscode-step fragment" data-fragment-index="4"
          data-lines="27-28"
          data-stopped="27"
          data-values="27: 0.8×-0.99 − -0.2×0.14 = -0.76"

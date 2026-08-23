@@ -69,7 +69,7 @@ public int DecodeNext(int token)
       <span class="vscode-step fragment" data-fragment-index="0"
          data-text="Vector embedding = weights.EmbeddedTokens[token];"
          data-stopped
-         data-values="1: one token in, not int[] | 3: EmbeddedTokens[137] → embedding = 1 × 64"
+         data-values="1: one token in, not int[] | 3: Prefill: Matrix 3 × 64 for the whole prompt → here: Vector 64 for one token"
          data-note="One row out of the table. Prefill embedded the whole prompt: 3 × 64"></span>
 
       <span class="vscode-step fragment" data-fragment-index="1"
@@ -103,22 +103,11 @@ public int DecodeNext(int token)
          data-note="Append one vector per token. The cache grows by exactly one row per step"></span>
 
       <span class="vscode-step fragment" data-fragment-index="6"
-         data-lines="27-32"
+         data-lines="27-30"
          data-stopped="27"
-         data-values="27: attentionOut = 1 × 64 | 29: 4 cached keys, 1 × 16 each | 30: 4 cached values | 32: projectedAttention = 1 × 64"
-         data-note="One query against the whole cached history. Next slide opens this up"></span>
+         data-values="27: attentionOut = 1 × 64 | 29: 4 cached keys, 1 × 16 each | 30: 4 cached values"
+         data-note="One query row against the whole cached history. Everything below is the same layer tail as Prefill, one row wide instead of three — and no 'take the last row' at the end, because there is only one row. That call is the next stretch of the talk"></span>
 
-      <span class="vscode-step fragment" data-fragment-index="7"
-         data-lines="37-45"
-         data-stopped="39"
-         data-values="39: gate = 1 × 128 | 40: up = 1 × 128 | 43: feedForwardOutput = 1 × 64 | 45: embedding = 1 × 64"
-         data-note="Same SwiGLU as before, 1 × 128 wide instead of 3 × 128"></span>
-
-      <span class="vscode-step fragment" data-fragment-index="8"
-         data-lines="48-52"
-         data-stopped="51"
-         data-values="49: 1×64 • 64×250 → logits = 1 × 250 | 51: max of 250 → best = 9.02 | 52: 9.02 sits at slot 214 → returns 214"
-         data-note="No 'take the last row'. There is only one row — the waste is never computed"></span>
     </div>
 
     <style>

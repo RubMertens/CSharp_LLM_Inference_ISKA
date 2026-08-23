@@ -20,29 +20,20 @@ public int PredictNextTokenGreedy(int[] tokens)
 
       <span class="vscode-step fragment" data-fragment-index="0"
          data-text="var logits = Forward(tokens)"
-         data-stopped
-    </span>
+         data-stopped></span>
       <span class="vscode-step fragment" data-fragment-index="1"
          data-text="Vector last = logits[tokens.Length - 1]"
          data-stopped
-        </span>
+         data-values="4: last = 1 × 250 — one score per vocab entry"></span>
       <span class="vscode-step fragment" data-fragment-index="2"
          data-text="var best = last.Data.Max()"
-         data-stopped
-         </span>
+         data-stopped></span>
       <span class="vscode-step fragment" data-fragment-index="3"
          data-text="var bestIndex = Array.IndexOf(last.Data, best)"
-         data-stopped
-        </span>
+         data-stopped></span>
       <span class="vscode-step fragment" data-fragment-index="4"
          data-text="return bestIndex"
-         data-stopped
-         </span>
-         <span class="vscode-step fragment" data-fragment-index="5"
-         data-text="var logits = Forward(tokens)"
-         data-stopped
-         
-        </span>
+         data-stopped></span>
     </div>
 
     <style>

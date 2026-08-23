@@ -4,9 +4,9 @@
 
     <div class="two-column ml-weights-grid">
       <div class="vscode-window" data-fill
-         data-font-size="1.4rem"
+           data-font-size="0.85rem"
            data-src="Runner.ConsoleApp/ModelWeights.cs"
-           data-lines="6-33"
+           data-lines="6-22"
            data-start-line="6">
         <pre class="vscode-source">
 public class ModelWeights
@@ -17,24 +17,13 @@ public class ModelWeights
     public int NumberdOfQueryHeads {get;set;}
     public int NumberOfKeyValueHeads {get;set;}
     public int HeadDimension { get; set; }
-    // public int HeadDimension =&gt; HiddenDimension / NumberdOfQueryHeads;
 
-    /// &lt;summary&gt;
-    /// vocabSize x hiddenDim
-    /// &lt;/summary&gt;
     public required Matrix EmbeddedTokens { get; set; }
 
     public required LayerWeights[] Layers { get; set; }
 
-    /// &lt;summary&gt;
-    /// hiddenDim x vocabSize
-    /// Optional: if not provided, we can reuse the EmbeddedTokens for output projection. that is just loaded as a transposed matrix.
-    /// &lt;/summary&gt;
-    public required Matrix OutputEmbedding { get; set; } 
+    public required Matrix OutputEmbedding { get; set; }
 
-    /// &lt;summary&gt;
-    /// hiddenDim
-    /// &lt;/summary&gt;
     public required Vector FinalNormWeight { get; set; }
 }
         </pre>
@@ -42,82 +31,52 @@ public class ModelWeights
         <span class="vscode-step fragment" data-fragment-index="0"
               data-text="public required LayerWeights[] Layers"
               data-stopped
-              data-values="16: LayerWeights[2] — everything per-layer moved in here"
+              data-values="12: LayerWeights[2] — everything per-layer moved in here"
               data-note="SingleLayerModelWeights held one flat set of projections. Now it is an array."></span>
 
         <span class="vscode-step fragment" data-fragment-index="1"
-              data-lines="14,22,27"
-              data-values="14: 250 &times; 64 | 22: 64 &times; 250 | 27: 64 floats"
+              data-lines="10,14,16"
+              data-values="10: 250 &times; 64 | 14: 64 &times; 250 | 16: 64 floats"
               data-note="What stayed at the top is exactly what happens once per model, not once per layer: the token table in, the vocabulary projection out, and the final norm."></span>
       </div>
 
       <div class="vscode-window" data-fill
-         data-font-size="1.4rem"
+           data-font-size="0.85rem"
            data-src="Runner.ConsoleApp/ModelWeights.cs"
-           data-lines="35-84"
-           data-start-line="35">
+           data-lines="24-37"
+           data-start-line="24">
         <pre class="vscode-source">
 public class LayerWeights
 {
-    /// &lt;summary&gt;
-    /// hiddenDim
-    /// &lt;/summary&gt;
     public required Vector AttentionNormWeight { get; set; }
-
-    /// &lt;summary&gt;
-    /// hiddenDim
-    /// &lt;/summary&gt;
     public required Vector FeedForwardNormWeight { get; set; }
 
-    /// &lt;summary&gt;
-    /// hiddenDim x hiddenDim
-    /// &lt;/summary&gt;
     public required Matrix QueryProjection { get; set; }
-
-    /// &lt;summary&gt;
-    /// hiddenDim x keyValueDim
-    /// &lt;/summary&gt;
     public required Matrix KeyProjection { get; set; }
-
-    /// &lt;summary&gt;
-    /// hiddenDim x keyValueDim
-    /// For simple demo: hiddenDim x hiddenDim is okay.
-    /// &lt;/summary&gt;
     public required Matrix ValueProjection { get; set; }
-
-    /// &lt;summary&gt;
-    /// hiddenDim x hiddenDim
-    /// &lt;/summary&gt;
     public required Matrix OutputProjection { get; set; }
 
-    /// &lt;summary&gt;
-    /// hiddenDim x gateDim
-    /// (gateDim &gt; hiddenDim)
-    /// &lt;/summary&gt;
     public required Matrix GateProjection { get; set; }
-    /// &lt;summary&gt;
-    /// hiddenDim x gateDim
-    /// (gateDim &gt; hiddenDim)
-    /// &lt;/summary&gt;
-    
     public required Matrix UpProjection { get; set; }
-    /// &lt;summary&gt;
-    /// gateDim x hiddenDim
-    /// (gateDim &gt; hiddenDim)
-    /// &lt;/summary&gt;
     public required Matrix DownProjection { get; set; }
-}        </pre>
+}
+        </pre>
 
         <span class="vscode-step fragment" data-fragment-index="2"
               data-lines="1-2"
               data-stopped="1"
-              data-values="1: the model holds 2 of these — Layers[0], Layers[1]"
               data-note="One layer's worth of weights. Norm, Q, K, V, output projection — the set the single-layer struct had."></span>
 
         <span class="vscode-step fragment" data-fragment-index="3"
-              data-lines="38,44,49"
-              data-values="38: 64 &times; 128 | 44: 64 &times; 128 | 49: 128 &times; 64"
-              data-note="Three the single-layer struct did not have. Gate, Up, Down: the SwiGLU feed-forward weights — next slide."></span>
+              data-lines="6-8"
+              data-stopped="6"
+              data-values="6: 64 &times; 64 | 7: 64 &times; 64 | 8: 64 &times; 64"
+              data-note="Query, key, value — the three you already used. Square, hiddenDim × hiddenDim, one head. The output projection under them is the same shape."></span>
+
+        <span class="vscode-step fragment" data-fragment-index="4"
+              data-lines="11-13"
+              data-values="11: 64 &times; 128 | 12: 64 &times; 128 | 13: 128 &times; 64"
+              data-note="Three the single-layer struct did not have. Gate and Up widen 64 → 128, Down comes back to 64. SwiGLU feed-forward — next slide."></span>
       </div>
     </div>
 

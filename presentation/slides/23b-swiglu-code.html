@@ -4,9 +4,11 @@
 
     <!-- Invisible fragment markers. The engine reveals them in index order; the CSS
          below hangs the diff states off their .fragment-visible class, so the whole
-         slide is driven by ordinary fragments and backward navigation just works. -->
+         slide is driven by ordinary fragments and backward navigation just works.
+         Step 0 lands the insertion as a diff, step 1 resolves it to plain source, and
+         the code-panel steps (2-9) walk the block line by line after that. -->
     <span class="diff-fx diff-fx-add fragment" data-fragment-index="0" aria-hidden="true"></span>
-    <span class="diff-fx diff-fx-resolve fragment" data-fragment-index="7" aria-hidden="true"></span>
+    <span class="diff-fx diff-fx-resolve fragment" data-fragment-index="1" aria-hidden="true"></span>
 
     <div class="diff-head">
       <!-- Both labels sit in the same grid cell, so the swap is a pure opacity
@@ -47,30 +49,40 @@
 
       <span class="vscode-inline" data-line="1" data-value="embeddings = 3&#215;64 &mdash; first residual add, where the old version stopped"></span>
 
-      <span class="vscode-step fragment" data-fragment-index="1"
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-text="residual = embeddings;"
+            data-stopped
+            data-values="2: residual = 3&#215;64 &mdash; re-captured, this time after attention"
+            data-note="A second residual checkpoint. The feed-forward block gets its own skip connection"></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+            data-text="RMSNorm(embeddings, layer.FeedForwardNormWeight)"
+            data-stopped
+            data-values="3: normalizedEmbeddings = 3&#215;64 &mdash; its own norm weight, not the attention one"
+            data-note="Normalise again before the block. Every sub-layer in a transformer is norm, then work, then add"></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
             data-text="Matrix gate="
             data-values="6: gate = 3&#215;128 &mdash; projected UP, 64 &#8594; 128"
             data-note="Project UP, wider than hiddenDim. The comment says why: room for more complex interactions"></span>
-      <span class="vscode-step fragment" data-fragment-index="2"
+      <span class="vscode-step fragment" data-fragment-index="5"
             data-text="Matrix up ="
             data-values="7: up = 3&#215;128 &mdash; same input, a second projection"
             data-note="A second, separate up-projection from the same input. Two views of the same normalized embeddings"></span>
-      <span class="vscode-step fragment" data-fragment-index="3"
+      <span class="vscode-step fragment" data-fragment-index="6"
             data-text="SigmoidLinearUnit(gate)"
             data-stopped
             data-values="8: activated = 3&#215;128 &mdash; x &#183; &#963;(x), gate branch only"
             data-note="The nonlinearity. Without it the whole stack collapses to one big matrix multiply"></span>
-      <span class="vscode-step fragment" data-fragment-index="4"
+      <span class="vscode-step fragment" data-fragment-index="7"
             data-stopped
             data-text="ElementwiseMultiply"
             data-values="9: gated = 3&#215;128 &mdash; activated &#8857; up, element by element"
             data-note="This product IS the gated linear unit: the gate decides, per element, how much of up survives"></span>
-      <span class="vscode-step fragment" data-fragment-index="5"
+      <span class="vscode-step fragment" data-fragment-index="8"
             data-stopped
             data-text="gated * layer.DownProjection"
             data-values="11: feedForwardOutput = 3&#215;64 &mdash; back DOWN, 128 &#8594; 64"
             data-note="Down-project to hiddenDim so it can rejoin the residual stream"></span>
-      <span class="vscode-step fragment" data-fragment-index="6"
+      <span class="vscode-step fragment" data-fragment-index="9"
             data-lines="2"
             data-text="residual + feedForwardOutput"
             data-stopped="13"
@@ -88,7 +100,6 @@
          Same values as the RoPE diff slide — the two must read as siblings. */
       --diff-add-fg: color-mix(in srgb, var(--color-accent-secondary) 62%, #000);
       --diff-add-bg: color-mix(in srgb, var(--color-accent-secondary) 15%, transparent);
-      --diff-add-hl: color-mix(in srgb, var(--color-accent-secondary) 30%, transparent);
       --diff-add-bar: var(--color-accent-secondary);
       --diff-del-fg: color-mix(in srgb, var(--color-danger) 78%, #000);
     }
@@ -173,21 +184,15 @@
       content: "+";
     }
 
-    /* The step highlight would paint its blue band over the green one; keep the
-       accent in the same hue, just stronger. */
-    [data-id="swiglu-code"] .vscode-line.hl,
-    [data-id="swiglu-code"] .vscode-line.hl .vscode-ln {
-      background: var(--diff-add-hl);
-    }
-
-    [data-id="swiglu-code"] .vscode-line.hl {
-      border-left-color: var(--diff-add-bar);
-    }
-
     /* ---------- resolve: the diff becomes the file ---------- */
 
-    /* Markers, tint, dimming and the debugger values all drop away, leaving the
-       post-change code as ordinary source.
+    /* Fires one step after the add. Green tint, "+" markers and the hunk header drop
+       away, leaving the post-change code as ordinary source — and the line-by-line
+       walkthrough runs *after* this. So resolve drops the diff treatment ONLY: the
+       step highlight, the amber stopped line, its gutter arrow and the inline
+       debugger values must all keep working. That is what the .hl / .stopped / .dim
+       variants below are for — they re-assert the normal panel palette on the
+       inserted lines, which the add rule would otherwise keep tinting green.
 
        Each selector repeats the :not() chain of the add rule it has to beat — equal
        specificity, later in source order, so resolve wins. Without the chain these
@@ -195,35 +200,48 @@
     [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .diff-head .diff-hunk { opacity: 0; }
     [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .diff-head .diff-file { opacity: 1; }
 
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line,
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]),
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) .vscode-ln,
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line.stopped,
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line.stopped .vscode-ln {
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) {
       background: transparent;
       border-left-color: transparent;
       opacity: 1;
-      filter: none;
     }
 
-    /* The debugger's gutter arrow on the last step's stopped line goes too, along with
-       the amber / active tint the last step left on those two line numbers. */
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line.stopped .vscode-ln::before {
-      content: none;
-    }
-
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line.hl .vscode-ln,
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line.stopped .vscode-ln {
-      color: var(--vs-ln);
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) .vscode-ln {
+      background: var(--vs-editor-bg);
     }
 
     [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) .vscode-text::before {
       content: " ";
     }
 
-    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-inline-value {
-      opacity: 0;
-      transition: opacity 0.3s ease;
+    /* One class more specific than the base resolve rule above, so the walkthrough
+       paints over the cleared state instead of the other way round. */
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).hl {
+      background: var(--vs-line-hl);
+      border-left-color: var(--vs-line-hl-bar);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).hl .vscode-ln {
+      background: var(--vs-line-hl);
+      color: var(--vs-ln-active);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).stopped,
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).stopped.hl {
+      background: var(--vs-stop-bg);
+      border-left-color: var(--vs-stop-fg);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).stopped .vscode-ln {
+      background: var(--vs-stop-bg);
+      color: var(--vs-stop-fg);
+    }
+
+    /* Non-active lines dim like on any other code panel. The add rule pins these rows
+       to opacity 1, so .dim has to be re-asserted here to get through. */
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).dim {
+      opacity: 0.42;
+      filter: saturate(0.6);
     }
 
     @media (max-width: 820px) {

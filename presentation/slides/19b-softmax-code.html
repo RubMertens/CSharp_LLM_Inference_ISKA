@@ -1,0 +1,65 @@
+<section data-id="softmax-code" data-title="Softmax in Code">
+  <div class="slide-content">
+    <h2>Inside <span class="highlight">Softmax</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+         data-member="Softmax"
+         data-start-line="114">
+      <pre class="vscode-source">
+public static float[] Softmax(float[] input)
+{
+    float max = input.Max();
+    var exp = input.Select(x =&gt; MathF.Exp(x - max)).ToArray();
+    float sum = exp.Sum();
+
+    return exp.Select(x =&gt; x / sum).ToArray();
+}
+      </pre>
+
+      <span class="vscode-inline" data-line="1"
+            data-value="input = scores = [1.55, 1.61, -∞]"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="0"
+            data-text="float max = input.Max();"
+            data-stopped="3"
+            data-values="3: max = 1.61"
+            data-note="Subtracting the largest value changes no result — it stops MathF.Exp overflowing on big scores"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="1"
+            data-text="MathF.Exp(x - max)"
+            data-stopped="4"
+            data-values="4: e^-0.06 = 0.94   e^0 = 1.00   e^-∞ = 0"
+            data-note="e^x is always positive and grows fast — bigger score, disproportionately bigger share. And e^-∞ is 0, so the masked future drops out here"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-text="float sum = exp.Sum();"
+            data-stopped="5"
+            data-values="5: 0.94 + 1.00 + 0 = 1.94"
+            data-note="One number to divide by. Nothing more than a total"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="3"
+            data-text="x / sum"
+            data-stopped="7"
+            data-values="7: [0.94, 1.00, 0] / 1.94 → [0.49, 0.51, 0]"
+            data-note="Divide by the total and the three add up to 1. Now they read as percentages of attention — 49%, 51%, 0%"></span>
+    </div>
+  </div>
+
+  <style>
+    [data-id="softmax-code"] h2 {
+      margin-bottom: 0.6rem;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="softmax-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+      [data-id="softmax-code"] .vscode-window {
+        --vs-max-height: 46vh;
+      }
+    }
+  </style>
+</section>

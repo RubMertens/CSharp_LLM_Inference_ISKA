@@ -52,6 +52,11 @@ void RunSingleLayer()
          data-stopped="19"
          data-values="19: [2,2,2] → [2,2,2,137] → [2,2,2,137,88] | 12: re-reads every token, every pass"
          data-note="No memory between iterations — the sequence grows, so each pass costs more"></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-lines="14-17"
+         data-stopped="14"
+         data-values="14: nextTokenId = 1 → &lt;eos&gt;, or 20 tokens hit | 17: break — generation stops"
+         data-note="The model decides when to stop: it predicts the end-of-sequence token"></span>
     </div>
 
   </div>

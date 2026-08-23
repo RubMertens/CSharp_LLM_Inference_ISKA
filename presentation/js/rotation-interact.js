@@ -1,7 +1,11 @@
-import { makeDraggable, el } from './interactions.js';
+import { makeDraggable, registerInteraction, el } from './interactions.js';
 
 const CX = 250, CY = 250, R = 180, ARC_R = 70;
 const ALPHA = 25 * Math.PI / 180;
+
+// Where the draggable ball sits before anyone touches it. The markup paints it at
+// (326, 87), which is this angle on the circle -- keep the two in step.
+const INITIAL_ANGLE = 65 * Math.PI / 180;
 
 // Two more balls on the same circle, spun at higher frequencies. Same position drives
 // all three; only theta differs. No arcs or angle marks — the message is that the
@@ -121,6 +125,23 @@ function update(angle) {
 
   updateFast(theta);
 }
+
+// The fast balls' positions are a function of the drag angle, so nothing in the
+// markup can be authored correctly by hand -- and it was not: both were painted at
+// the same point, so the first drag made them jump. Run the real update once on
+// entry instead, and frame zero is the state the drag handler would have produced.
+//
+// Guard it. registerInteraction fires from a MutationObserver watching childList on
+// the slide container, and update() writes label textContent -- which is itself a
+// childList mutation. Without the flag that is an infinite loop that hangs the page.
+// The flag is a data attribute, and attributes are not observed, so setting it is
+// free. The engine swaps innerHTML per slide entrance, so each entrance starts clean.
+registerInteraction('rot-drag-dot', () => {
+  const dot = el('rot-drag-dot');
+  if (!dot || dot.dataset.initialised) return;
+  dot.dataset.initialised = '1';
+  update(INITIAL_ANGLE);
+});
 
 makeDraggable({
   hit: /^rot-drag-(hit|dot)$/,

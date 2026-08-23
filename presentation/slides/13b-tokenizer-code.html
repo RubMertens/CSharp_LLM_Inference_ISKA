@@ -38,12 +38,21 @@
 };
       </pre>
 
+      <!-- Three beats: the lookup call, the words it finds, the fallback it lands on
+           when it finds nothing. The <unk> line comes last on purpose — it is the
+           handoff to the [2, 2, 2] the generation slides run on. -->
       <span class="vscode-step fragment" data-fragment-index="0"
-            data-lines="1-5"
-            data-stopped="4"></span>
+            data-text="Vocabulary.GetValueOrDefault"
+            data-stopped="4"
+            data-values="3: input.Split(' ') → [&quot;hello&quot;, &quot;world&quot;, ...] | 4: one dictionary lookup per word"></span>
       <span class="vscode-step fragment" data-fragment-index="1"
-            data-lines="7-27"
-            data-stopped="13"></span>
+            data-lines="15-17"
+            data-stopped="15"
+            data-values="15: &quot;hello&quot; → 3 | 16: &quot;world&quot; → 4 | 17: &quot;this&quot; → 5"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-lines="13"
+            data-stopped="13"
+            data-values="13: &quot;Capital&quot; not in the table → 2"></span>
     </div>
   </div>
 

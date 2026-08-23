@@ -101,16 +101,7 @@
           <p>Attention scores above the diagonal are set to <span class="highlight">-&infin;</span>. After softmax, they effectively become <strong>0</strong>.</p>
         </div>
 
-        <div class="code-block fragment">
-          <div class="code-header">Causal Mask</div>
-          <pre><code class="language-csharp">for (int i = 0; i < seqLen; i++)
-  for (int j = i + 1; j < seqLen; j++)
-    scores[i, j] = float.NegativeInfinity;</code></pre>
-        </div>
-
-        <p class="fragment" style="color: var(--color-text-muted); font-size: 0.85em; margin-top: 1rem;">
-          Triangular pattern &mdash; simple but essential for autoregressive generation.
-        </p>
+        
       </div>
     </div>
   </div>
