@@ -34,7 +34,7 @@
 // Attributes — presentation:
 //   data-theme="light|dark"   VS Code Light Modern (default) or Dark Modern colours
 //   data-numbers="file|snippet|off"   gutter numbering, default file
-//   data-font-size="0.7rem"   starting size; the fit pass grows or shrinks it to fill
+//   data-font-size="0.7rem"   exact size; the fit pass leaves it alone and scrolls instead
 //                             the slide
 //   data-max-height="60vh"    ceiling for the code area
 //   data-wrap="on|off"        soft-wrap long lines, default on
@@ -491,9 +491,13 @@ function fitSlide(slide) {
     const size = () => parseFloat(win.style.getPropertyValue('--vs-font-size'));
     const setSize = (rem) => win.style.setProperty('--vs-font-size', `${rem.toFixed(3)}rem`);
 
+    // An authored data-font-size is an exact size, not a starting point: the deck wants
+    // every code slide at the same scale, so skip the grow passes and let it scroll.
+    const authoredSize = win.dataset.fontSize ? parseFloat(win.dataset.fontSize) : null;
+
     // Grow into the space first: a code slide is the code, so it should be as large as
     // the slide allows. Wrapping is measured each step, since a bigger font wraps more.
-    for (let pass = 0; pass < 14; pass++) {
+    for (let pass = 0; pass < 14 && authoredSize === null; pass++) {
       const next = size() * 1.06;
       if (next > FIT_MAX_FONT) break;
       const before = size();
@@ -502,7 +506,7 @@ function fitSlide(slide) {
     }
 
     // Fine step, so 6% granularity doesn't leave a band of empty slide.
-    for (let pass = 0; pass < 6; pass++) {
+    for (let pass = 0; pass < 6 && authoredSize === null; pass++) {
       const next = size() * 1.02;
       if (next > FIT_MAX_FONT) break;
       const before = size();
@@ -511,11 +515,13 @@ function fitSlide(slide) {
     }
 
     // Then shrink if it still doesn't fit — a snippet you can read in full beats one
-    // that scrolls.
+    // that scrolls. Unless the slide authored data-font-size: that is a deliberate
+    // "keep it this big and let it scroll" for long methods, so treat it as a floor.
+    const shrinkFloor = Math.max(FIT_MIN_FONT, authoredSize ?? 0);
     for (let pass = 0; pass < 14; pass++) {
       if (box.scrollHeight <= room(box) + 1) break;
       const next = size() * 0.94;
-      if (!(next >= FIT_MIN_FONT)) break;
+      if (!(next >= shrinkFloor)) break;
       setSize(next);
     }
 

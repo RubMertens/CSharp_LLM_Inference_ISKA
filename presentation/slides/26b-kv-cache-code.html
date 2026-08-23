@@ -1,54 +1,54 @@
-<section data-id="kv-cache-code" data-title="KV Cache in Code">
+<section data-id="kv-cache-code" data-title="The KV Cache — Two Fields">
   <div class="slide-content">
-    <h2>KV Cache — <span class="highlight">in Code</span></h2>
+    <h2>The Fix Is <span class="highlight">Two Fields</span></h2>
 
-    <div class="vscode-window"
+    <!-- Deliberately NOT data-fill: that is for slides where the panel is the whole
+         slide, and its 78vh min-height would push the explanation below off-screen.
+         data-font-size is a MAXIMUM, and it stays low here on purpose: these two
+         declarations are 88 characters wide, and the fit pass only shrinks for
+         height, so anything above ~0.95rem soft-wraps each field onto a second
+         row and the snippet stops reading as two lines. -->
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
          data-src="Runner.ConsoleApp/6_MultiLayerWithKVCache/MultiLayerTransformerWithKVCache.cs"
-         data-lines="65-86"
-         data-member="DecodeNext"
-         data-start-line="65">
+         data-lines="5-8"
+         data-start-line="5">
       <pre class="vscode-source">
-Vector normalized = RootMeanSquareNormalisation(embedding, layer.AttentionNormWeight);
-
-int position = _keyCache[layerIndex].Count;
-
-// 1xhiddenDim • hiddenDim x headDim = 1xheadDim
-Vector query = normalized * layer.QueryProjection;
-// 1xhiddenDim • hiddenDim x keyValueDim = 1xkeyValueDim
-Vector key = normalized * layer.KeyProjection;
-// 1xhiddenDim • hiddenDim x keyValueDim = 1xkeyValueDim
-Vector value = normalized * layer.ValueProjection;
-
-query = ApplyRoPETo(query, weights.HeadDimension, position);
-key = ApplyRoPETo(key, weights.HeadDimension, position);
-
-_keyCache[layerIndex].Add(key);
-_valueCache[layerIndex].Add(value);
-
-Vector attentionOut = GroupedQueryAttentionWithCache(
-    query,
-    _keyCache[layerIndex],
-    _valueCache[layerIndex]);
+public class MultiLayerTransformerWithKVCache(ModelWeights weights)
+{
+    private readonly List&lt;Vector&gt;[] _keyCache = new List&lt;Vector&gt;[weights.Layers.Length];
+    private readonly List&lt;Vector&gt;[] _valueCache = new List&lt;Vector&gt;[weights.Layers.Length];
       </pre>
-      <span class="vscode-inline" data-line="1" data-value="token = 995   layerIndex = 0   hiddenDimension = 8"></span>
+      <span class="vscode-inline" data-line="2"
+          
+          </span>
       <span class="vscode-step fragment" data-fragment-index="0"
-         data-text="int position = _keyCache"
-         data-stopped
-         data-values="3: _keyCache[0].Count = 12 → position = 12"
-         data-note="Cache count = current position"></span>
+            data-text="_keyCache"
+            data-stopped
+
+            data-note="Keys, kept per layer"></span>
       <span class="vscode-step fragment" data-fragment-index="1"
-         data-lines="6-10"
-         data-values="6: query = 1×8 (not 12×8) | 8: key = 1×4 | 10: value = 1×4"
-         data-note="Vector × Matrix, once per layer"></span>
-      <span class="vscode-step fragment" data-fragment-index="2"
-         data-lines="12-16"
-         data-stopped="15"
-         data-values="12: rotated at position 12 | 15: _keyCache[0].Count = 13"
-         data-note="Rotate, then append to the K/V cache"></span>
-      <span class="vscode-step fragment" data-fragment-index="3"
-         data-lines="18-21"
-         data-values="18: 1 query × 13 cached keys = 13 scores"
-         data-note="One query against the full cached history"></span>
+            data-text="_valueCache"
+            data-stopped
+
+            data-note="Values, same shape"></span>
     </div>
+
   </div>
+
+  <style>
+    [data-id="kv-cache-code"] h2 {
+      margin-bottom: 0.7rem;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="kv-cache-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.4rem;
+      }
+      [data-id="kv-cache-code"] .vscode-window {
+        --vs-font-size: 0.5rem !important;
+      }
+    }
+  </style>
 </section>

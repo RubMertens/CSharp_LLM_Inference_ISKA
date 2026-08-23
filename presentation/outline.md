@@ -43,7 +43,7 @@ Demo tokenizer
 
 Uitleg over QKV
 
-## Positional embedding
+## Positional embedding1
 
 ## Swiglu (as an example of activation features)
 

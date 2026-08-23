@@ -1,0 +1,84 @@
+<section data-id="multilayer-forward-code" data-title="The Multi-Layer Forward Pass">
+  <div class="slide-content">
+    <h2>Same forward pass — <span class="highlight">now in a loop</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/3_MultiLayer/MultiLayerTransformer.cs"
+         data-member="Forward"
+         data-start-line="35"
+         style="max-width: min(100%, 94vw);">
+      <pre class="vscode-source">
+public Matrix Forward(int[] tokens)
+{
+    var sequenceLength = tokens.Length;
+    //translate the tokens to a sequence of embeddings
+
+    Matrix embeddings = Embed(tokens);
+
+
+    foreach (var layer in Weights.Layers)
+    {
+        var residual = embeddings;
+
+        // normalize 
+        Matrix normalizedEmbeddings = RMSNorm(embeddings, layer.AttentionNormWeight);
+
+        // project each token into Q, K, V
+        // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
+        var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection);
+        var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection);
+        var values = normalizedEmbeddings * layer.ValueProjection;
+
+        var attentionOutput = SingleHeadSelfAttention(Weights.HiddenDimension, sequenceLength, queries, keys, values);
+
+        var projectedAttention = attentionOutput * layer.OutputProjection;
+
+        embeddings = residual + projectedAttention;
+    }
+
+    embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
+    var logits = embeddings * Weights.OutputEmbedding;
+    return logits;  
+}      </pre>
+
+      <!-- always on: the toy's real numbers, and where the pass ends up -->
+      <span class="vscode-inline" data-line="1"
+            data-value="tokens = [2, 2, 2]   HiddenDimension = 64   VocabularySize = 250"></span>
+      <span class="vscode-inline" data-line="29" data-value="once, after every layer has run"></span>
+      <span class="vscode-inline" data-line="30" data-value="logits = 3 &times; 250"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="0"
+            data-text="Matrix embeddings = Embed(tokens)"
+            data-stopped
+            data-values="6: embeddings = 3 &times; 64 — the same table lookup as before"
+            data-note="Identical to the single-layer version. It just moved into a helper."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="1"
+            data-text="foreach (var layer in Weights.Layers)"
+            data-stopped
+            data-values="9: Weights.Layers = LayerWeights[2] — two passes | 11: pass 1, then pass 2 | 26: each pass feeds the next"
+            data-note="This is the whole change. Norm, QKV, attention, residual — you already walked all of it. Now it runs once per layer, and the weights come from layer. instead of weights. Toy: 2 layers. Llama 3 8B: 32. Same loop."></span>
+    </div>
+
+  </div>
+
+  <style>
+    [data-id="multilayer-forward-code"] h2 { margin-bottom: 0.6rem; }
+
+    /* theme.css caps every <pre> at 80ch; at 32 lines with a 120-char comment that
+       wraps half the method and starves the fit pass. Let it use the panel. */
+    [data-id="multilayer-forward-code"] .vscode-code { max-width: none; }
+
+
+    @media (max-width: 820px) {
+      [data-id="multilayer-forward-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+      /* Narrow screens wrap the long lines hard. Give the code area the full column
+         and let it scroll rather than clipping to a stub. */
+      [data-id="multilayer-forward-code"] .vscode-window { --vs-max-height: none; }
+    }
+  </style>
+</section>

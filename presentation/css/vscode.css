@@ -598,3 +598,17 @@
     filter: none;
   }
 }
+
+/* theme.css caps every <pre> at 80ch; .vscode-code is a <pre>, which narrowed and
+   clipped code panels deck-wide. Code windows manage their own width. */
+.vscode-code { max-width: none; }
+
+/* Single-window code slides fill the slide: the panel is the slide, so a short
+   snippet gets the same frame as a long one instead of floating in the middle. */
+.vscode-window[data-fill] {
+  min-height: 79vh;
+  display: flex;
+  flex-direction: column;
+}
+.vscode-window[data-fill] .vscode-body { flex: 1 1 auto; min-height: 0; }
+.vscode-window[data-fill] .vscode-code { height: 100%; }

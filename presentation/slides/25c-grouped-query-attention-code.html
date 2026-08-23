@@ -2,63 +2,115 @@
   <div class="slide-content">
     <h2>Grouped Query Attention — <span class="highlight">in Code</span></h2>
 
-    <div class="vscode-window"
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
          data-src="Runner.ConsoleApp/5_MultiLayerWithGQA/MultiLayerTransformerWithGroupedQueryAttention.cs"
-         data-lines="123-152"
+         data-lines="119-169"
          data-member="GroupedQueryAttention"
-         data-start-line="123">
+         data-start-line="119">
       <pre class="vscode-source">
-var groupSize = weights.NumberdOfQueryHeads / weights.NumberOfKeyValueHeads;
-float scale = MathF.Sqrt(weights.HeadDimension);
-
-for (int queryHead = 0; queryHead &lt; weights.NumberdOfQueryHeads; queryHead++)
+private Matrix GroupedQueryAttention(int sequenceLength, Matrix queries, Matrix keys, Matrix values)
 {
-    var keyValueHead = queryHead / groupSize;
-    var queryOffset = queryHead * weights.HeadDimension;
-    var keyValueOffset = keyValueHead * weights.HeadDimension;
+    Matrix output = new(sequenceLength, weights.HiddenDimension);
 
+    var groupSize = weights.NumberdOfQueryHeads / weights.NumberOfKeyValueHeads;
+    float scale = MathF.Sqrt(weights.HeadDimension);
 
-    for (int lookingFrom = 0; lookingFrom &lt; sequenceLength; lookingFrom++)
+    for (int queryHead = 0; queryHead &lt; weights.NumberdOfQueryHeads; queryHead++)
     {
-        Vector scores = new(sequenceLength);
-        for (int lookingTo = 0; lookingTo &lt; sequenceLength; lookingTo++)
+        var keyValueHead = queryHead / groupSize;
+        var queryOffset = queryHead * weights.HeadDimension;
+        var keyValueOffset = keyValueHead * weights.HeadDimension;
+
+
+        for (int lookingFrom = 0; lookingFrom &lt; sequenceLength; lookingFrom++)
         {
-            if (lookingTo &gt; lookingFrom)
+            Vector scores = new(sequenceLength);
+            for (int lookingTo = 0; lookingTo &lt; sequenceLength; lookingTo++)
             {
-                scores[lookingTo] = float.NegativeInfinity;
-                continue;
+                if (lookingTo &gt; lookingFrom)
+                {
+                    scores[lookingTo] = float.NegativeInfinity;
+                    continue;
+                }
+
+                var queryVector = queries[lookingFrom]
+                    [queryOffset..(queryOffset + weights.HeadDimension)];
+                var keyVector = keys[lookingTo]
+                    [keyValueOffset..(keyValueOffset + weights.HeadDimension)];
+
+                scores[lookingTo] = queryVector * keyVector / scale;
             }
 
-            var queryVector = queries[lookingFrom]
-                [queryOffset..(queryOffset + weights.HeadDimension)];
-            var keyVector = keys[lookingTo]
-                [keyValueOffset..(keyValueOffset + weights.HeadDimension)];
+            var attentionWeights = Softmax(scores);
 
-            scores[lookingTo] = queryVector * keyVector / scale;
+            Vector outputVector = new(weights.HeadDimension);
+            for (int j = 0; j &lt; sequenceLength; j++)
+            {
+                var valueVector = values[j]
+                    [keyValueOffset..(keyValueOffset + weights.HeadDimension)];
+                outputVector += attentionWeights[j] * valueVector;
+            }
+
+            for (int j = 0; j &lt; outputVector.Length; j++)
+            {
+                output[lookingFrom, queryOffset + j] = outputVector[j];
+            }
         }
-
-        var attentionWeights = Softmax(scores);
+    }
+    return output;
+}
       </pre>
-      <span class="vscode-inline" data-line="2" data-value="queryHeads = 32   kvHeads = 4   headDimension = 8"></span>
+      <span class="vscode-inline" data-line="1" data-value="queryHeads = 8   kvHeads = 2   hiddenDim = 64   headDim = 8   sequenceLength = 3"></span>
       <span class="vscode-step fragment" data-fragment-index="0"
          data-text="groupSize = weights.NumberdOfQueryHeads"
          data-stopped
-         data-values="1: 32 / 4 = 8 | 2: scale = √8 = 2.83"
-         data-note="One KV head per group of queries"></span>
+         data-values="5: 8 / 2 = 4"
+         data-note="groupSize: how many query heads share one key/value head"></span>
       <span class="vscode-step fragment" data-fragment-index="1"
-         data-text="keyValueHead = queryHead / groupSize"
+         data-text="float scale = MathF.Sqrt"
          data-stopped
-         data-values="4: queryHead = 17 | 6: 17 / 8 = 2"
-         data-note="Query head 17 → KV head 2"></span>
+         data-values="6: scale = √8 = 2.83"
+         data-note="Same √headDim scaling as single-head attention"></span>
       <span class="vscode-step fragment" data-fragment-index="2"
-         data-lines="7-8"
-         data-values="7: queryOffset = 17 × 8 = 136 | 8: keyValueOffset = 2 × 8 = 16"
-         data-note="Offsets into the concatenated heads"></span>
+         data-lines="8-10"
+         data-stopped="10"
+         data-values="8: queryHead = 5 (of 0..7) | 10: 5 / 4 = 1"
+         data-note="Integer division is the mapping. Q heads 0-3 → KV head 0, 4-7 → KV head 1. Quarter the KV cache."></span>
       <span class="vscode-step fragment" data-fragment-index="3"
-         data-lines="22-27"
-         data-stopped="27"
-         data-values="22: queries[2][136..144] | 24: keys[1][16..24] | 27: 6.7 / 2.83 = 2.37"
-         data-note="Same query • key / √headDim, on a slice"></span>
+         data-lines="11-12"
+         data-values="11: queryOffset = 5 × 8 = 40 | 12: keyValueOffset = 1 × 8 = 8"
+         data-note="Each head owns a slice of the 64-wide hidden dimension"></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-lines="15-24"
+         data-stopped="22"
+         data-values="15: lookingFrom = 1 | 17: scores = [0, 0, 0] | 18: lookingTo = 0, 1, 2 | 20: 2 &gt; 1 → mask | 22: scores[2] = -∞"
+         data-note="Causal mask: token 1 cannot look at token 2"></span>
+      <span class="vscode-step fragment" data-fragment-index="5"
+         data-lines="26-31"
+         data-stopped="31"
+         data-values="26: queries[1][40..48] | 28: keys[0][8..16] | 31: 6.7 / 2.83 = 2.37"
+         data-note="Same dot product as before — now on an 8-wide slice"></span>
+      <span class="vscode-step fragment" data-fragment-index="6"
+         data-text="var attentionWeights = Softmax(scores)"
+         data-stopped
+         data-values="34: [2.37, 1.10, -∞] → [0.78, 0.22, 0]"
+         data-note="Softmax over the 3 scores; the masked one goes to 0"></span>
+      <span class="vscode-step fragment" data-fragment-index="7"
+         data-lines="36-42"
+         data-stopped="41"
+         data-values="36: outputVector = 8 zeros | 39: values[0][8..16] | 41: += 0.78 × v0, then 0.22 × v1"
+         data-note="Weighted sum of value slices — identical shape to single-head"></span>
+      <span class="vscode-step fragment" data-fragment-index="8"
+         data-lines="44-47"
+         data-stopped="46"
+         data-values="46: output[1, 40..48] = head 5's 8 numbers"
+         data-note="Each head writes into its own slice — concatenation, in place"></span>
+      <span class="vscode-step fragment" data-fragment-index="9"
+         data-text="return output"
+         data-stopped
+         data-values="50: output = 3 × 64"
+         data-note="All 8 heads concatenated back to the hidden dimension"></span>
     </div>
   </div>
 </section>

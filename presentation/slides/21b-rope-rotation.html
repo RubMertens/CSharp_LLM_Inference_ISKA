@@ -57,6 +57,16 @@
       <circle id="rot-drag-dot" cx="326" cy="87" fill="var(--color-accent, #1C8680)" style="cursor: grab; r: 10;"/>
       <circle id="rot-drag-hit" cx="326" cy="87" style="cursor: grab; fill: transparent; r: 24; pointer-events: all;"/>
 
+
+
+      <!-- Two more balls on the same circle, spun at higher frequencies.
+           No arcs, no angle marks: the point is that their positions drift apart
+           unpredictably as the shared position advances. -->
+      <circle id="rot-fast-a" cx="413" cy="174" r="9"
+              fill="var(--color-accent-secondary, #29AC8D)"/>
+      <circle id="rot-fast-b" cx="413" cy="174" r="9"
+              fill="var(--color-danger, #E8833A)"/>
+
       <!-- Fragment 2: Rotation formula box -->
       <g class="fragment">
         <rect x="490" y="80" width="200" height="80" rx="8" fill="var(--color-bg-subtle, #EFF6F5)" stroke="var(--color-accent, #1C8680)" stroke-width="2.5"/>

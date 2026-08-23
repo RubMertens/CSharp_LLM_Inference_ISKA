@@ -3,6 +3,14 @@ import { makeDraggable, el } from './interactions.js';
 const CX = 250, CY = 250, R = 180, ARC_R = 70;
 const ALPHA = 25 * Math.PI / 180;
 
+// Two more balls on the same circle, spun at higher frequencies. Same position drives
+// all three; only theta differs. No arcs or angle marks — the message is that the
+// three positions drift apart unpredictably, which is the RoPE frequency story.
+const FAST = [
+  { id: 'rot-fast-a', mult: 3.7 },
+  { id: 'rot-fast-b', mult: 8.3 },
+];
+
 function arcPath(from, to, r) {
   const sx = CX + r * Math.cos(from), sy = CY - r * Math.sin(from);
   const ex = CX + r * Math.cos(to), ey = CY - r * Math.sin(to);
@@ -10,6 +18,16 @@ function arcPath(from, to, r) {
   if (sweep < 0) sweep += 2 * Math.PI;
   const large = sweep > Math.PI ? 1 : 0;
   return `M ${sx.toFixed(1)},${sy.toFixed(1)} A ${r},${r} 0 ${large},0 ${ex.toFixed(1)},${ey.toFixed(1)}`;
+}
+
+function updateFast(theta) {
+  for (const f of FAST) {
+    const ang = ALPHA + f.mult * theta;
+    const dot = el(f.id);
+    if (!dot) continue;
+    dot.setAttribute('cx', (CX + R * Math.cos(ang)).toFixed(1));
+    dot.setAttribute('cy', (CY - R * Math.sin(ang)).toFixed(1));
+  }
 }
 
 function update(angle) {
@@ -100,6 +118,8 @@ function update(angle) {
     thetaLabel.setAttribute('y', CY - lr * Math.sin(mid));
     thetaLabel.textContent = `θ = ${deg}°`;
   }
+
+  updateFast(theta);
 }
 
 makeDraggable({

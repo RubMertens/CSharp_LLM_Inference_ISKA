@@ -1,42 +1,122 @@
-<section data-id="qkv-code" data-title="Q, K, V in Code">
+<section data-id="qkv-code" data-title="Self-Attention in Code">
   <div class="slide-content">
-    <h2>Q, K, V — <span class="highlight">three matrix multiplies</span></h2>
+    <h2>Self-Attention — <span class="highlight">the whole method</span></h2>
 
-    <div class="vscode-window" style="max-width: min(100%, 980px);"
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         style="margin: 0 auto; box-sizing: border-box; max-width: min(100%, 92vw);"
          data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
-         data-lines="27-40"
-         data-member="Forward"
-         data-start-line="27">
+         data-lines="53-95"
+         data-member="SingleHeadSelfAttention"
+         data-start-line="53">
       <pre class="vscode-source">
-// normalize 
-Matrix normalizedEmbeddings = new(sequenceLength, weights.HiddenDimension);
-for (int row = 0; row &lt; sequenceLength; row++)
+private Matrix SingleHeadSelfAttention(int headDimension, int sequenceLength, Matrix queries, Matrix keys, Matrix values)
 {
-    normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row], weights.AttentionNormWeight);
+    float scale = MathF.Sqrt(headDimension);
+
+    Matrix attentionOutput = new(sequenceLength, headDimension);
+
+    //for each token, compute the attention scores against all other tokens
+    for (int lookingFrom = 0; lookingFrom &lt; sequenceLength; lookingFrom++)
+    {
+        var scores = new float[sequenceLength];
+
+        for (var lookingTo = 0; lookingTo &lt; sequenceLength; lookingTo++)
+        {
+            if (lookingTo &gt; lookingFrom)
+            {
+                // causal masking: prevent attending to future tokens by setting their scores to a very large negative number
+                // in language generation, you should never look to the future!
+                // causality only looks backwards
+                scores[lookingTo] = float.NegativeInfinity;
+                continue;
+            }
+            // attention = query • key / sqrt(headDim)
+            // dot product is a indication of how much 2 vectors are aligned
+            // scaling to prevent large outputs (AxX + BxY + CxZ) can grow extremely large
+            // in short how much does the vector representation of the question (query) align with the vector representation of the context (key)
+            scores[lookingTo] = queries[lookingFrom] * keys[lookingTo] / scale;
+        }
+
+        // make the sum of the score equal to 1 so that we can interpret them as probabilities. (1 == 100% attention, 0 == 0% attention)
+        // we dont care about the actual numbers, just the relative differences between them.
+        var attentionWeights = Softmax(scores);
+
+        Vector attended = new(headDimension);
+        // now for each token in the sequence we have a score that indicates how important it is to the current token.
+        for (int j = 0; j &lt; sequenceLength; j++)
+        {
+            attended = attended + (attentionWeights[j] * values[j]);
+        }
+
+        attentionOutput[lookingFrom] = attended;
+    }
+    return attentionOutput;
 }
-
-// project each token into Q, K, V
-// embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
-var queries = normalizedEmbeddings * weights.QueryProjection;
-var keys = normalizedEmbeddings * weights.KeyProjection;
-var values = normalizedEmbeddings * weights.ValueProjection;
-
-var attentionOutput = SingleHeadSelfAttention(weights.HiddenDimension, sequenceLength, queries, keys, values);
       </pre>
-      <span class="vscode-inline" data-line="2" data-value="sequenceLength = 4   hiddenDimension = 8"></span>
+      <span class="vscode-inline" data-line="1" data-value="headDimension = 64   sequenceLength = 3   queries / keys / values = 3×64"></span>
       <span class="vscode-step fragment" data-fragment-index="0"
-         data-lines="1-6"
-         data-values="5: normalizedEmbeddings = 4×8"
-         data-note="Normalize first — every block starts with RMSNorm"></span>
+         data-lines="3-5"
+         data-stopped="3"
+         data-values="3: √64 = 8 | 5: attentionOutput = 3×64"
+         data-note="Scale = √headDim. 64-dim dot products grow big; without it softmax spikes to one-hot"></span>
       <span class="vscode-step fragment" data-fragment-index="1"
-         data-lines="10-12"
-         data-stopped="10"
-         data-values="10: 4×8 · 8×8 = 4×8 | 11: keys = 4×8 | 12: values = 4×8"
-         data-note="Same input, three different weight matrices"></span>
+         data-lines="7-10"
+         data-values="8: lookingFrom = 0, 1, 2 | 10: scores = float[3]"
+         data-note="One output row per token — each token decides for itself what to look at"></span>
       <span class="vscode-step fragment" data-fragment-index="2"
-         data-lines="14"
-         data-values="14: attentionOutput = 4×8"
-         data-note="Attention consumes all three"></span>
+         data-lines="12-13"
+         data-values="12: lookingFrom = 1 → lookingTo = 0, 1, 2"
+         data-note="Score the current token against every token in the sequence"></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-lines="14-21"
+         data-stopped="19"
+         data-values="14: lookingTo = 2 &gt; lookingFrom = 1 ✓ | 19: scores[2] = -∞"
+         data-note="Causality only looks backwards. -∞ is picked so softmax turns it into exactly 0"></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-text="scores[lookingTo] = queries[lookingFrom] * keys[lookingTo] / scale;"
+         data-stopped="26"
+         data-values="26: q₁ • k₀ = 12.4, / 8 → scores[0] = 1.55"
+         data-note="That * is the dot product from earlier. Query = what I want, key = what I offer, dot = how well they align"></span>
+      <span class="vscode-step fragment" data-fragment-index="5"
+         data-lines="29-31"
+         data-stopped="31"
+         data-values="31: [1.55, 1.61, -∞] → [0.49, 0.51, 0]"
+         data-note="Raw scores → weights summing to 1. The masked -∞ becomes 0 — that's the payoff"></span>
+      <span class="vscode-step fragment" data-fragment-index="6"
+         data-lines="33-38"
+         data-stopped="37"
+         data-values="33: attended = 64 zeros | 37: 0.49 × v₀ + 0.51 × v₁"
+         data-note="The punchline: output is a blend of value vectors, mixed by attention"></span>
+      <span class="vscode-step fragment" data-fragment-index="7"
+         data-lines="40-42"
+         data-values="42: returns 3×64"
+         data-note="One blended row per token, 3×64 back to Forward"></span>
     </div>
   </div>
+
+  <style>
+    /* The code area is a <pre>, and theme.css:257 caps every <pre> at 80ch. At 43 lines
+       that wraps the long comments three deep and starves the fit pass. Let the code
+       use the full panel width — the method scrolls rather than shrinking to fit. */
+    [data-id="qkv-code"] .vscode-code {
+      max-width: none;
+    }
+
+    [data-id="qkv-code"] h2 {
+      margin-bottom: 0.6rem;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="qkv-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+      /* 43 lines wrap hard on a phone. Drop the vh cap so the fit pass sizes the font
+         against the real room instead of the code area being clipped twice over. */
+      [data-id="qkv-code"] .vscode-window {
+        --vs-max-height: none;
+      }
+    }
+  </style>
 </section>

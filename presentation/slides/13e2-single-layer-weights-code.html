@@ -1,0 +1,99 @@
+<section data-id="single-layer-weights-code" data-title="One Layer's Weights">
+  <div class="slide-content">
+    <h2>Everything <span class="highlight">one layer</span> needs</h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/SingleLayerModelWeights.cs"
+         data-member="SingleLayerModelWeights"
+         data-start-line="5">
+      <pre class="vscode-source">
+public class SingleLayerModelWeights
+{
+    public int VocabularySize =&gt; EmbeddedTokens.Rows;
+    public int HiddenDimension =&gt; EmbeddedTokens.Columns;
+
+    public required Vector AttentionNormWeight { get; set; }
+    public required Vector FeedForwardNormWeight { get; set; }
+
+    /// &lt;summary&gt;
+    /// rows = vocab size, cols = hidden dimension
+    /// &lt;/summary&gt;
+    public required Matrix EmbeddedTokens { get; set; }
+
+    /// &lt;summary&gt;
+    /// hiddenDim x hiddenDim
+    /// &lt;/summary&gt;
+    public required Matrix QueryProjection { get; set; }
+    /// &lt;summary&gt;
+    /// hiddenDim x hiddenDim
+    /// &lt;/summary&gt;
+    public required Matrix KeyProjection { get; set; }
+    /// &lt;summary&gt;
+    /// hiddenDim x hiddenDim
+    /// &lt;/summary&gt;
+    public required Matrix ValueProjection { get; set; }
+    /// &lt;summary&gt;
+    /// hiddenDim x hiddenDim — projects attention output back
+    /// &lt;/summary&gt;
+    public required Matrix OutputProjection { get; set; }
+
+    /// &lt;summary&gt;
+    /// hiddenDim x vocabSize — projects hidden state to logits
+    /// &lt;/summary&gt;
+    public required Matrix OutputEmbedding { get; set; }
+
+}
+      </pre>
+
+      <span class="vscode-step fragment" data-fragment-index="0"
+            data-lines="6-7"
+            data-values="6: Vector, 64 floats | 7: Vector, 64 floats"
+            data-note="Two norm weights — one scale per dimension, nothing more"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="1"
+            data-lines="9-12"
+            data-stopped="12"
+            data-values="12: Matrix 250 × 64 — one row per token"
+            data-note="The lookup table: token id in, vector out"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-lines="14-29"
+            data-values="17: Matrix 64 × 64 | 21: Matrix 64 × 64 | 25: Matrix 64 × 64 | 29: Matrix 64 × 64"
+            data-note="Q, K, V and the output projection — all square, all hiddenDim × hiddenDim"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="3"
+            data-lines="31-34"
+            data-stopped="34"
+            data-values="34: Matrix 64 × 250 — one score per token"
+            data-note="Back out to logits: hidden state scored against the whole vocabulary"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="4"
+            data-lines="3-4"
+            data-stopped="3"
+            data-values="3: VocabularySize = 250 | 4: HiddenDimension = 64"
+            data-note="Two numbers size the whole thing — and only one of them is hiddenDim"></span>
+    </div>
+
+  </div>
+
+  <style>
+    /* Every pixel below the panel is code font size: 36 lines are fitted against whatever
+       room is left in the column, so nothing sits under the panel and the h2 is tight. */
+    [data-id="single-layer-weights-code"] h2 {
+      margin-bottom: 0.35rem;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="single-layer-weights-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+      /* 36 lines wrap hard on a phone. Drop the vh cap so the fit pass sizes the font
+         against the real room instead of the code area being clipped. */
+      [data-id="single-layer-weights-code"] .vscode-window {
+        --vs-max-height: none;
+      }
+    }
+  </style>
+</section>

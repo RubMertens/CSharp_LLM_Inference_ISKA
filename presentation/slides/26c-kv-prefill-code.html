@@ -1,0 +1,127 @@
+<section data-id="kv-prefill-code" data-title="Prefill in Code">
+  <div class="slide-content">
+    <h2>Prefill — <span class="highlight">read the whole prompt</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/6_MultiLayerWithKVCache/MultiLayerTransformerWithKVCache.cs"
+         data-lines="11-54"
+         data-member="Prefill"
+         data-start-line="11">
+      <pre class="vscode-source">
+public int Prefill(int[] promptTokens)
+{
+    int sequenceLength = promptTokens.Length;
+    Matrix embeddings = Embed(promptTokens);
+
+
+    for (int layerIndex = 0; layerIndex &lt; weights.Layers.Length; layerIndex++)
+    {
+        LayerWeights layer = weights.Layers[layerIndex];
+        Matrix residual = embeddings;
+
+        Matrix normalizedEmbeddings = RootMeanSquareNormalisation(embeddings, layer.AttentionNormWeight);
+
+        var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection, weights.HeadDimension);
+        var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection, weights.HeadDimension);
+        var values = normalizedEmbeddings * layer.ValueProjection;
+
+        _keyCache[layerIndex] = keys.ToRowList();
+        _valueCache[layerIndex] = values.ToRowList();
+
+        var attentionOutput = GroupedQueryAttention(sequenceLength, queries, keys, values);
+
+        var projectedAttention = attentionOutput * layer.OutputProjection;
+
+        embeddings = residual + projectedAttention;
+        residual = embeddings;
+        normalizedEmbeddings = RootMeanSquareNormalisation(embeddings, layer.FeedForwardNormWeight);
+
+        Matrix gate = normalizedEmbeddings * layer.GateProjection;
+        Matrix up = normalizedEmbeddings * layer.UpProjection;
+        Matrix activated = SigmoidLinearUnit(gate);
+        Matrix gated = activated.ElementwiseMultiply(up);
+        Matrix feedForwardOutput = gated * layer.DownProjection;
+
+        embeddings = residual + feedForwardOutput;
+    }
+
+    embeddings = RootMeanSquareNormalisation(embeddings, weights.FinalNormWeight);
+    var logits = embeddings * weights.OutputEmbedding;
+
+    Vector last = logits[sequenceLength - 1];
+    var best = last.Data.Max();
+    return Array.IndexOf(last.Data, best);
+}
+      </pre>
+      <span class="vscode-inline" data-line="1" data-value='promptTokens = [2, 2, 2] ("Capital of France?")   2 layers   hiddenDimension = 64'></span>
+
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-lines="3-4"
+         data-stopped="4"
+         data-values="3: promptTokens.Length = 3 → sequenceLength = 3 | 4: embeddings = 3 × 64 — one row per prompt token"
+         data-note="Whole prompt goes in at once, as a matrix — not one token at a time"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="7-12"
+         data-values="7: layerIndex = 0, then 1 | 10: residual = 3 × 64 | 12: normalizedEmbeddings = 3 × 64"
+         data-note="Same per-layer loop as before: stash the residual, normalise"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-lines="14-16"
+         data-values="14: queries = 3 × 64 (8 query heads × 8) | 15: keys = 3 × 16 (2 kv heads × 8) | 16: values = 3 × 16 — no RoPE"
+         data-note="RoPE on queries and keys. Not on values — position belongs to the match, not the payload"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-lines="18-19"
+         data-stopped
+         data-values="18: _keyCache[0] = 3 rows × 16 | 19: _valueCache[0] = 3 rows × 16"
+         data-note="THE new lines. Keys and values for every prompt token, kept per layer"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-lines="21-25"
+         data-values="21: attentionOutput = 3 × 64 | 23: projectedAttention = 3 × 64 | 25: embeddings = 3 × 64"
+         data-note="Attention, output projection, first residual add — unchanged"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="5"
+         data-lines="26-35"
+         data-values="29: gate = 3 × 128 | 33: feedForwardOutput = 3 × 64 | 35: embeddings = 3 × 64"
+         data-note="SwiGLU feed-forward and the second residual — already covered"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="6"
+         data-lines="38-43"
+         data-stopped="43"
+         data-values="39: logits = 3 × 250 | 41: logits[2] — last row only, rows 0 and 1 discarded | 43: → token 137"
+         data-note="Same greedy argmax as the very first code slide. Prefill returns the FIRST generated token"></span>
+    </div>
+
+    <style>
+      /* Standing rule for code slides: wide text that scrolls. The fit pass would
+         shrink 44 lines to ~0.44rem and still clamp — unreadable, and it scrolls
+         either way. Pin a readable size and let the clamped box scroll; step
+         highlights scroll themselves into view. */
+      [data-id="kv-prefill-code"] .vscode-window {
+        /* size comes from (fit-pass floor) */
+      }
+
+      .prefill-caption {
+        max-width: 84ch;
+        margin: 0.6rem auto 0;
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 820px) {
+        [data-id="kv-prefill-code"] .vscode-window {
+          --vs-font-size: 0.58rem !important;
+        }
+
+        .prefill-caption {
+          max-width: 88vw;
+          margin: 0.6rem 0 0;
+          font-size: 0.8rem;
+        }
+      }
+    </style>
+
+  </div>
+</section>

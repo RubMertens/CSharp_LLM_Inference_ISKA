@@ -1,0 +1,85 @@
+<section data-id="forward-code-2" data-title="The Forward Pass in Code — Back on the Map">
+  <div class="slide-content">
+    <h2>One Forward Pass — <span class="highlight">back on the map</span></h2>
+
+    <div class="vscode-window" data-fill data-font-size="1.4rem"
+      data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs" data-member="Forward" data-start-line="17">
+      <pre class="vscode-source">
+public Matrix Forward(int[] tokens)
+{
+    var sequenceLength = tokens.Length;
+    //translate the tokens to a sequence of embeddings
+    Matrix embeddings = new(sequenceLength, weights.HiddenDimension);
+    for (int row = 0; row &lt; sequenceLength; row++)
+    {
+        embeddings[row] = weights.EmbeddedTokens[tokens[row]];
+    }
+
+    // normalize 
+    Matrix normalizedEmbeddings = new(sequenceLength, weights.HiddenDimension);
+    for (int row = 0; row &lt; sequenceLength; row++)
+    {
+        normalizedEmbeddings[row] = RootMeanSquareNormalisation(embeddings[row], weights.AttentionNormWeight);
+    }
+
+    // project each token into Q, K, V
+    // embeddings is sequenceLength x hiddenDim, projection is hiddenDim x hiddenDim, result is sequenceLength x hiddenDim
+    var queries = normalizedEmbeddings * weights.QueryProjection;
+    var keys = normalizedEmbeddings * weights.KeyProjection;
+    var values = normalizedEmbeddings * weights.ValueProjection;
+
+    var attentionOutput = SingleHeadSelfAttention(weights.HiddenDimension, sequenceLength, queries, keys, values);
+
+    var projectedAttention = attentionOutput * weights.OutputProjection;
+
+    Matrix hidden = new(sequenceLength, weights.HiddenDimension);
+    for (int row = 0; row &lt; sequenceLength; row++)
+    {
+        hidden[row] = embeddings[row] + projectedAttention[row];
+    }
+    var logits = hidden * weights.OutputEmbedding;
+    return logits;
+}
+      </pre>
+
+      <!-- always on: the inputs, and the shape of the rest of the pass -->
+      <span class="vscode-inline" data-line="1"
+        data-value="tokens = [2, 2, 2]   HiddenDimension = 64   VocabularySize = 250"></span>
+      <span class="vscode-inline" data-line="22" data-value="queries, keys, values — 3 × 64 each"></span>
+      <span class="vscode-inline" data-line="24" data-value="3 × 64"></span>
+      <span class="vscode-inline" data-line="26" data-value="3 × 64"></span>
+      <span class="vscode-inline" data-line="31" data-value="residual: what came in, plus what attention added"></span>
+      <span class="vscode-inline" data-line="33" data-value="logits = 3 × 250 — one score per vocab entry"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="0" data-text="RootMeanSquareNormalisation(embeddings[row]"
+        data-stopped></span>
+
+      <span class="vscode-step fragment" data-fragment-index="1" data-lines="18-24" data-stopped="24"
+        data-values="20: 3 × 64 · 64 × 64 → 3 × 64"
+        data-note="Three projections, then one attention call. That call is the next stretch of the talk"></span>
+    </div>
+  </div>
+
+  <style>
+    [data-id="forward-code-2"] h2 {
+      margin-bottom: 0.6rem;
+    }
+
+    /* The code area is a <pre>, and theme.css caps every <pre> at 80ch. At 35 lines
+       that wraps half the method and starves the fit pass. Let it use the panel. */
+    [data-id="forward-code-2"] .vscode-code {
+      max-width: none;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="forward-code-2"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+
+      [data-id="forward-code-2"] .vscode-window {
+        --vs-max-height: 76vh;
+      }
+    }
+  </style>
+</section>

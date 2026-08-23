@@ -1,0 +1,141 @@
+<section data-id="kv-decode-next-code" data-title="DecodeNext — One Token at a Time">
+  <div class="slide-content">
+    <h2>DecodeNext — <span class="highlight">Matrix → Vector</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/6_MultiLayerWithKVCache/MultiLayerTransformerWithKVCache.cs"
+         data-member="DecodeNext"
+         data-start-line="56">
+      <pre class="vscode-source">
+public int DecodeNext(int token)
+{
+    Vector embedding = weights.EmbeddedTokens[token];
+
+    for (int layerIndex = 0; layerIndex &lt; weights.Layers.Length; layerIndex++)
+    {
+        LayerWeights layer = weights.Layers[layerIndex];
+        Vector residual = embedding;
+
+        Vector normalized = RootMeanSquareNormalisation(embedding, layer.AttentionNormWeight);
+
+        int position = _keyCache[layerIndex].Count;
+
+        // 1xhiddenDim • hiddenDim x headDim = 1xheadDim
+        Vector query = normalized * layer.QueryProjection;
+        // 1xhiddenDim • hiddenDim x keyValueDim = 1xkeyValueDim
+        Vector key = normalized * layer.KeyProjection;
+        // 1xhiddenDim • hiddenDim x keyValueDim = 1xkeyValueDim
+        Vector value = normalized * layer.ValueProjection;
+
+        query = ApplyRoPETo(query, weights.HeadDimension, position);
+        key = ApplyRoPETo(key, weights.HeadDimension, position);
+
+        _keyCache[layerIndex].Add(key);
+        _valueCache[layerIndex].Add(value);
+
+        Vector attentionOut = GroupedQueryAttentionWithCache(
+            query,
+            _keyCache[layerIndex],
+            _valueCache[layerIndex]);
+
+        Vector projectedAttention = attentionOut * layer.OutputProjection;
+
+        embedding = residual + projectedAttention;
+        residual =  embedding;
+
+        Vector normalizedFeedForward = RootMeanSquareNormalisation(embedding, layer.FeedForwardNormWeight);
+
+        Vector gate = normalizedFeedForward * layer.GateProjection;
+        Vector up = normalizedFeedForward * layer.UpProjection;
+        Vector activatedGate = SigmoidLinearUnit(gate);
+        Vector gated = activatedGate.ElementwiseMultiply(up);
+        Vector feedForwardOutput = gated * layer.DownProjection;
+
+        embedding = residual + feedForwardOutput;
+    }
+
+    Vector finalNorm = RootMeanSquareNormalisation(embedding, weights.FinalNormWeight);
+    Vector logits = finalNorm * weights.OutputEmbedding;
+
+    float best = logits.Data.Max();
+    return Array.IndexOf(logits.Data, best);
+}
+      </pre>
+
+      <span class="vscode-inline" data-line="1"
+            data-value="token = 137 (one int)   hiddenDim = 64   layers = 2   cache already holds 3 rows"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-text="Vector embedding = weights.EmbeddedTokens[token];"
+         data-stopped
+         data-values="1: one token in, not int[] | 3: EmbeddedTokens[137] → embedding = 1 × 64"
+         data-note="One row out of the table. Prefill embedded the whole prompt: 3 × 64"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="5-10"
+         data-stopped="10"
+         data-values="5: layerIndex = 0, 1 | 8: residual = 1 × 64 | 10: normalized = 1 × 64"
+         data-note="Every Matrix in Prefill is a Vector here. Same code shape, one row instead of three"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-text="int position = _keyCache[layerIndex].Count;"
+         data-stopped
+         data-values="12: _keyCache[0].Count = 3 → position = 3"
+         data-note="The cache length IS the position. Nothing tracks the index separately"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-lines="14-19"
+         data-stopped="15"
+         data-values="15: 1×64 • 64×64 → query = 1 × 64 (8 heads × headDim 8) | 17: 1×64 • 64×16 → key = 1 × 16 | 19: 1×64 • 64×16 → value = 1 × 16"
+         data-note="Read the comments: the left factor is 1 row. In Prefill it was 3"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-lines="21-22"
+         data-stopped="21"
+         data-values="21: rotate query by position 3 | 22: rotate key by position 3"
+         data-note="RoPE takes the position explicitly now — the cache told us what it is"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="5"
+         data-lines="24-25"
+         data-stopped="24"
+         data-values="24: _keyCache[0]: 3 rows → 4 | 25: _valueCache[0]: 3 rows → 4"
+         data-note="Append one vector per token. The cache grows by exactly one row per step"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="6"
+         data-lines="27-32"
+         data-stopped="27"
+         data-values="27: attentionOut = 1 × 64 | 29: 4 cached keys, 1 × 16 each | 30: 4 cached values | 32: projectedAttention = 1 × 64"
+         data-note="One query against the whole cached history. Next slide opens this up"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="7"
+         data-lines="37-45"
+         data-stopped="39"
+         data-values="39: gate = 1 × 128 | 40: up = 1 × 128 | 43: feedForwardOutput = 1 × 64 | 45: embedding = 1 × 64"
+         data-note="Same SwiGLU as before, 1 × 128 wide instead of 3 × 128"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="8"
+         data-lines="48-52"
+         data-stopped="51"
+         data-values="49: 1×64 • 64×250 → logits = 1 × 250 | 51: max of 250 → best = 9.02 | 52: 9.02 sits at slot 214 → returns 214"
+         data-note="No 'take the last row'. There is only one row — the waste is never computed"></span>
+    </div>
+
+    <style>
+      /* Standing rule for code slides: wide text that scrolls. The fit pass shrinks
+         53 lines to ~0.44rem and still clamps — unreadable, and it scrolls either
+         way. Pin a readable size, matching the Prefill slide next door, and let the
+         clamped box scroll; step highlights scroll themselves into view. */
+      [data-id="kv-decode-next-code"] .vscode-window {
+        /* size comes from (fit-pass floor) */
+      }
+
+      @media (max-width: 820px) {
+        [data-id="kv-decode-next-code"] .vscode-window {
+          --vs-font-size: 0.58rem !important;
+        }
+      }
+    </style>
+
+  </div>
+</section>
