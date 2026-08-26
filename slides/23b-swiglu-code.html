@@ -1,0 +1,257 @@
+<section data-id="swiglu-code" data-title="SwiGLU in Code">
+  <div class="slide-content">
+    <h2>Adding the feed-forward block &mdash; <span class="highlight">+12 lines</span></h2>
+
+    <!-- Invisible fragment markers. The engine reveals them in index order; the CSS
+         below hangs the diff states off their .fragment-visible class, so the whole
+         slide is driven by ordinary fragments and backward navigation just works.
+         Step 0 lands the insertion as a diff, step 1 resolves it to plain source, and
+         the code-panel steps (2-9) walk the block line by line after that. -->
+    <span class="diff-fx diff-fx-add fragment" data-fragment-index="0" aria-hidden="true"></span>
+    <span class="diff-fx diff-fx-resolve fragment" data-fragment-index="1" aria-hidden="true"></span>
+
+    <div class="diff-head">
+      <!-- Both labels sit in the same grid cell, so the swap is a pure opacity
+           cross-fade with no height change. -->
+      <p class="diff-hunk">
+        <span class="hunk">@@ -60,2 +57,14 @@</span>
+        <span class="del">3_MultiLayer</span>
+        <span class="arrow">&rarr;</span>
+        <span class="add">4_MultiLayerWithActivation</span>
+      </p>
+      <p class="diff-file">MultiLayerTransformerWithActivation.cs</p>
+    </div>
+
+    <!-- Unified diff, but a verbatim slice of the *after* file: the feed-forward block
+         is a pure insertion, so line 1 (the attention residual add) and line 14 (the
+         closing brace) are context and 2-13 are "+". That keeps data-src honest — the
+         +/- treatment is CSS on top of the real snippet. -->
+    <div class="vscode-window"
+         data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
+         data-lines="57-70"
+         data-start-line="57">
+      <pre class="vscode-source">
+    embeddings = residual + projectedAttention;
+    residual = embeddings;
+    normalizedEmbeddings = RMSNorm(embeddings, layer.FeedForwardNormWeight);
+
+    Matrix gate= normalizedEmbeddings * layer.GateProjection;
+    Matrix up = normalizedEmbeddings * layer.UpProjection;
+    Matrix activated = SigmoidLinearUnit(gate);
+    Matrix gated = activated.ElementwiseMultiply(up);
+    Matrix feedForwardOutput = gated * layer.DownProjection;
+
+    embeddings = residual + feedForwardOutput;      
+}
+      </pre>
+
+      <span class="vscode-inline" data-line="1" data-value="embeddings = 3&#215;64 &mdash; first residual add, where the old version stopped"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-text="residual = embeddings;"
+            data-stopped
+            data-values="2: residual = 3&#215;64 &mdash; re-captured, this time after attention"
+            data-note="A second residual checkpoint. The feed-forward block gets its own skip connection"></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+            data-text="RMSNorm(embeddings, layer.FeedForwardNormWeight)"
+            data-stopped
+            data-values="3: normalizedEmbeddings = 3&#215;64 &mdash; its own norm weight, not the attention one"
+            data-note="Normalise again before the block. Every sub-layer in a transformer is norm, then work, then add"></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
+            data-text="Matrix gate="
+            data-values="5: gate = 3&#215;128 &mdash; projected UP, 64 &#8594; 128"
+            data-note="Project UP, wider than hiddenDim. The comment says why: room for more complex interactions"></span>
+      <span class="vscode-step fragment" data-fragment-index="5"
+            data-text="Matrix up ="
+            data-values="6: up = 3&#215;128 &mdash; same input, a second projection"
+            data-note="A second, separate up-projection from the same input. Two views of the same normalized embeddings"></span>
+      <span class="vscode-step fragment" data-fragment-index="6"
+            data-text="SigmoidLinearUnit(gate)"
+            data-stopped
+            data-values="7: activated = 3&#215;128 &mdash; x &#183; &#963;(x), gate branch only"
+            data-note="The nonlinearity. Without it the whole stack collapses to one big matrix multiply"></span>
+      <span class="vscode-step fragment" data-fragment-index="7"
+            data-stopped
+            data-text="ElementwiseMultiply"
+            data-values="8: gated = 3&#215;128 &mdash; activated &#8857; up, element by element"
+            data-note="This product IS the gated linear unit: the gate decides, per element, how much of up survives"></span>
+      <span class="vscode-step fragment" data-fragment-index="8"
+            data-stopped
+            data-text="gated * layer.DownProjection"
+            data-values="9: feedForwardOutput = 3&#215;64 &mdash; back DOWN, 128 &#8594; 64"
+            data-note="Down-project to hiddenDim so it can rejoin the residual stream"></span>
+      <span class="vscode-step fragment" data-fragment-index="9"
+            data-lines="2"
+            data-text="residual + feedForwardOutput"
+            data-stopped="11"
+            data-values="2: residual = 3&#215;64 &mdash; re-captured after attention | 11: embeddings = 3&#215;64 &mdash; second residual add"
+            data-note="Two residual adds per layer now: one after attention, one after feed-forward. That is what every real transformer block looks like"></span>
+    </div>
+  </div>
+
+  <style>
+    [data-id="swiglu-code"] {
+      /* Diff colours derived from the deck palette, not invented: green from the
+         secondary accent, red from --color-danger (the ISKS house red). Both are
+         darkened so they clear 4.5:1 on the white editor background, and neither
+         collides with the amber --vs-stop-bg the stepping uses elsewhere.
+         Same values as the RoPE diff slide — the two must read as siblings. */
+      --diff-add-fg: color-mix(in srgb, var(--color-accent-secondary) 62%, #000);
+      --diff-add-bg: color-mix(in srgb, var(--color-accent-secondary) 15%, transparent);
+      --diff-add-bar: var(--color-accent-secondary);
+      --diff-del-fg: color-mix(in srgb, var(--color-danger) 78%, #000);
+    }
+
+    [data-id="swiglu-code"] h2 {
+      margin-bottom: 0.55rem;
+    }
+
+    [data-id="swiglu-code"] .diff-fx {
+      display: none;
+    }
+
+    /* ---------- git header strip ---------- */
+
+    [data-id="swiglu-code"] .diff-head {
+      display: grid;
+      margin-bottom: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      line-height: 1.4;
+    }
+
+    [data-id="swiglu-code"] .diff-head > p {
+      grid-area: 1 / 1;
+      margin: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    [data-id="swiglu-code"] .diff-hunk .hunk {
+      color: var(--color-text-muted);
+      margin-right: 0.9em;
+    }
+
+    [data-id="swiglu-code"] .diff-hunk .del { color: var(--diff-del-fg); }
+    [data-id="swiglu-code"] .diff-hunk .add { color: var(--diff-add-fg); }
+
+    [data-id="swiglu-code"] .diff-hunk .arrow {
+      color: var(--color-text-muted);
+      margin: 0 0.4em;
+    }
+
+    [data-id="swiglu-code"] .diff-file {
+      opacity: 0;
+      color: var(--color-heading);
+    }
+
+    /* ---------- diff gutter marker ---------- */
+
+    /* One marker column in front of every line: a space for context, "+" for the
+       inserted block. Uniform width, so the code stays aligned in both states. */
+    [data-id="swiglu-code"] .vscode-text::before {
+      content: " ";
+      display: inline-block;
+      width: 1.6ch;
+      font-weight: 700;
+      color: var(--diff-add-fg);
+    }
+
+    /* ---------- added lines (snippet lines 2-13) ---------- */
+
+    /* Everything between the two context lines. Hidden until the first fragment, but
+       still occupying their rows, so the reveal is opacity + transform only and
+       nothing reflows. */
+    [data-id="swiglu-code"] .vscode-line:not([data-line="1"]):not([data-line="14"]) {
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.35s ease, transform 0.35s ease, background-color 0.3s ease;
+    }
+
+    [data-id="swiglu-code"] .diff-fx-add.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) {
+      opacity: 1;
+      transform: none;
+      background: var(--diff-add-bg);
+      border-left-color: var(--diff-add-bar);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-add.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) .vscode-ln {
+      background: var(--diff-add-bg);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-add.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) .vscode-text::before {
+      content: "+";
+    }
+
+    /* ---------- resolve: the diff becomes the file ---------- */
+
+    /* Fires one step after the add. Green tint, "+" markers and the hunk header drop
+       away, leaving the post-change code as ordinary source — and the line-by-line
+       walkthrough runs *after* this. So resolve drops the diff treatment ONLY: the
+       step highlight, the amber stopped line, its gutter arrow and the inline
+       debugger values must all keep working. That is what the .hl / .stopped / .dim
+       variants below are for — they re-assert the normal panel palette on the
+       inserted lines, which the add rule would otherwise keep tinting green.
+
+       Each selector repeats the :not() chain of the add rule it has to beat — equal
+       specificity, later in source order, so resolve wins. Without the chain these
+       rules lose and the green stays on. */
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .diff-head .diff-hunk { opacity: 0; }
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .diff-head .diff-file { opacity: 1; }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) {
+      background: transparent;
+      border-left-color: transparent;
+      opacity: 1;
+    }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) .vscode-ln {
+      background: var(--vs-editor-bg);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]) .vscode-text::before {
+      content: " ";
+    }
+
+    /* One class more specific than the base resolve rule above, so the walkthrough
+       paints over the cleared state instead of the other way round. */
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).hl {
+      background: var(--vs-line-hl);
+      border-left-color: var(--vs-line-hl-bar);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).hl .vscode-ln {
+      background: var(--vs-line-hl);
+      color: var(--vs-ln-active);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).stopped,
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).stopped.hl {
+      background: var(--vs-stop-bg);
+      border-left-color: var(--vs-stop-fg);
+    }
+
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).stopped .vscode-ln {
+      background: var(--vs-stop-bg);
+      color: var(--vs-stop-fg);
+    }
+
+    /* Non-active lines dim like on any other code panel. The add rule pins these rows
+       to opacity 1, so .dim has to be re-asserted here to get through. */
+    [data-id="swiglu-code"] .diff-fx-resolve.fragment-visible ~ .vscode-window .vscode-line:not([data-line="1"]):not([data-line="14"]).dim {
+      opacity: 0.42;
+      filter: saturate(0.6);
+    }
+
+    @media (max-width: 820px) {
+      [data-id="swiglu-code"] h2 {
+        font-size: 1.05rem;
+        margin-bottom: 0.35rem;
+      }
+      [data-id="swiglu-code"] .diff-head {
+        font-size: 0.58em;
+      }
+      /* The hunk header wraps rather than shrinking the code. */
+      [data-id="swiglu-code"] .diff-hunk .arrow { margin: 0 0.25em; }
+    }
+  </style>
+</section>

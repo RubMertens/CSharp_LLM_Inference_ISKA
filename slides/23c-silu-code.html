@@ -1,0 +1,71 @@
+<section data-id="silu-code" data-title="SiLU in Code">
+  <div class="slide-content">
+    <h2>Inside <span class="highlight">SigmoidLinearUnit</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/4_MultiLayerWithActivation/MultiLayerTransformerWithActivation.cs"
+         data-member="SigmoidLinearUnit"
+         data-start-line="154">
+      <pre class="vscode-source">
+public static Matrix SigmoidLinearUnit(Matrix input)
+{
+    Matrix result = new(input.Rows, input.Columns);
+
+    for (int row = 0; row &lt; input.Rows; row++)
+    {
+        for (int i = 0; i &lt; input.Columns; i++)
+        {
+            float x =  input[row][i];
+            float sigmoid = 1 / (1 + MathF.Exp(-x));
+            result[row][i] = x * sigmoid;
+        }
+    }
+    return result;
+}
+      </pre>
+
+      <span class="vscode-inline" data-line="1"
+            data-value="input = gate — 3 tokens × 128 gate dims = 384 floats"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="0"
+            data-lines="5-8"
+            data-values="5: row = 0, 1, 2 | 7: i = 0 … 127"
+            data-note="Elementwise: every one of the 384 numbers on its own. No mixing across positions — attention already did that"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="1"
+            data-text="float sigmoid = 1 / (1 + MathF.Exp(-x));"
+            data-stopped="10"
+            data-values="9: x = 2.0 | 10: 1 / (1 + e^-2) = 0.88   —   for x = -2.0 → 0.12"
+            data-note="Logistic sigmoid. Any real number squashed into (0, 1): big positive → ~1, big negative → ~0, zero → exactly 0.5"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-text="result[row][i] = x * sigmoid;"
+            data-stopped="11"
+            data-values="11: 2.0 × 0.88 = 1.76   —   and -2.0 × 0.12 = -0.24"
+            data-note="The punchline — SiLU, not sigmoid: x multiplied by its own sigmoid"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="3"
+            data-text="return result;"
+            data-values="14: Matrix 3 × 128 — same shape in, same shape out"
+            data-note="Nothing reshaped, nothing summed. A curve applied 384 times"></span>
+    </div>
+
+  </div>
+
+  <style>
+    [data-id="silu-code"] h2 {
+      margin-bottom: 0.6rem;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="silu-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+      [data-id="silu-code"] .vscode-window {
+        --vs-max-height: 46vh;
+      }
+    }
+  </style>
+</section>

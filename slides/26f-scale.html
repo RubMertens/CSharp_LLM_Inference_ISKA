@@ -1,0 +1,104 @@
+<section data-id="scale" data-title="Getting a Sense of Scale">
+  <div class="slide-content">
+    <h2 style="margin-bottom: 0.3rem;">Getting a Sense of <span class="highlight">Scale</span></h2>
+    <p style="color: var(--color-text-muted); margin: 0 0 0.4rem; font-size: 0.9em;">Four open-weight models — same core recipe, three orders of magnitude apart</p>
+
+    <!-- ═══ Legend (revealed first) ═══
+         Colour encodes tier, not vendor: cool = runs on your desk, warm = runs on a rack. -->
+    <div class="fragment" data-fragment-index="0" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.1rem; margin-bottom: 0.7rem; font-size: 0.75em;">
+      <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+        <span style="width: 13px; height: 13px; border-radius: 3px; background: #003760; display: inline-block;"></span>
+        <span style="color: var(--color-text);">TinyLlama-1.1B</span>
+        <span style="background: rgba(56,189,248,0.18); border: 1px solid #003760; color: #003760; border-radius: 4px; padding: 0 0.4rem; font-size: 0.78em; font-weight: 600;">DEMO</span>
+      </span>
+      <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+        <span style="width: 13px; height: 13px; border-radius: 3px; background: #1C8680; display: inline-block;"></span>
+        <span style="color: var(--color-text);">Qwen3.8-27B</span>
+      </span>
+      <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+        <span style="width: 13px; height: 13px; border-radius: 3px; background: #F0A413; display: inline-block;"></span>
+        <span style="color: var(--color-text);">DeepSeek-V4-Pro</span>
+      </span>
+      <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+        <span style="width: 13px; height: 13px; border-radius: 3px; background: #F04E23; display: inline-block;"></span>
+        <span style="color: var(--color-text);">Qwen3.8-Max · 2.4T-A95B</span>
+      </span>
+    </div>
+
+    <!-- ═══ Three charts in a row ═══ -->
+    <div class="three-column" style="gap: 1.2rem; align-items: stretch; flex: 1; min-height: 0;">
+
+      <!-- ── Chart 1: Parameters (log scale) ── -->
+      <div class="fragment" data-fragment-index="1" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.6rem 0.4rem 0.4rem; display: flex; flex-direction: column;">
+        <p style="font-size: 0.82em; text-align: center; margin: 0 0 0.2rem; color: var(--color-heading);">Parameters · total
+          <span style="color: var(--color-text-muted); font-size: 0.8em; border: 1px solid var(--color-border); border-radius: 4px; padding: 0 0.3rem; margin-left: 0.2rem;">log scale</span>
+        </p>
+        <svg class="svg-diagram" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" style="flex: 1 1 0; min-height: 0; height: 0; width: 100%; display: block;" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="350" x2="290" y2="350" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+          <rect x="20"  y="346" width="57" height="4"   rx="3" style="fill:#003760;"/>
+          <text class="svg-num" style="font-size:13px; fill:#003760;" x="48.5" y="338" text-anchor="middle">1.1B</text>
+          <text class="svg-muted" style="font-size:9px;" x="48.5" y="372" text-anchor="middle">TinyLlama</text>
+          <text class="svg-muted" style="font-size:9px; fill:#003760;" x="48.5" y="388" text-anchor="middle">1.1B active</text>
+          <rect x="91"  y="216" width="57" height="134" rx="3" style="fill:#1C8680; opacity:0.9;"/>
+          <text class="svg-num" style="font-size:13px; fill:#1C8680;" x="119.5" y="208" text-anchor="middle">27B</text>
+          <text class="svg-muted" style="font-size:9px;" x="119.5" y="372" text-anchor="middle">Qwen3.8-27B</text>
+          <text class="svg-muted" style="font-size:9px; fill:#1C8680;" x="119.5" y="388" text-anchor="middle">27B dense</text>
+          <rect x="162" y="49"  width="57" height="301" rx="3" style="fill:#F0A413;"/>
+          <text class="svg-num" style="font-size:13px; fill:#F0A413;" x="190.5" y="41" text-anchor="middle">1.6T</text>
+          <text class="svg-muted" style="font-size:9px;" x="190.5" y="372" text-anchor="middle">DeepSeek-V4</text>
+          <text class="svg-muted" style="font-size:9px; fill:#F0A413;" x="190.5" y="388" text-anchor="middle">49B active</text>
+          <rect x="233" y="33"  width="57" height="317" rx="3" style="fill:#F04E23;"/>
+          <text class="svg-num" style="font-size:13px; fill:#F04E23;" x="261.5" y="25" text-anchor="middle">2.4T</text>
+          <text class="svg-muted" style="font-size:9px;" x="261.5" y="372" text-anchor="middle">Qwen3.8-Max</text>
+          <text class="svg-muted" style="font-size:9px; fill:#F04E23;" x="261.5" y="388" text-anchor="middle">95B active</text>
+        </svg>
+      </div>
+
+      <!-- ── Chart 2: Embedding dim (linear scale) ── -->
+      <div class="fragment" data-fragment-index="2" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.6rem 0.4rem 0.4rem; display: flex; flex-direction: column;">
+        <p style="font-size: 0.82em; text-align: center; margin: 0 0 0.2rem; color: var(--color-heading);">Embedding dim
+          <span style="color: var(--color-text-muted); font-size: 0.8em; border: 1px solid var(--color-border); border-radius: 4px; padding: 0 0.3rem; margin-left: 0.2rem;">linear</span>
+        </p>
+        <svg class="svg-diagram" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" style="flex: 1 1 0; min-height: 0; height: 0; width: 100%; display: block;" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="350" x2="290" y2="350" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+          <rect x="20"  y="268" width="57" height="82"  rx="3" style="fill:#003760;"/>
+          <text class="svg-num" style="font-size:13px; fill:#003760;" x="48.5" y="260" text-anchor="middle">2,048</text>
+          <text class="svg-muted" style="font-size:9px;" x="48.5" y="372" text-anchor="middle">TinyLlama</text>
+          <rect x="91"  y="146" width="57" height="204" rx="3" style="fill:#1C8680; opacity:0.9;"/>
+          <text class="svg-num" style="font-size:13px; fill:#1C8680;" x="119.5" y="138" text-anchor="middle">5,120</text>
+          <text class="svg-muted" style="font-size:9px;" x="119.5" y="372" text-anchor="middle">Qwen3.8-27B</text>
+          <rect x="162" y="65"  width="57" height="285" rx="3" style="fill:#F0A413;"/>
+          <text class="svg-num" style="font-size:13px; fill:#F0A413;" x="190.5" y="57" text-anchor="middle">7,168</text>
+          <text class="svg-muted" style="font-size:9px;" x="190.5" y="372" text-anchor="middle">DeepSeek-V4</text>
+          <rect x="233" y="24"  width="57" height="326" rx="3" style="fill:#F04E23;"/>
+          <text class="svg-num" style="font-size:13px; fill:#F04E23;" x="261.5" y="16" text-anchor="middle">8,192</text>
+          <text class="svg-muted" style="font-size:9px;" x="261.5" y="372" text-anchor="middle">Qwen3.8-Max</text>
+        </svg>
+      </div>
+
+      <!-- ── Chart 3: Memory footprint (log scale) ── -->
+      <div class="fragment" data-fragment-index="3" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.6rem 0.4rem 0.4rem; display: flex; flex-direction: column;">
+        <p style="font-size: 0.82em; text-align: center; margin: 0 0 0.2rem; color: var(--color-heading);">Memory · BF16
+          <span style="color: var(--color-text-muted); font-size: 0.8em; border: 1px solid var(--color-border); border-radius: 4px; padding: 0 0.3rem; margin-left: 0.2rem;">log scale</span>
+        </p>
+        <svg class="svg-diagram" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" style="flex: 1 1 0; min-height: 0; height: 0; width: 100%; display: block;" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="350" x2="290" y2="350" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+          <rect x="20"  y="319" width="57" height="31"  rx="3" style="fill:#003760;"/>
+          <text class="svg-num" style="font-size:13px; fill:#003760;" x="48.5" y="311" text-anchor="middle">2.2 GB</text>
+          <text class="svg-muted" style="font-size:9px;" x="48.5" y="372" text-anchor="middle">TinyLlama</text>
+          <rect x="91"  y="199" width="57" height="151" rx="3" style="fill:#1C8680; opacity:0.9;"/>
+          <text class="svg-num" style="font-size:13px; fill:#1C8680;" x="119.5" y="191" text-anchor="middle">56 GB</text>
+          <text class="svg-muted" style="font-size:9px;" x="119.5" y="372" text-anchor="middle">Qwen3.8-27B</text>
+          <rect x="162" y="48"  width="57" height="302" rx="3" style="fill:#F0A413;"/>
+          <text class="svg-num" style="font-size:13px; fill:#F0A413;" x="190.5" y="40" text-anchor="middle">3.2 TB</text>
+          <text class="svg-muted" style="font-size:9px;" x="190.5" y="372" text-anchor="middle">DeepSeek-V4</text>
+          <text class="svg-muted" style="font-size:8px; fill:#F0A413;" x="190.5" y="388" text-anchor="middle">862 GB FP4/8</text>
+          <rect x="233" y="33"  width="57" height="317" rx="3" style="fill:#F04E23;"/>
+          <text class="svg-num" style="font-size:13px; fill:#F04E23;" x="261.5" y="25" text-anchor="middle">4.8 TB</text>
+          <text class="svg-muted" style="font-size:9px;" x="261.5" y="372" text-anchor="middle">Qwen3.8-Max</text>
+          <text class="svg-muted" style="font-size:8px; fill:#F04E23;" x="261.5" y="388" text-anchor="middle">2.4 TB FP8</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>

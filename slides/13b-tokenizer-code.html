@@ -1,0 +1,70 @@
+<section data-id="tokenizer-code" data-title="Tokenizer in Code">
+  <div class="slide-content">
+    <h2>Tokenizer — <span class="highlight">in Code</span></h2>
+
+    <!-- Re-ordered for the talk: Tokenize first, then the table it reads. That is not a
+         contiguous slice of DemoTokenizer.cs, so no data-src — check:code reports this
+         as a hand-written snippet. The padding constructor (lines 29-37) is omitted. -->
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-numbers="snippet">
+      <pre class="vscode-source">
+    public int[] Tokenize(string input)
+    {
+        var tokens = input.Split(' ');
+        return tokens.Select(token =&gt; Vocabulary.GetValueOrDefault(token, Vocabulary["&lt;unk&gt;"])).ToArray();
+    }
+
+    public Dictionary&lt;string, int&gt; Vocabulary { get; set; } = new Dictionary&lt;string, int&gt;()
+{
+
+    {"&lt;bos&gt;", 0},
+    {"&lt;eos&gt;", 1},
+    {"&lt;unk&gt;", 2},
+
+    {"hello", 3},
+    {"world", 4},
+    {"this", 5},
+    {"is", 6},
+    {"a", 7},
+    {"test", 8},
+    {"tiny", 9},
+    {"llm", 10},
+    {"replies", 11},
+    {"to", 12},
+    {"input", 13},
+    {"tokens", 14}
+};
+      </pre>
+
+      <!-- Three beats: the lookup call, the words it finds, the fallback it lands on
+           when it finds nothing. The <unk> line comes last on purpose — it is the
+           handoff to the [2, 2, 2] the generation slides run on. -->
+      <span class="vscode-step fragment" data-fragment-index="0"
+            data-text="Vocabulary.GetValueOrDefault"
+            data-stopped="4"
+            data-values="3: input.Split(' ') → [&quot;hello&quot;, &quot;world&quot;, ...] | 4: one dictionary lookup per word"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+            data-lines="14-16"
+            data-stopped="14"
+            data-values="14: &quot;hello&quot; → 3 | 15: &quot;world&quot; → 4 | 16: &quot;this&quot; → 5"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-lines="12"
+            data-stopped="12"
+            data-values="12: &quot;Capital&quot; not in the table → 2"></span>
+    </div>
+  </div>
+
+  <style>
+    [data-id="tokenizer-code"] h2 {
+      margin-bottom: 0.6rem;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="tokenizer-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+    }
+  </style>
+</section>

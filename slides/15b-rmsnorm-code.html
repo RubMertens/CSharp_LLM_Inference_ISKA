@@ -1,0 +1,46 @@
+<section data-id="rmsnorm-code" data-title="RMSNorm in Code">
+  <div class="slide-content">
+    <h2>RMSNorm — <span class="highlight">in Code</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+         data-member="RootMeanSquareNormalisation"
+         data-start-line="96">
+      <pre class="vscode-source">
+public static Vector RootMeanSquareNormalisation(Vector input, Vector normWeight)
+{
+    float sumSquares = input.Data.Sum(x =&gt; x * x);
+
+    const float divideByZeroProtection = 1e-5f;
+    float mean = sumSquares / input.Length;
+    float rootMeanSquare = MathF.Sqrt(mean + divideByZeroProtection);
+
+    Vector result = new(input.Length);
+    for (var i = 0; i &lt; input.Length; i++)
+    {
+        result[i] = input[i] / rootMeanSquare * normWeight[i];
+    }
+
+    return result;
+}
+      </pre>
+      <span class="vscode-inline" data-line="1" data-value="input = [2, 3, 1, 4]   normWeight = [1, 0.5, 2, 1]"></span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-text="sumSquares = input.Data.Sum"
+         data-stopped="3"
+         data-values="3: 4 + 9 + 1 + 16 = 30"
+         data-note="Σ x² over the vector"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="5-7"
+         data-stopped="7"
+         data-values="6: mean = 30 / 4 = 7.5 | 7: rootMeanSquare = 2.74"
+         data-note="mean → sqrt → rms (1e-5 guards divide-by-zero)"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-lines="9-13"
+         data-stopped="12"
+         data-values="10: i = 0 | 12: 2 / 2.74 × 1 = 0.73"
+         data-note="x / rms * weight — normalize, then rescale"></span>
+    </div>
+  </div>
+</section>

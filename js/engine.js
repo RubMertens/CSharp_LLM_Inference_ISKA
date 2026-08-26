@@ -52,9 +52,17 @@ class PresentationEngine {
     this.#currentIndex = index;
     location.hash = this.#slides[index].id;
 
+    const slide = this.#slides[index];
     const el = document.createElement('div');
-    el.className = `slide slide-enter-${direction}`;
-    el.innerHTML = this.#slides[index].html;
+    el.className = `slide slide-enter-${direction}${slide.cls ? ' ' + slide.cls : ''}`;
+    el.dataset.id = slide.id;
+    if (slide.layout) el.dataset.layout = slide.layout;
+    el.innerHTML = slide.html;
+
+    // Mirrored onto <body> so page-level chrome (the ISKS footer bar) can
+    // respond to the current slide without needing :has().
+    document.body.dataset.slide = slide.id;
+    document.body.dataset.layout = slide.layout;
 
     el.querySelectorAll('.speaker-notes').forEach(n => n.hidden = true);
     if (revealFragments) {
@@ -302,7 +310,9 @@ class PresentationEngine {
       if (i === this.#currentIndex) item.classList.add('current');
 
       const inner = document.createElement('div');
-      inner.className = 'slide';
+      inner.className = `slide${slide.cls ? ' ' + slide.cls : ''}`;
+      inner.dataset.id = slide.id;
+      if (slide.layout) inner.dataset.layout = slide.layout;
       inner.innerHTML = slide.html;
 
       inner.querySelectorAll('.speaker-notes').forEach(n => n.hidden = true);

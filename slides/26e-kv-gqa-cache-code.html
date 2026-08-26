@@ -1,0 +1,105 @@
+<section data-id="kv-gqa-cache-code" data-title="Attention Without Recomputing">
+  <div class="slide-content">
+    <h2>Attention — <span class="highlight">without recomputing</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/6_MultiLayerWithKVCache/MultiLayerTransformerWithKVCache.cs"
+         data-member="GroupedQueryAttentionWithCache"
+         data-start-line="274">
+      <pre class="vscode-source">
+private Vector GroupedQueryAttentionWithCache(
+    Vector queryRow,
+    List&lt;Vector&gt; cachedKeys,
+    List&lt;Vector&gt; cachedValues)
+{
+    int cacheLength = cachedKeys.Count;
+    Vector output = new(weights.HiddenDimension);
+
+    var groupSize = weights.NumberdOfQueryHeads / weights.NumberOfKeyValueHeads;
+    float scale = MathF.Sqrt(weights.HeadDimension);
+
+    for (int queryHead = 0; queryHead &lt; weights.NumberdOfQueryHeads; queryHead++)
+    {
+        var keyValueHead = queryHead / groupSize;
+        var queryOffset = queryHead * weights.HeadDimension;
+        var keyValueOffset = keyValueHead * weights.HeadDimension;
+
+        var queryForHead = queryRow[queryOffset..(queryOffset + weights.HeadDimension)];
+
+        Vector scores = new(cacheLength);
+        for (int t = 0; t &lt; cacheLength; t++)
+        {
+            var key = cachedKeys[t][keyValueOffset..(keyValueOffset + weights.HeadDimension)];
+            scores[t] = queryForHead * key / scale;
+        }
+
+        var attentionWeights = Softmax(scores);
+
+        Vector headOutput = new(weights.HeadDimension);
+        for (int t = 0; t &lt; cacheLength; t++)
+        {
+            var value = cachedValues[t][keyValueOffset..(keyValueOffset + weights.HeadDimension)];
+            headOutput += attentionWeights[t] * value;
+        }
+
+        for (int j = 0; j &lt; weights.HeadDimension; j++)
+        {
+            output[queryOffset + j] = headOutput[j];
+        }
+    }
+
+    return output;
+}
+      </pre>
+      <span class="vscode-inline" data-line="1" data-value="queryHeads = 8   kvHeads = 2   hiddenDim = 64   headDim = 8   layers = 2"></span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-lines="1-2"
+         data-note="No causal mask here. On 16b and 25c we set -∞ for future positions. The cache only ever holds the past, so there is no future to mask."></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="1-4"
+         data-values="2: queryRow = 64 numbers (one token) | 3: cachedKeys = 4 rows | 4: cachedValues = 4 rows"
+         data-note="One query row in. All of history comes in as two lists."></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-text="int cacheLength = cachedKeys.Count"
+         data-stopped
+         data-values="6: cachedKeys.Count = 4"
+         data-note="How far back we can look IS the cache length. Prompt [2, 2, 2] plus one generated token = 4."></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-lines="9-16"
+         data-stopped="14"
+         data-values="9: 8 / 2 = 4 | 10: scale = √8 = 2.83 | 12: queryHead = 5 | 14: 5 / 4 = 1 | 15: queryOffset = 40 | 16: keyValueOffset = 8"
+         data-note="Same head mapping as slide 25c. Only 2 KV heads exist, so the cache stores 2 heads, not 8 — that is why GQA and KV caching turn up in the same conversation."></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-text="var queryForHead = queryRow"
+         data-stopped
+         data-values="18: queryRow[40..48] — 8 numbers"
+         data-note="The only thing computed fresh this step: the query for the one new token."></span>
+      <span class="vscode-step fragment" data-fragment-index="5"
+         data-lines="20-25"
+         data-stopped="23"
+         data-values="20: scores = [0, 0, 0, 0] | 21: t = 0, 1, 2, 3 | 23: cachedKeys[0][8..16] — a list lookup | 24: 6.7 / 2.83 = 2.37"
+         data-note="The payoff. This key used to be recomputed from the token embedding on every single step. Now it is an index into a list."></span>
+      <span class="vscode-step fragment" data-fragment-index="6"
+         data-text="var attentionWeights = Softmax(scores)"
+         data-stopped
+         data-values="27: [2.37, 1.10, 0.42, 1.85] → [0.50, 0.14, 0.07, 0.29]"
+         data-note="Four real scores, no -∞ anywhere. Nothing to mask out."></span>
+      <span class="vscode-step fragment" data-fragment-index="7"
+         data-lines="29-34"
+         data-stopped="32"
+         data-values="29: headOutput = 8 zeros | 30: t = 0, 1, 2, 3 | 32: cachedValues[0][8..16] — read, not recomputed | 33: += 0.50 × v0, 0.14 × v1, 0.07 × v2, 0.29 × v3"
+         data-note="Same again for the values. Loop over history, not over a freshly built matrix."></span>
+      <span class="vscode-step fragment" data-fragment-index="8"
+         data-lines="36-39"
+         data-stopped="38"
+         data-values="38: output[40..48] = head 5's 8 numbers"
+         data-note="Each head writes its own slice — concatenation, in place."></span>
+      <span class="vscode-step fragment" data-fragment-index="9"
+         data-text="return output"
+         data-stopped
+         data-values="42: output = 64 numbers, one token"
+         data-note="One token in, one token out — and the cost of a step no longer grows by redoing the past. Price: memory. The cache is sequenceLength × layers × kvHeads × headDim, and on long contexts it becomes the biggest thing in RAM. Which is exactly what grouped-query attention shrinks."></span>
+    </div>
+  </div>
+</section>

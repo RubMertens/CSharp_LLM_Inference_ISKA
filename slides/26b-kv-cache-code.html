@@ -1,0 +1,54 @@
+<section data-id="kv-cache-code" data-title="The KV Cache — Two Fields">
+  <div class="slide-content">
+    <h2>The Fix Is <span class="highlight">Two Fields</span></h2>
+
+    <!-- Deliberately NOT data-fill: that is for slides where the panel is the whole
+         slide, and its 78vh min-height would push the explanation below off-screen.
+         data-font-size is a MAXIMUM, and it stays low here on purpose: these two
+         declarations are 88 characters wide, and the fit pass only shrinks for
+         height, so anything above ~0.95rem soft-wraps each field onto a second
+         row and the snippet stops reading as two lines. -->
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/6_MultiLayerWithKVCache/MultiLayerTransformerWithKVCache.cs"
+         data-lines="5-8"
+         data-start-line="5">
+      <pre class="vscode-source">
+public class MultiLayerTransformerWithKVCache(ModelWeights weights)
+{
+    private readonly List&lt;Vector&gt;[] _keyCache = new List&lt;Vector&gt;[weights.Layers.Length];
+    private readonly List&lt;Vector&gt;[] _valueCache = new List&lt;Vector&gt;[weights.Layers.Length];
+      </pre>
+      <span class="vscode-inline" data-line="2"
+          
+          </span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+            data-text="_keyCache"
+            data-stopped
+
+            data-note="Keys, kept per layer"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+            data-text="_valueCache"
+            data-stopped
+
+            data-note="Values, same shape"></span>
+    </div>
+
+  </div>
+
+  <style>
+    [data-id="kv-cache-code"] h2 {
+      margin-bottom: 0.7rem;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="kv-cache-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.4rem;
+      }
+      [data-id="kv-cache-code"] .vscode-window {
+        --vs-font-size: 0.5rem !important;
+      }
+    }
+  </style>
+</section>

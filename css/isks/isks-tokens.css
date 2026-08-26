@@ -1,0 +1,203 @@
+/*
+ * ISKS 2026 "Built to Last" -- CSS Design Tokens
+ *
+ * Extracted from: ISKS_sprekers_basisslides_z_animaties.pptx
+ *   (Info Support speaker base deck, slide size 12192000 x 6858000 EMU = 16:9 @ 960x540pt)
+ *
+ * Every value below is verbatim from the pptx XML or measured from its
+ * embedded raster assets. Provenance is noted per token.
+ * See colors.md for the full audit trail.
+ *
+ * Usage:
+ *   @import url("isks/isks-tokens.css");
+ *   -- or just use isks.css, which imports this file.
+ */
+
+:root {
+  /* ============================================================
+     BRAND COLOURS
+     ============================================================ */
+
+  /* --- Teal: the ISKS signature colour. Titles + body copy on
+         white content slides. (slideLayout2/3/5, srgbClr 066F6B) --- */
+  --isks-teal:            #066F6B;
+
+  /* --- Amber: accent. Triangle bullet, vertical rules, subtitles.
+         The deck contains two near-identical ambers; both are real.
+         F0A413 -- shapes/rules (slideLayout2/3/5)
+         F0A314 -- title-slide subtitle text (slideLayout1)
+         Use --isks-amber unless matching title-slide text exactly. --- */
+  --isks-amber:           #F0A413;
+  --isks-amber-text:      #F0A314;
+
+  /* --- Gradient ramp: navy -> mid -> teal.
+         Used for the full-bleed background and for card fills.
+         (slideLayout5 "Rechthoek" gradFill stops 0 / 50% / 100%) --- */
+  --isks-navy:            #003760;
+  --isks-mid:             #005C75;
+  --isks-teal-bright:     #1C8680;
+
+  /* --- Red-orange: the diagonal stripe block on the title slide, and
+         the offset shadow behind the "Built to Last" lockup. The stripe
+         colour is the Info Support house red -- see
+         ../housestyle/colors.md -- which ties the event artwork back to
+         the corporate palette. The lockup shadow is a slightly deeper
+         cut of the same hue, as it ships in the bar artwork. --- */
+  --isks-orange:          #F04E23;   /* house "Rood", title-slide stripes */
+  --isks-lockup-shadow:   #DD4111;   /* offset shadow inside the lockup   */
+
+  --isks-white:           #FFFFFF;
+
+  /* --- Derived / usage tokens --- */
+  --isks-bg:              var(--isks-white);   /* master bg = bg1 = white */
+  --isks-heading:         var(--isks-teal);
+  --isks-body:            var(--isks-teal);
+  --isks-on-dark:         var(--isks-white);
+  --isks-on-dark-muted:   rgba(255, 255, 255, 0.72);
+
+  /* ============================================================
+     GRADIENTS
+     ============================================================ */
+
+  /* Full-bleed slide background: horizontal, left navy -> right teal.
+     Verified against the embedded 8000x4500 background asset:
+       x=0%  #003660   x=50% #005D75   x=100% #1C8680
+     (matches the declared 003760 / 005C75 / 1C8680 stops) */
+  --isks-gradient-h: linear-gradient(
+    90deg,
+    var(--isks-navy)        0%,
+    var(--isks-mid)        50%,
+    var(--isks-teal-bright) 100%
+  );
+
+  /* Card / panel fill: vertical, navy at top -> teal at bottom.
+     (slideLayout5 gradFill, a:lin ang="5400000" = 90deg = top to bottom) */
+  --isks-gradient-v: linear-gradient(
+    180deg,
+    var(--isks-navy)        0%,
+    var(--isks-mid)        50%,
+    var(--isks-teal-bright) 100%
+  );
+
+  /* ============================================================
+     HALFTONE DOT FIELD
+     ============================================================
+     Measured from the embedded background asset (8000px wide):
+       grid          square, pitch 121px  = 1.5125% of slide width
+       dot colour    #1C8680 at 40% alpha over the gradient
+       falloff       dot area shrinks linearly with x, reaching 0
+                     at x = 54%; alpha holds 0.40 to x = 27%, then
+                     ramps to 0 at x = 54%
+       dot diameter  0.72 x pitch at x=0, 0.51 at x=24%, 0 at x=54%
+
+     The footer bar ships as separate artwork with its own, finer
+     grid (measured on the 4400px bar asset): pitch 53px = 1.2045%
+     of width, dot diameter 0.48 x pitch, same #1C8680 @ 40%,
+     petering out around 40%.
+
+     Pitch is expressed in vw because a slide fills the viewport,
+     so 1vw == 1% of slide width, and vw keeps the tiles square at
+     any aspect ratio (a % background-size would not).
+     ============================================================ */
+  --isks-dot-pitch:       1.5125vw;        /* background field */
+  --isks-dot-radius:      36%;             /* 0.72 x pitch diameter */
+  --isks-dot-color:       rgba(28, 134, 128, 0.40);
+  --isks-dot-fade-start:  34%;             /* peak of the small-dot band */
+  --isks-dot-fade-end:    54%;             /* gone by here */
+
+  --isks-bar-dot-pitch:   1.2045vw;        /* footer bar field */
+  --isks-bar-dot-radius:  24%;             /* 0.48 x pitch diameter */
+  --isks-bar-dot-fade:    40%;
+
+  /* ============================================================
+     TYPOGRAPHY
+     ============================================================
+     Deck font is Arial throughout (declared explicitly on every
+     text placeholder in slideLayout2/3/5 and on the master).
+     Line spacing is 90% on both title and body styles.
+
+     Sizes are the pptx point sizes converted to a fraction of the
+     960pt slide width, then clamped so the deck stays readable at
+     phone widths (this deck is opened from a QR code).
+       55pt -> 5.729vw     24pt -> 2.500vw
+       40pt -> 4.167vw     20pt -> 2.083vw
+       18pt -> 1.875vw     12pt -> 1.250vw
+     ============================================================ */
+  --isks-font: Arial, Helvetica, "Helvetica Neue", -apple-system,
+               BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --isks-fs-hero:      clamp(2rem,    5.729vw, 5.15rem);  /* 55pt  title slide h1 */
+  --isks-fs-title:     clamp(1.5rem,  4.167vw, 3.75rem);  /* 40pt  section title  */
+  --isks-fs-subtitle:  clamp(1rem,    2.500vw, 2.25rem);  /* 24pt  amber subtitle */
+  --isks-fs-body:      clamp(0.95rem, 2.083vw, 1.88rem);  /* 20pt  body           */
+  --isks-fs-body-sm:   clamp(0.85rem, 1.875vw, 1.69rem);  /* 18pt  dense body     */
+  --isks-fs-footer:    clamp(0.6rem,  1.250vw, 1.13rem);  /* 12pt  footer/meta    */
+
+  /* The bar's "ISKS / 2026" block, derived from the bar artwork rather
+     than a declared point size: cap height is 25% of the bar height,
+     which for Arial (cap 0.716em) works out to 2.007% of slide width. */
+  --isks-fs-bar:       clamp(0.62rem, 2.007vw, 1.81rem);
+
+  --isks-lh:           0.9;    /* 90% line spacing, per master lnSpc */
+  --isks-lh-body:      1.35;   /* 90% is too tight for wrapped web copy */
+  --isks-weight-title: 700;    /* b="1" on the title placeholder */
+
+  /* ============================================================
+     LAYOUT GEOMETRY  (all % of slide box, verbatim from the pptx)
+     ============================================================ */
+
+  /* Content-slide title block: off x=1457945 y=890307 -> 11.96% / 12.98% */
+  --isks-title-x:      11.96%;
+  --isks-title-y:      12.98%;
+  --isks-title-w:      81.12%;
+
+  /* Amber triangle bullet: frame 4.09% x 3.71%, centre at 9.77% / 18.07%
+     (off 942160,1111934 ext 498905x254396, rot="8100000" = 135deg) */
+  --isks-bullet-size:  4.09%;
+  --isks-bullet-x:     7.73%;
+  --isks-bullet-y:     16.21%;
+
+  /* Body content area. Full width, and the two-column split. */
+  --isks-content-x:    7.59%;
+  --isks-content-y:    24.53%;
+  --isks-content-w:    85.48%;
+  --isks-content-h:    61.05%;
+  --isks-col-left-w:   39.40%;
+  --isks-col-right-x:  50.99%;
+  --isks-col-right-w:  42.08%;
+
+  /* Footer bar: off -0.29%,90.08% ext 100.39% x 10.22%.
+     The bar asset is 4400x252 (aspect 5.727% of width), placed at
+     native aspect -- so its height is 10.22% of slide height. */
+  --isks-bar-h:        10.22%;
+  --isks-bar-y:        90.08%;
+
+  /* Card row (slideLayout5): four cards, 19.65% x 40.87%, top 31.34%,
+     left edges 7.63 / 29.49 / 51.36 / 73.23%  -> pitch 21.87%, gap 2.22% */
+  --isks-card-w:       19.65%;
+  --isks-card-h:       40.87%;
+  --isks-card-y:       31.34%;
+  --isks-card-gap:     2.22%;
+
+  /* Title slide (slideLayout1) */
+  --isks-hero-x:       4.86%;
+  --isks-hero-y:       31.66%;
+  --isks-hero-w:       48.67%;
+  --isks-hero-sub-y:   58.14%;
+
+  /* ============================================================
+     ASSET PATHS
+     ============================================================
+     Relative to css/isks/. Point these at the optimised web/
+     variants; the full-resolution originals sit one level up
+     in assets/ for print or re-export.
+     ============================================================ */
+  --isks-asset-title-bg:  url("assets/web/isks-title-background.jpg");
+  --isks-asset-bar:       url("assets/web/isks-bar.jpg");
+  --isks-asset-logo:      url("assets/web/infosupport-40jaar-logo-white.png");
+  /* The lockup ships in two cuts: `-solid` is the filled two-tone mark
+     used in the footer bar, `-white`/`-amber`/`-teal` are the outlined
+     cut (higher resolution, for large display use). */
+  --isks-asset-lockup:    url("assets/web/isks-built-to-last-solid.png");
+  --isks-asset-lockup-outline: url("assets/web/isks-built-to-last-white.png");
+}

@@ -54,21 +54,5 @@
         <text class="svg-text-sm svg-muted" x="640" y="103">output</text>
       </svg>
     </div>
-
-    <div class="fragment">
-      <div class="card" style="padding: clamp(0.5rem, 1.2vh, 0.8rem) clamp(1rem, 2vw, 1.4rem); text-align: center;">
-        <code style="font-size: clamp(1rem, 1.8vw, 1.25em); color: var(--color-accent);">SwiGLU(x) = Swish(xW₁) ⊙ (xW₂)</code>
-        <p style="font-size: clamp(0.85rem, 1.4vw, 1em); color: var(--color-text-muted); margin-top: 0.3rem; margin-bottom: 0.1rem;">
-          Swish(x) = x × sigmoid(x) — a smooth version of ReLU
-        </p>
-        <p style="font-size: clamp(0.85rem, 1.4vw, 1em); color: var(--color-text-muted); margin: 0;">
-          ⊙ = element-wise multiplication (the "gating" mechanism)
-        </p>
-      </div>
-    </div>
-
-    <p class="fragment" style="text-align: center; margin: 0; color: var(--color-text-muted); font-size: clamp(0.85rem, 1.4vw, 1em);">
-      The gate learns <span class="highlight">which parts of the signal to keep</span> and which to suppress
-    </p>
   </div>
 </section>

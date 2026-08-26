@@ -1,0 +1,100 @@
+<section data-id="causal-masking-code" data-title="Causal Masking in Code">
+  <div class="slide-content">
+    <h2>Causal Masking &mdash; <span class="highlight">in Code</span></h2>
+
+    <!-- The whole method, on every one of the three attention code slides. Only the
+         steps differ: this one walks from the causal check through the rest of the loop body. -->
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         style="margin: 0 auto; box-sizing: border-box; max-width: min(100%, 92vw);"
+         data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+         data-lines="53-95"
+         data-member="SingleHeadSelfAttention"
+         data-start-line="53">
+      <pre class="vscode-source">
+private Matrix SingleHeadSelfAttention(int headDimension, int sequenceLength, Matrix queries, Matrix keys, Matrix values)
+{
+    float scale = MathF.Sqrt(headDimension);
+
+    Matrix attentionOutput = new(sequenceLength, headDimension);
+
+    for (int lookingFrom = 0; lookingFrom &lt; sequenceLength; lookingFrom++)
+    {
+        var scores = new float[sequenceLength];
+
+        for (var lookingTo = 0; lookingTo &lt; sequenceLength; lookingTo++)
+        {
+            if (lookingTo &gt; lookingFrom)
+            {
+                scores[lookingTo] = float.NegativeInfinity;
+                continue;
+            }
+            scores[lookingTo] = queries[lookingFrom] * keys[lookingTo] / scale;
+        }
+
+        var attentionWeights = Softmax(scores);
+
+        Vector attended = new(headDimension);
+        for (int j = 0; j &lt; sequenceLength; j++)
+        {
+            attended = attended + (attentionWeights[j] * values[j]);
+        }
+
+        attentionOutput[lookingFrom] = attended;
+    }
+    return attentionOutput;
+}
+      </pre>
+      <span class="vscode-inline" data-line="1" data-value="headDimension = 64   sequenceLength = 3   queries / keys / values = 3&#215;64"></span>
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-lines="13"
+         data-stopped
+         data-values="13: lookingTo = 2 &gt; lookingFrom = 1 &#10003;"
+         data-note="Same line we left on. Now watch what it does"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="14-17"
+         data-stopped="15"
+         data-values="15: scores[2] = -&#8734; | 16: continue &mdash; skip the rest of the loop body"
+         data-note="-&#8734; is picked so softmax turns it into exactly 0. The future contributes nothing"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-lines="18"
+         data-stopped="18"
+         data-values="18: q&#8321; &#8226; k&#8320; = 12.4, / 8 &#8594; scores[0] = 1.55"
+         data-note="The unmasked pairs get the real work: that * is the dot product from earlier. Query = what I want, key = what I offer"></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-lines="19"
+         data-values="19: scores = [1.55, 1.61, -&#8734;]"
+         data-note="Inner loop done. Three raw numbers for token 1 &mdash; two real, one masked"></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-lines="21"
+         data-stopped="21"
+         data-values="21: [1.55, 1.61, -&#8734;] &#8594; [0.49, 0.51, 0]"
+         data-note="Raw scores into weights that sum to 1. Step into Softmax &mdash; that is the next slide"></span>
+    </div>
+  </div>
+
+  <style>
+    /* The code area is a <pre>, and theme.css caps every <pre> at 80ch. At 43 lines
+       that wraps the long comments three deep and starves the fit pass. Let the code
+       use the full panel width. */
+    [data-id="causal-masking-code"] .vscode-code {
+      max-width: none;
+    }
+
+    [data-id="causal-masking-code"] h2 {
+      margin-bottom: 0.6rem;
+    }
+
+    @media (max-width: 820px) {
+      [data-id="causal-masking-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+      /* 43 lines wrap hard on a phone. Drop the vh cap so the fit pass sizes the font
+         against the real room instead of the code area being clipped twice over. */
+      [data-id="causal-masking-code"] .vscode-window {
+        --vs-max-height: none;
+      }
+    }
+  </style>
+</section>

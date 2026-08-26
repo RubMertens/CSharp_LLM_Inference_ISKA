@@ -1,7 +1,19 @@
-import { makeDraggable, el } from './interactions.js';
+import { makeDraggable, registerInteraction, el } from './interactions.js';
 
 const CX = 250, CY = 250, R = 180, ARC_R = 70;
 const ALPHA = 25 * Math.PI / 180;
+
+// Where the draggable ball sits before anyone touches it. The markup paints it at
+// (326, 87), which is this angle on the circle -- keep the two in step.
+const INITIAL_ANGLE = 65 * Math.PI / 180;
+
+// Two more balls on the same circle, spun at higher frequencies. Same position drives
+// all three; only theta differs. No arcs or angle marks — the message is that the
+// three positions drift apart unpredictably, which is the RoPE frequency story.
+const FAST = [
+  { id: 'rot-fast-a', mult: 3.7 },
+  { id: 'rot-fast-b', mult: 8.3 },
+];
 
 function arcPath(from, to, r) {
   const sx = CX + r * Math.cos(from), sy = CY - r * Math.sin(from);
@@ -10,6 +22,16 @@ function arcPath(from, to, r) {
   if (sweep < 0) sweep += 2 * Math.PI;
   const large = sweep > Math.PI ? 1 : 0;
   return `M ${sx.toFixed(1)},${sy.toFixed(1)} A ${r},${r} 0 ${large},0 ${ex.toFixed(1)},${ey.toFixed(1)}`;
+}
+
+function updateFast(theta) {
+  for (const f of FAST) {
+    const ang = ALPHA + f.mult * theta;
+    const dot = el(f.id);
+    if (!dot) continue;
+    dot.setAttribute('cx', (CX + R * Math.cos(ang)).toFixed(1));
+    dot.setAttribute('cy', (CY - R * Math.sin(ang)).toFixed(1));
+  }
 }
 
 function update(angle) {
@@ -100,7 +122,26 @@ function update(angle) {
     thetaLabel.setAttribute('y', CY - lr * Math.sin(mid));
     thetaLabel.textContent = `θ = ${deg}°`;
   }
+
+  updateFast(theta);
 }
+
+// The fast balls' positions are a function of the drag angle, so nothing in the
+// markup can be authored correctly by hand -- and it was not: both were painted at
+// the same point, so the first drag made them jump. Run the real update once on
+// entry instead, and frame zero is the state the drag handler would have produced.
+//
+// Guard it. registerInteraction fires from a MutationObserver watching childList on
+// the slide container, and update() writes label textContent -- which is itself a
+// childList mutation. Without the flag that is an infinite loop that hangs the page.
+// The flag is a data attribute, and attributes are not observed, so setting it is
+// free. The engine swaps innerHTML per slide entrance, so each entrance starts clean.
+registerInteraction('rot-drag-dot', () => {
+  const dot = el('rot-drag-dot');
+  if (!dot || dot.dataset.initialised) return;
+  dot.dataset.initialised = '1';
+  update(INITIAL_ANGLE);
+});
 
 makeDraggable({
   hit: /^rot-drag-(hit|dot)$/,

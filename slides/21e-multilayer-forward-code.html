@@ -1,0 +1,126 @@
+<section data-id="multilayer-forward-code" data-title="The Multi-Layer Forward Pass">
+  <div class="slide-content">
+    <h2>Same forward pass — <span class="highlight">now in a loop</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/3_MultiLayer/MultiLayerTransformer.cs"
+         data-member="Forward"
+         data-start-line="35"
+         style="max-width: min(100%, 94vw);">
+      <pre class="vscode-source">
+public Matrix Forward(int[] tokens)
+{
+    var sequenceLength = tokens.Length;
+
+    Matrix embeddings = Embed(tokens);
+
+
+    foreach (var layer in Weights.Layers)
+    {
+        var residual = embeddings;
+
+        Matrix normalizedEmbeddings = RMSNorm(embeddings, layer.AttentionNormWeight);
+
+        var queries = ApplyRoPETo(normalizedEmbeddings * layer.QueryProjection);
+        var keys = ApplyRoPETo(normalizedEmbeddings * layer.KeyProjection);
+        var values = normalizedEmbeddings * layer.ValueProjection;
+
+        var attentionOutput = SingleHeadSelfAttention(Weights.HiddenDimension, sequenceLength, queries, keys, values);
+
+        var projectedAttention = attentionOutput * layer.OutputProjection;
+
+        embeddings = residual + projectedAttention;
+    }
+
+    embeddings = RMSNorm(embeddings, Weights.FinalNormWeight);
+    var logits = embeddings * Weights.OutputEmbedding;
+    return logits;  
+}      
+</pre>
+
+      <!-- always on: the toy's real numbers -->
+      <span class="vscode-inline" data-line="1"
+            data-value="tokens = [2, 2, 2]   HiddenDimension = 64   VocabularySize = 250"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="0"
+            data-text="Matrix embeddings = Embed(tokens)"
+            data-stopped
+            data-values="5: embeddings = 3 &times; 64 — the same table lookup as before"
+            data-note="Identical to the single-layer version. It just moved into a helper."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="1"
+            data-text="foreach (var layer in Weights.Layers)"
+            data-stopped
+            data-values="8: Weights.Layers = LayerWeights[2] — two passes"
+            data-note="This is the whole change: the block below now runs once per layer, and the weights come from layer. instead of Weights. Toy: 2 layers. Llama 3 8B: 32. Same loop."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="2"
+            data-text="var residual = embeddings"
+            data-stopped
+            data-values="10: residual = 3 &times; 64 — this layer's input, kept aside"
+            data-note="Park the input. Everything this layer computes is a correction added back onto it."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="3"
+            data-text="Matrix normalizedEmbeddings = RMSNorm"
+            data-stopped
+            data-values="12: 3 &times; 64, rescaled per row by layer.AttentionNormWeight (64 floats)"
+            data-note="Same RMSNorm as before — but the norm weight is this layer's, not the model's."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="4"
+            data-text="normalizedEmbeddings * layer."
+            data-values="14: queries = 3 &times; 64 | 15: keys = 3 &times; 64 | 16: values = 3 &times; 64"
+            data-note="Three projections out of this layer's weights, each 64 × 64. RoPE on Q and K only — V carries no position."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="5"
+            data-text="SingleHeadSelfAttention"
+            data-stopped
+            data-values="18: attentionOutput = 3 &times; 64 — from a 3 &times; 3 masked score matrix"
+            data-note="Untouched from the single-layer version. One head, causal mask, softmax, weighted sum of values."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="6"
+            data-text="attentionOutput * layer.OutputProjection"
+            data-stopped
+            data-values="20: projectedAttention = 3 &times; 64 — 64 × 64 projection"
+            data-note="Mix the head's output back into the model's width before it rejoins the stream."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="7"
+            data-text="embeddings = residual + projectedAttention"
+            data-stopped
+            data-values="22: embeddings = 3 &times; 64 — layer 1 out, layer 2 in"
+            data-note="Add the correction to the parked input. That is one layer. Loop back, same code, Layers[1]."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="8"
+            data-text="RMSNorm(embeddings, Weights.FinalNormWeight)"
+            data-stopped
+            data-values="25: 3 &times; 64 — once, after every layer has run"
+            data-note="Out of the loop. One final norm, and this one is Weights. again — per model, not per layer."></span>
+
+      <span class="vscode-step fragment" data-fragment-index="9"
+            data-text="logits"
+            data-stopped="26"
+            data-values="26: logits = 3 &times; 250 | 27: one score per vocabulary token, per position"
+            data-note="Back out to the vocabulary. Take the last row, argmax it, that is the next token."></span>
+    </div>
+
+  </div>
+
+  <style>
+    [data-id="multilayer-forward-code"] h2 { margin-bottom: 0.6rem; }
+
+    /* theme.css caps every <pre> at 80ch; at 32 lines with a 120-char comment that
+       wraps half the method and starves the fit pass. Let it use the panel. */
+    [data-id="multilayer-forward-code"] .vscode-code { max-width: none; }
+
+
+    @media (max-width: 820px) {
+      [data-id="multilayer-forward-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+      /* Narrow screens wrap the long lines hard. Give the code area the full column
+         and let it scroll rather than clipping to a stub. */
+      [data-id="multilayer-forward-code"] .vscode-window { --vs-max-height: none; }
+    }
+  </style>
+</section>

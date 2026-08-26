@@ -1,0 +1,57 @@
+<section data-id="predict-next-token-code" data-title="Predict Next Token in Code">
+  <div class="slide-content">
+    <h2>Predict Next Token — <span class="highlight">in Code</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/1_SingleLayer/Transformer.cs"
+         data-member="PredictNextTokenGreedy"
+         data-start-line="8">
+      <pre class="vscode-source">
+public int PredictNextTokenGreedy(int[] tokens)
+{
+    var logits = Forward(tokens);
+    Vector last = logits[tokens.Length - 1];
+    var best = last.Data.Max();
+    var bestIndex = Array.IndexOf(last.Data, best);
+    return bestIndex;
+}
+      </pre>
+
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-text="var logits = Forward(tokens)"
+         data-stopped></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-text="Vector last = logits[tokens.Length - 1]"
+         data-stopped
+         data-values="4: last = 1 × 250 — one score per vocab entry"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-text="var best = last.Data.Max()"
+         data-stopped></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-text="var bestIndex = Array.IndexOf(last.Data, best)"
+         data-stopped></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-text="return bestIndex"
+         data-stopped></span>
+    </div>
+
+    <style>
+      .greedy-caption {
+        max-width: 78ch;
+        margin: 0.7rem auto 0;
+        font-size: 1rem;
+      }
+
+      @media (max-width: 820px) {
+        .greedy-caption {
+          max-width: 86vw;
+          margin: 0.7rem 0 0;
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+
+  
+  </div>
+</section>

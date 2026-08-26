@@ -1,0 +1,110 @@
+<section data-id="multilayer-weights-code" data-title="Weights, Per Layer">
+  <div class="slide-content">
+    <h2>The weights grew an <span class="highlight">array</span></h2>
+
+    <div class="two-column ml-weights-grid">
+      <div class="vscode-window" data-fill
+           data-font-size="0.85rem"
+           data-src="Runner.ConsoleApp/ModelWeights.cs"
+           data-lines="6-22"
+           data-start-line="6">
+        <pre class="vscode-source">
+public class ModelWeights
+{
+    public int VocabularySize =&gt; EmbeddedTokens.Rows;
+    public int HiddenDimension =&gt; EmbeddedTokens.Columns;
+
+    public int NumberdOfQueryHeads {get;set;}
+    public int NumberOfKeyValueHeads {get;set;}
+    public int HeadDimension { get; set; }
+
+    public required Matrix EmbeddedTokens { get; set; }
+
+    public required LayerWeights[] Layers { get; set; }
+
+    public required Matrix OutputEmbedding { get; set; }
+
+    public required Vector FinalNormWeight { get; set; }
+}
+        </pre>
+
+        <span class="vscode-step fragment" data-fragment-index="0"
+              data-text="public required LayerWeights[] Layers"
+              data-stopped
+              data-values="12: LayerWeights[2] — everything per-layer moved in here"
+              data-note="SingleLayerModelWeights held one flat set of projections. Now it is an array."></span>
+
+        <span class="vscode-step fragment" data-fragment-index="1"
+              data-lines="10,14,16"
+              data-values="10: 250 &times; 64 | 14: 64 &times; 250 | 16: 64 floats"
+              data-note="What stayed at the top is exactly what happens once per model, not once per layer: the token table in, the vocabulary projection out, and the final norm."></span>
+      </div>
+
+      <div class="vscode-window" data-fill
+           data-font-size="0.85rem"
+           data-src="Runner.ConsoleApp/ModelWeights.cs"
+           data-lines="24-37"
+           data-start-line="24">
+        <pre class="vscode-source">
+public class LayerWeights
+{
+    public required Vector AttentionNormWeight { get; set; }
+    public required Vector FeedForwardNormWeight { get; set; }
+
+    public required Matrix QueryProjection { get; set; }
+    public required Matrix KeyProjection { get; set; }
+    public required Matrix ValueProjection { get; set; }
+    public required Matrix OutputProjection { get; set; }
+
+    public required Matrix GateProjection { get; set; }
+    public required Matrix UpProjection { get; set; }
+    public required Matrix DownProjection { get; set; }
+}
+        </pre>
+
+        <span class="vscode-step fragment" data-fragment-index="2"
+              data-lines="1-2"
+              data-stopped="1"
+              data-note="One layer's worth of weights. Norm, Q, K, V, output projection — the set the single-layer struct had."></span>
+
+        <span class="vscode-step fragment" data-fragment-index="3"
+              data-lines="6-8"
+              data-stopped="6"
+              data-values="6: 64 &times; 64 | 7: 64 &times; 64 | 8: 64 &times; 64"
+              data-note="Query, key, value — the three you already used. Square, hiddenDim × hiddenDim, one head. The output projection under them is the same shape."></span>
+
+        <span class="vscode-step fragment" data-fragment-index="4"
+              data-lines="11-13"
+              data-values="11: 64 &times; 128 | 12: 64 &times; 128 | 13: 128 &times; 64"
+              data-note="Three the single-layer struct did not have. Gate and Up widen 64 → 128, Down comes back to 64. SwiGLU feed-forward — next slide."></span>
+      </div>
+    </div>
+
+  </div>
+
+  <style>
+    [data-id="multilayer-weights-code"] h2 { margin-bottom: 0.6rem; }
+
+    .ml-weights-grid {
+      gap: 1.1rem;
+      align-items: start;
+    }
+
+    .ml-weights-grid .vscode-window { min-width: 0; }
+
+    /* theme.css caps every <pre> at 80ch, which wraps the doc comments in a half-width
+       column and starves the fit pass. Let each panel use its own column. */
+    [data-id="multilayer-weights-code"] .vscode-code { max-width: none; }
+
+    @media (max-width: 820px) {
+      [data-id="multilayer-weights-code"] h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+      }
+      .ml-weights-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+      /* Stacked, the 50-line class would push the 28-line one off the slide. Cap both
+         and let each scroll to its own step. */
+      [data-id="multilayer-weights-code"] .vscode-window { --vs-max-height: 34vh; }
+    }
+  </style>
+</section>

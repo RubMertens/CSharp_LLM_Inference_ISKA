@@ -17,6 +17,12 @@ export async function loadSlide(path) {
   return {
     id: section.dataset.id,
     title: section.dataset.title ?? section.dataset.id,
+    // Only the section's innerHTML is rendered, so anything on the wrapper
+    // itself has to be carried across explicitly. `layout` is a space-
+    // separated list of layout hints (e.g. "isks-dark isks-bare") that the
+    // engine copies onto the .slide element for CSS to key off.
+    layout: section.dataset.layout ?? '',
+    cls: section.className ?? '',
     html: section.innerHTML,
   };
 }

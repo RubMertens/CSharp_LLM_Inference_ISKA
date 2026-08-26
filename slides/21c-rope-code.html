@@ -1,0 +1,66 @@
+<section data-id="rope-code" data-title="RoPE in Code">
+  <div class="slide-content">
+    <h2>RoPE — <span class="highlight">in Code</span></h2>
+
+    <div class="vscode-window" data-fill
+         data-font-size="1.4rem"
+         data-src="Runner.ConsoleApp/2_WithRope/TransformerWithRope.cs"
+         data-member="ApplyRoPETo"
+         data-start-line="58">
+      <pre class="vscode-source">
+private static Matrix ApplyRoPETo(Matrix matrix)
+{
+    float sequenceLength = matrix.Rows;
+    float dimension = matrix.Columns;
+
+    Matrix result = new(matrix.Rows, matrix.Columns);
+    for (int position = 0; position &lt; sequenceLength; position++)
+    {
+        for (int j = 0; j &lt; dimension; j+=2)
+        {
+            var x1 = matrix[position][j];
+            var x2 = matrix[position][j+1];
+
+            var theta = 1.0F / MathF.Pow(10000.0F, j / dimension);
+
+            var angle = position * theta;
+            var cos = MathF.Cos(angle);
+            var sin = MathF.Sin(angle);
+
+            result[position][j] = x1 * cos - x2 * sin;
+            result[position][j+1] = x1 * sin + x2 * cos;
+        }
+    }
+    return result;
+}
+      </pre>
+      <span class="vscode-inline" data-line="3" data-value="sequenceLength = 4   dimension = 8"></span>
+      <!-- Both loops lit together: one over tokens, one over dimension pairs. The
+           nesting is the point, so they get a single band rather than a step each. -->
+      <span class="vscode-step fragment" data-fragment-index="0"
+         data-lines="7-10"
+         data-values="7: position = 0, 1, 2, 3 &mdash; one per token | 9: j = 0, 2, 4, 6 &mdash; two dims at a time"
+         data-note="Outer loop walks the tokens, inner loop walks the dimension pairs. Every pair gets its own rotation"></span>
+      <span class="vscode-step fragment" data-fragment-index="1"
+         data-lines="11-12"
+         data-stopped
+         data-values="11: x1 = 0.8 | 12: x2 = -0.2"
+         data-note="The pair being rotated: two neighbouring dimensions read as one 2D point"></span>
+      <span class="vscode-step fragment" data-fragment-index="2"
+         data-lines="14"
+         data-stopped="14"
+         data-values="14: 1 / 10000^(0/8) = 1.0"
+         data-note="theta = 1 / 10000^(j / dimension)"></span>
+      <span class="vscode-step fragment" data-fragment-index="3"
+         data-lines="16-18"
+         data-stopped="16"
+         data-values="16: 3 × 1.0 = 3.0 | 17: cos = -0.99 | 18: sin = 0.14"
+         data-note="angle = position × theta"></span>
+      <span class="vscode-step fragment" data-fragment-index="4"
+         data-lines="20-21"
+         data-stopped="20"
+         data-values="20: 0.8×-0.99 − -0.2×0.14 = -0.76"
+         data-note="Standard 2D rotation applied to the pair"></span>
+    </div>
+  </div>
+</section>
