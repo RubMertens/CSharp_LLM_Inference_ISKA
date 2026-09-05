@@ -222,7 +222,7 @@ void RunRealTinyLlama()
     }
 
     var realTokenizer = new RealTokenizer(Path.Combine(modelDirectory, "tokenizer.model"));
-    const string realPrompt = "Give seahorse emoji";
+    const string realPrompt = "Capital of france?";
 
     Console.WriteLine("Loading real TinyLlama weights (this reads ~2.2GB, may take a moment)...");
     var weights = RealWeightLoader.LoadWeights(modelDirectory);
