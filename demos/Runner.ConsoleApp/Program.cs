@@ -17,7 +17,7 @@ var modelDirectory = args.Length > 1
 var prompt = "Capital of France?";
 var tokenizer = new DemoTokenizer();
 var inputIds = tokenizer.Tokenize(prompt);
-const int maxTokensToGenerate = 20;
+const int maxTokensToGenerate = 60;
 
 Console.WriteLine($"--- Scenario {scenario}: {ScenarioName(scenario)} ---");
 // Scenario 7 uses the real tokenizer and prints its own prompt/IDs below.
@@ -222,7 +222,7 @@ void RunRealTinyLlama()
     }
 
     var realTokenizer = new RealTokenizer(Path.Combine(modelDirectory, "tokenizer.model"));
-    const string realPrompt = "Capital of france?";
+    const string realPrompt = "what is france?";
 
     Console.WriteLine("Loading real TinyLlama weights (this reads ~2.2GB, may take a moment)...");
     var weights = RealWeightLoader.LoadWeights(modelDirectory);
