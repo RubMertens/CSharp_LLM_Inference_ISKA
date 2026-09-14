@@ -237,6 +237,13 @@ class PresentationEngine {
           e.preventDefault();
           this.#toggleOverview();
           break;
+        case 'p':
+        case 'P':
+          // Handout: print.html renders every slide into its own frame and lays
+          // them out two to a page. Opened in a tab so the deck keeps its place.
+          e.preventDefault();
+          window.open('print.html', '_blank', 'noopener');
+          break;
       }
     });
   }

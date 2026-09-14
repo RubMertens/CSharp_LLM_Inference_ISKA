@@ -73,7 +73,7 @@ function shipped(src) {
   return true;
 }
 
-for (const asset of ['index.html', 'css', 'js', 'slides']) {
+for (const asset of ['index.html', 'print.html', 'print-frame.html', 'css', 'js', 'slides']) {
   cpSync(join(ROOT, asset), join(DIST, asset), { recursive: true, filter: shipped });
 }
 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>slide print frame</title>
+  <!-- One slide, rendered at exactly 1280x720. print.html embeds this in an iframe of
+       that size, so every vh/vw/vmin in the deck resolves against the slide box the
+       same way it does on stage -- the printed page box never leaks in. -->
+  <link rel="stylesheet" href="css/isks/isks.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/svg.css">
+  <link rel="stylesheet" href="css/print-frame.css">
+  <!-- highlight.js is NOT loaded up front. One slide in the deck uses a plain
+       <pre><code> block; pulling the CDN into all 59 frames was ~180 requests for it.
+       print-frame.js fetches it only if the slide it rendered actually needs it. -->
+</head>
+<body>
+  <svg style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="svg-arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <polygon points="0 0, 8 3, 0 6" class="fill-accent" opacity="0.5"/>
+      </marker>
+      <marker id="svg-arrowhead-muted" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <polygon points="0 0, 8 3, 0 6" class="fill-muted" opacity="0.5"/>
+      </marker>
+    </defs>
+  </svg>
+  <div id="presentation"></div>
+
+  <!-- Same page-level footer bar as index.html: slides opt in by data-layout, and the
+       engine mirrors the current slide onto <body>. -->
+  <div class="isks-bar" id="isks-bar">
+    <span class="isks-halftone"></span>
+    <img class="isks-bar__logo" src="css/isks/assets/web/infosupport-40jaar-logo-white.png" alt="Info Support, 40 jaar">
+    <span class="isks-bar__rule"></span>
+    <p class="isks-bar__event">ISKS<span>2026</span></p>
+    <img class="isks-bar__lockup" src="css/isks/assets/web/isks-built-to-last-solid.png" alt="Built to Last">
+  </div>
+
+  <script type="module" src="js/print-frame.js"></script>
+</body>
+</html>

@@ -41,6 +41,51 @@ Two dev-only pages (not copied to `dist/`):
 
 See the `engine-capabilities` skill for the full attribute reference.
 
+## Print / PDF
+
+Press `p` in the deck, or open `print.html`. It lays the deck out as a handout — two
+slides per A4 page by default — and then it is an ordinary browser print: `⌘P` →
+*Save as PDF*.
+
+```
+print.html?per=2&paper=a4    # defaults: 2 slides per A4 portrait page
+print.html?per=1             # 1 slide per page, A4 landscape
+print.html?paper=letter      # Letter instead of A4
+print.html?numbers=0         # drop the number + title caption under each slide
+print.html?steps=0           # one page per code slide instead of one per step
+print.html?from=12&to=20     # reprint one section (1-based, inclusive)
+print.html?auto=1            # open the print dialog as soon as rendering finishes
+```
+
+Leave the dialog's scale on **Default** and the paper matching the option above — the
+page size comes from the document. Backgrounds print without ticking *Background
+graphics*.
+
+Every slide renders in its own 1280x720 iframe, which is then scaled onto the page.
+That indirection is the whole trick: printing resolves `vh`/`vw`/`vmin` against the
+*page box*, so slides laid out directly on A4 would reflow — and most of this deck
+sizes itself off the viewport. A fixed-size frame keeps each slide pixel-identical to
+what the room sees. Links stay clickable in the PDF, and a link whose text doesn't
+already spell out its URL gets the URL appended.
+
+Fragments are all revealed, as in overview mode, so each slide prints in its end
+state — except code walkthroughs, which print **one page per step**, the same path the
+room saw. The panel is also re-fitted for paper: on stage a long method keeps a
+back-row font and scrolls, which on paper would print the first few lines and silently
+drop the rest, so the font shrinks until the whole snippet fits and the step's band is
+lit on top of it. `?steps=0` collapses a walkthrough back to one page. The deck's 59
+slides come out as 78 pages with steps, 30 without.
+
+Motion is frozen once a frame has settled, and the layers that exist only to move
+(confetti, the drifting emoji fields, the wave background — anything running an endless
+animation inside an `aria-hidden` container) are dropped. That is not only about taste
+on paper: each animated layer prints as a full-slide bitmap, and past a few dozen of
+them Chrome abandons the print outright with "Printing failed" and no PDF. The title
+slide used to do exactly that.
+
+Rendering all slides takes a few seconds (the status line counts them off); wait for
+*ready to print* before opening the dialog.
+
 ## Build
 
 ```bash

@@ -609,31 +609,23 @@ pre code {
   }
 }
 
+/* Printing goes through print.html, which renders each slide in its own 1280x720
+   frame and scales it onto the paper. So a slide keeps its on-stage geometry here --
+   these rules only drop the live chrome and make sure nothing is left mid-animation.
+   (Do not reintroduce `background: white`: it flattens the hero gradients and the
+   ISKS bar, and on a dark-layout slide it prints the text invisible.) */
 @media print {
-  html, body {
-    height: auto;
-    overflow: visible;
-  }
-
-  .slide {
-    position: relative;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    page-break-after: always;
-    min-height: 100vh;
-    background: white;
-  }
-
-  .slide-title h1 {
-    background: none;
-    -webkit-text-fill-color: var(--color-heading);
-  }
-
   #progress,
   #slide-counter,
   .nav-hint {
     display: none;
+  }
+
+  .slide {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: none;
   }
 
   .fragment {
