@@ -1,0 +1,43 @@
+/* Styling that only applies inside a print frame. The slide itself is untouched --
+   this just strips the interactive affordances and forces the deck's dark surfaces
+   to survive the print pipeline. */
+
+/* Chrome drops backgrounds when printing unless asked. That would strip the hero
+   gradients, the ISKS bar and every code-panel highlight band. Setting it here means
+   the reader does not have to find "Background graphics" in the dialog. */
+html, body, .slide {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* No navigation happens in a frame, and a caret or focus ring would print. */
+.nav-hint, #progress, #slide-counter { display: none; }
+
+/* The URL tail added next to a link whose text doesn't already spell it out. */
+.print-url {
+  font-family: var(--font-mono);
+  font-size: 0.62em;
+  color: var(--color-text-muted);
+  word-break: break-all;
+}
+.print-url::before { content: " "; }
+
+/* Motion is frozen once the frame has settled (print-frame.js pauses every running
+   animation). This catches anything that starts afterwards, and keeps a repaint from
+   ever being scheduled -- which is what makes headless --print-to-pdf finish. */
+html[data-print-frozen] *,
+html[data-print-frozen] *::before,
+html[data-print-frozen] *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+@media print {
+  /* The frame is the page; never let a slide split or scroll. */
+  html, body { width: 1280px; height: 720px; overflow: hidden; }
+  .slide { break-inside: avoid; }
+}
+/* Motion is frozen once the frame has settled, and the layers that exist only to move
+   are shed outright (print-frame.js explains why -- they print as full-slide bitmaps
+   and enough of them fail the print outright). */
+[data-print-shed] { display: none !important; }

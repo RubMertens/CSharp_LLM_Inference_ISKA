@@ -1,0 +1,149 @@
+/* The handout sheet. Each slide sits in its own 1280x720 iframe (print-frame.html)
+   scaled down into a page slot -- that indirection is what keeps the deck's vh/vw/vmin
+   units resolving against the slide instead of the paper. */
+
+:root {
+  --slot-w: 194mm;          /* page width minus margins; js keeps this in sync */
+  --print-scale: 0.5728;    /* --slot-w / 1280px, computed in js */
+  --gap: 6mm;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #0f172a;
+}
+
+/* ---------- screen-only chrome ---------- */
+
+.print-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 1rem 1.5rem;
+  background: #0a0e17;
+  color: #e2e8f0;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+}
+
+.print-toolbar h1 { margin: 0 0 0.25rem; font-size: 1.05rem; }
+.print-status { margin: 0 0 0.6rem; color: #94a3b8; font-size: 0.85rem; }
+.print-status[data-state="ready"] { color: #38bdf8; }
+
+.print-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+#print-btn {
+  padding: 0.45rem 1rem;
+  border: 0;
+  border-radius: 6px;
+  background: #38bdf8;
+  color: #06121d;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+#print-btn:disabled { background: #334155; color: #94a3b8; cursor: default; }
+
+.print-opts { display: flex; gap: 0.75rem; font-size: 0.85rem; }
+.print-opts a { color: #94a3b8; text-decoration: none; border-bottom: 1px solid transparent; }
+.print-opts a:hover { color: #e2e8f0; }
+.print-opts a[aria-current="true"] { color: #38bdf8; border-bottom-color: #38bdf8; }
+
+.print-tip { margin: 0.6rem 0 0; color: #64748b; font-size: 0.78rem; max-width: 70ch; }
+.print-tip strong { color: #94a3b8; font-weight: 600; }
+
+@media screen {
+  body { background: #e2e8f0; }
+  main { padding: 24px 0 48px; }
+
+  .print-page {
+    width: var(--paper-w, 210mm);
+    padding: var(--paper-margin, 8mm);
+    margin: 0 auto 20px;
+    background: #fff;
+    box-shadow: 0 2px 14px rgba(15, 23, 42, 0.25);
+  }
+}
+
+/* ---------- the sheet itself ---------- */
+
+.print-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.print-item {
+  margin: 0;
+  display: block;
+  break-inside: avoid;
+}
+
+.print-slot {
+  width: var(--slot-w);
+  /* 16:9, expressed off the slot width so paper size is the only input */
+  height: calc(var(--slot-w) * 9 / 16);
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+}
+
+.print-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1280px;
+  height: 720px;
+  border: 0;
+  transform: scale(var(--print-scale));
+  transform-origin: top left;
+  /* Preview only: stops the engine inside a frame from eating wheel events. Links
+     still become PDF annotations -- those come from print layout, not hit testing. */
+  pointer-events: none;
+}
+
+/* A frame that has not rendered yet, so an unfinished sheet is obvious on screen */
+.print-slot:not([data-ready])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, #0f172a 0 10px, #111827 10px 20px);
+}
+
+.print-caption {
+  margin: 1.5mm 0 0;
+  font-size: 8pt;
+  color: #64748b;
+  display: flex;
+  gap: 0.6em;
+}
+.print-caption b { color: #0f172a; font-weight: 600; }
+/* Which walkthrough step this page is, on a code slide that got split. Pushed to the
+   right so a run of them reads as one column down the handout. */
+.print-caption em {
+  margin-left: auto;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  color: #94a3b8;
+}
+.print-caption span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media print {
+  .print-toolbar { display: none; }
+
+  .print-page {
+    width: auto;
+    padding: 0;
+    margin: 0;
+    min-height: var(--page-content-h);
+    justify-content: center;
+    break-after: page;
+    break-inside: avoid;
+  }
+  .print-page:last-child { break-after: auto; }
+
+  .print-item, .print-slot { break-inside: avoid; }
+  .print-slot::after { display: none; }
+}

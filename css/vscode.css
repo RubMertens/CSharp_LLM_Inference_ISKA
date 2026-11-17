@@ -551,10 +551,8 @@
     break-inside: avoid;
   }
 
-  .vscode-code {
-    max-height: none;
-    overflow: visible;
-  }
+  /* Deliberately no `max-height: none` here. The fit pass sized this panel to the
+     slide it lives on; letting it grow in print would push code past the slide box. */
 
   /* Debugger "stopped here" line: amber band plus the gutter arrow. */
 .vscode-line.stopped,

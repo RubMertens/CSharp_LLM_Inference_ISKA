@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Print the deck</title>
+  <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+  <header class="print-toolbar">
+    <h1>Print the deck</h1>
+    <p class="print-status" id="status">Loading slides…</p>
+    <div class="print-actions">
+      <button id="print-btn" disabled>Print / Save as PDF</button>
+      <span class="print-opts">
+        <a href="?per=2" data-per="2">2 per page</a>
+        <a href="?per=1" data-per="1">1 per page</a>
+        <a href="?per=2&amp;paper=letter" data-paper="letter">Letter</a>
+      </span>
+    </div>
+    <p class="print-tip">
+      Leave the print dialog's scale on <strong>Default</strong> and paper on
+      <strong id="paper-name">A4</strong> — the page size is set by the document.
+      Backgrounds print without ticking anything.
+    </p>
+  </header>
+
+  <main id="sheets"></main>
+
+  <script type="module" src="js/print.js"></script>
+</body>
+</html>
