@@ -6,7 +6,6 @@
   <!-- One slide, rendered at exactly 1280x720. print.html embeds this in an iframe of
        that size, so every vh/vw/vmin in the deck resolves against the slide box the
        same way it does on stage -- the printed page box never leaks in. -->
-  <link rel="stylesheet" href="css/isks/isks.css">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/svg.css">
   <link rel="stylesheet" href="css/print-frame.css">
@@ -27,15 +26,6 @@
   </svg>
   <div id="presentation"></div>
 
-  <!-- Same page-level footer bar as index.html: slides opt in by data-layout, and the
-       engine mirrors the current slide onto <body>. -->
-  <div class="isks-bar" id="isks-bar">
-    <span class="isks-halftone"></span>
-    <img class="isks-bar__logo" src="css/isks/assets/web/infosupport-40jaar-logo-white.png" alt="Info Support, 40 jaar">
-    <span class="isks-bar__rule"></span>
-    <p class="isks-bar__event">ISKS<span>2026</span></p>
-    <img class="isks-bar__lockup" src="css/isks/assets/web/isks-built-to-last-solid.png" alt="Built to Last">
-  </div>
 
   <script type="module" src="js/print-frame.js"></script>
 </body>
