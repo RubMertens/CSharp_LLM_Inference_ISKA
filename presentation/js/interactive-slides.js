@@ -6,4 +6,5 @@ import './rotation-interact.js';
 import './dot-product-interact.js';
 import './rmsnorm-interact.js';
 import './swiglu-interact.js';
+import './softmax-interact.js';
 import './vscode-code.js';

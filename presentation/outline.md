@@ -15,7 +15,7 @@ Code natuurlijk!
 wat gaan we niet doen?
 
 - GPU / CUDA / ONNX
-- Dingen installeren op de dure toasters
+- Dingen installeren op de server-GPU's
   
 Wat gaan we wel doen?
 

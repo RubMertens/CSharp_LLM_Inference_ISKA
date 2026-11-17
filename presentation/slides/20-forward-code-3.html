@@ -61,8 +61,13 @@ public Matrix Forward(int[] tokens)
 
       <span class="vscode-step fragment" data-fragment-index="3"
         data-text="hidden * weights.OutputEmbedding" data-stopped="29"
-        data-values="29: 3 × 64 · 64 × 250 → 3 × 250, then returned"
-        data-note="Out of 64 dimensions into the vocabulary — one score per possible token. That is one layer, one pass, done"></span>
+        data-values="29: 3 × 64 · 64 × 250 → 3 × 250"
+        data-note="Out of 64 dimensions into the vocabulary — one score per possible token"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="4"
+        data-text="return logits;" data-stopped
+        data-values="30: logits = 3 × 250 — one row of scores per input token"
+        data-note="Handed back to the caller. The last row is the guess for the next token. That is one layer, one pass, done"></span>
     </div>
   </div>
 
