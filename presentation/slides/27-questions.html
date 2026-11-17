@@ -20,16 +20,16 @@
 
   <!-- flying GitHub-themed emojis sweeping the whole viewport -->
   <div class="qq-flyers" aria-hidden="true">
-    <span class="qq-flyer qf1">💜</span>
+    <span class="qq-flyer qf1">💙</span>
     <span class="qq-flyer qf2">🐙</span>
     <span class="qq-flyer qf3">⭐</span>
     <span class="qq-flyer qf4">🍴</span>
     <span class="qq-flyer qf5">🚀</span>
-    <span class="qq-flyer qf6">💜</span>
+    <span class="qq-flyer qf6">💙</span>
     <span class="qq-flyer qf7">✨</span>
     <span class="qq-flyer qf8">🐙</span>
     <span class="qq-flyer qf9">⭐</span>
-    <span class="qq-flyer qf10">💜</span>
+    <span class="qq-flyer qf10">💙</span>
     <span class="qq-flyer qf11">🚀</span>
     <span class="qq-flyer qf12">💫</span>
   </div>
@@ -41,17 +41,8 @@
 
     <div class="qq-underline"></div>
 
-    <!-- QR block: session feedback on the left, repo on the right. Static on purpose. -->
+    <!-- QR block linking to the repo. Static on purpose. -->
     <div class="qq-qr">
-      <div class="qq-qr-item">
-        <span class="qq-badge">💬 RATE THIS TALK</span>
-        <div class="qq-qr-card">
-          <img class="qq-qr-code" src="slides/feedback-qr.png" width="660" height="660"
-               alt="QR code linking to the session feedback form">
-        </div>
-        <a class="qq-qr-url" href="https://sfeedback.com/fV530x">sfeedback.com/fV530x</a>
-      </div>
-
       <div class="qq-qr-item">
         <span class="qq-badge">⭐ STAR THE REPO</span>
         <div class="qq-qr-card">
@@ -70,7 +61,7 @@
       inset: 0;
       z-index: 0;
       background:
-        radial-gradient(120% 120% at 50% 0%, #1a1040 0%, #0b0a1f 45%, #06060f 100%);
+        radial-gradient(120% 120% at 50% 0%, #04305A 0%, #021B33 45%, #010B16 100%);
       pointer-events: none;
     }
 
@@ -85,7 +76,7 @@
       opacity: 0.22;
       mix-blend-mode: screen;
       background: conic-gradient(from 0deg,
-        #ff4d9d, #ff8a3d, #ffe24d, #4dff9d, #38bdf8, #a855f7, #ff4d9d);
+        #00A3E0, #0077C8, #E0F4FF, #6ECFF6, #38bdf8, #2563EB, #00A3E0);
       animation: qq-wash-spin 28s linear infinite;
       will-change: transform;
     }
@@ -107,7 +98,7 @@
     .qq-blob-1 {
       width: 480px; height: 480px;
       top: -120px; left: -80px;
-      background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+      background: radial-gradient(circle, #2563EB 0%, transparent 70%);
       animation: qq-blob-drift-a 18s ease-in-out infinite;
     }
     .qq-blob-2 {
@@ -119,13 +110,13 @@
     .qq-blob-3 {
       width: 400px; height: 400px;
       top: 30%; left: 55%;
-      background: radial-gradient(circle, #ff4d9d 0%, transparent 70%);
+      background: radial-gradient(circle, #00A3E0 0%, transparent 70%);
       animation: qq-blob-drift-c 26s ease-in-out infinite;
     }
     .qq-blob-4 {
       width: 360px; height: 360px;
       top: 60%; left: 8%;
-      background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+      background: radial-gradient(circle, #2563EB 0%, transparent 70%);
       animation: qq-blob-drift-a 20s ease-in-out infinite reverse;
     }
     @keyframes qq-blob-drift-a {
@@ -159,17 +150,17 @@
       will-change: transform;
       animation: qq-confetti-fall 9s linear infinite;
     }
-    .qc1  { left: 6%;  background: #a855f7; animation-duration: 8s;  animation-delay: 0s;   border-radius: 2px; }
+    .qc1  { left: 6%;  background: #2563EB; animation-duration: 8s;  animation-delay: 0s;   border-radius: 2px; }
     .qc2  { left: 14%; background: #38bdf8; animation-duration: 11s; animation-delay: 1.2s; border-radius: 50%; }
-    .qc3  { left: 22%; background: #ffe24d; animation-duration: 9s;  animation-delay: 2.4s; }
-    .qc4  { left: 30%; background: #a855f7; animation-duration: 12s; animation-delay: 0.6s; border-radius: 50%; }
-    .qc5  { left: 38%; background: #ff4d9d; animation-duration: 10s; animation-delay: 3.1s; border-radius: 2px; }
-    .qc6  { left: 46%; background: #4dff9d; animation-duration: 8.5s;animation-delay: 1.8s; }
+    .qc3  { left: 22%; background: #E0F4FF; animation-duration: 9s;  animation-delay: 2.4s; }
+    .qc4  { left: 30%; background: #2563EB; animation-duration: 12s; animation-delay: 0.6s; border-radius: 50%; }
+    .qc5  { left: 38%; background: #00A3E0; animation-duration: 10s; animation-delay: 3.1s; border-radius: 2px; }
+    .qc6  { left: 46%; background: #6ECFF6; animation-duration: 8.5s;animation-delay: 1.8s; }
     .qc7  { left: 54%; background: #38bdf8; animation-duration: 11.5s;animation-delay: 0.3s;border-radius: 50%; }
-    .qc8  { left: 62%; background: #a855f7; animation-duration: 9.5s;animation-delay: 2.7s; border-radius: 2px; }
-    .qc9  { left: 70%; background: #ffe24d; animation-duration: 10.5s;animation-delay: 1.0s; }
-    .qc10 { left: 78%; background: #ff4d9d; animation-duration: 8s;  animation-delay: 3.6s; border-radius: 50%; }
-    .qc11 { left: 86%; background: #a855f7; animation-duration: 12s; animation-delay: 0.9s; border-radius: 2px; }
+    .qc8  { left: 62%; background: #2563EB; animation-duration: 9.5s;animation-delay: 2.7s; border-radius: 2px; }
+    .qc9  { left: 70%; background: #E0F4FF; animation-duration: 10.5s;animation-delay: 1.0s; }
+    .qc10 { left: 78%; background: #00A3E0; animation-duration: 8s;  animation-delay: 3.6s; border-radius: 50%; }
+    .qc11 { left: 86%; background: #2563EB; animation-duration: 12s; animation-delay: 0.9s; border-radius: 2px; }
     .qc12 { left: 94%; background: #38bdf8; animation-duration: 9s;  animation-delay: 2.2s; }
     @keyframes qq-confetti-fall {
       0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
@@ -262,14 +253,14 @@
     }
     .slide-title h1.qq-holo {
       background: linear-gradient(115deg,
-        #ff4d9d 0%, #ff8a3d 18%, #ffe24d 36%,
-        #4dff9d 54%, #38bdf8 72%, #a855f7 90%, #ff4d9d 100%);
+        #00A3E0 0%, #0077C8 18%, #E0F4FF 36%,
+        #6ECFF6 54%, #38bdf8 72%, #2563EB 90%, #00A3E0 100%);
       background-size: 300% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       color: transparent;
-      filter: drop-shadow(0 0 20px rgba(168,85,247,0.6));
+      filter: drop-shadow(0 0 20px rgba(37,99,235,0.6));
       animation: qq-holo-slide 6s linear infinite;
     }
     @keyframes qq-holo-slide {
@@ -283,7 +274,7 @@
       width: clamp(220px, 36vw, 460px);
       border-radius: 999px;
       margin: 0.5rem auto 0;
-      background: linear-gradient(90deg, transparent, #ff4d9d, #ffe24d, #4dff9d, #38bdf8, #a855f7, transparent);
+      background: linear-gradient(90deg, transparent, #00A3E0, #E0F4FF, #6ECFF6, #38bdf8, #2563EB, transparent);
       background-size: 200% 100%;
       box-shadow: 0 0 22px rgba(56,189,248,0.9);
       animation: qq-underline-sweep 3s linear infinite,
@@ -323,7 +314,7 @@
       background: #ffffff;
       padding: 1rem;
       border-radius: 12px;
-      box-shadow: 0 0 40px rgba(168,85,247,0.65), 0 0 90px rgba(56,189,248,0.4);
+      box-shadow: 0 0 40px rgba(37,99,235,0.65), 0 0 90px rgba(56,189,248,0.4);
     }
     .qq-qr-card::before {
       content: "";
@@ -332,7 +323,7 @@
       border-radius: 18px;
       padding: 8px;
       background: conic-gradient(from 0deg,
-        #ff4d9d, #ff8a3d, #ffe24d, #4dff9d, #38bdf8, #a855f7, #ff4d9d);
+        #00A3E0, #0077C8, #E0F4FF, #6ECFF6, #38bdf8, #2563EB, #00A3E0);
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
       -webkit-mask-composite: xor;
       mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -348,7 +339,7 @@
       border-radius: 24px;
       padding: 3px;
       background: conic-gradient(from 180deg,
-        #38bdf8, #a855f7, #ff4d9d, #ffe24d, #4dff9d, #38bdf8);
+        #38bdf8, #2563EB, #00A3E0, #E0F4FF, #6ECFF6, #38bdf8);
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
       -webkit-mask-composite: xor;
       mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -377,9 +368,9 @@
       border-radius: 999px;
       color: #fff;
       white-space: nowrap;
-      background: linear-gradient(90deg, #a855f7, #ff4d9d, #38bdf8, #a855f7);
+      background: linear-gradient(90deg, #2563EB, #00A3E0, #38bdf8, #2563EB);
       background-size: 300% 100%;
-      box-shadow: 0 0 22px rgba(168,85,247,0.85);
+      box-shadow: 0 0 22px rgba(37,99,235,0.85);
     }
     @keyframes qq-badge-bob {
       0%,100% { transform: translateY(0) scale(1); }
@@ -396,7 +387,7 @@
       line-height: 1.35;
       text-decoration: none;
       letter-spacing: 0.02em;
-      background: linear-gradient(90deg, #a855f7, #ff4d9d, #38bdf8, #4dff9d, #a855f7);
+      background: linear-gradient(90deg, #2563EB, #00A3E0, #38bdf8, #6ECFF6, #2563EB);
       background-size: 200% 100%;
       -webkit-background-clip: text;
       background-clip: text;
@@ -413,7 +404,7 @@
       .qq-flyer:nth-child(n+8) { display: none; }
       /* two QRs side by side on a narrow screen */
       .qq-qr { gap: 1.2rem; margin-top: 1.4rem; }
-      .qq-qr-item { gap: 0.6rem; max-width: 47vw; }
+      .qq-qr-item { gap: 1rem; max-width: 60vw; }
       .qq-qr-card { padding: 0.6rem; }
       .qq-qr-code { width: clamp(110px, 34vw, 180px); height: clamp(110px, 34vw, 180px); }
       .qq-badge { letter-spacing: 0.08em; padding: 0.3rem 0.6rem; }
