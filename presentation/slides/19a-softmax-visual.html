@@ -6,7 +6,8 @@
          sum to 100%. Both charts share one baseline (y=500) and one top (y=100): a
          score of 4 is as tall as 100%. Defaults [2, 1, 0.5, -1] -> 61/22/14/3.0%;
          softmax-interact.js redraws from the same numbers on entry. -->
-    <svg id="smv-svg" class="svg-diagram" viewBox="0 0 1200 650" style="width: 100%; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+    <div class="svg-fill">
+    <svg id="smv-svg" class="svg-diagram" viewBox="0 0 1200 650" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
 
       <!-- ── Input: raw scores ── -->
       <text class="svg-label" style="font-size:18px" x="252" y="30">attention scores</text>
@@ -66,5 +67,6 @@
         <text id="smv-ov3" class="svg-num fill-accent" style="font-size:20px" x="987" y="472">3.0%</text>
       </g>
     </svg>
+    </div>
   </div>
 </section>

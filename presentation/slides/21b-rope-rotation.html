@@ -3,7 +3,7 @@
     <h2><span class="highlight">2D Rotation</span></h2>
 
     <div class="svg-fill">
-    <svg id="rot-svg" class="svg-diagram" viewBox="0 0 690 450" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <svg id="rot-svg" class="svg-diagram" viewBox="0 0 730 450" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
 
       <!-- Axes -->
       <line class="svg-axis" x1="50" y1="250" x2="470" y2="250"/>
@@ -25,11 +25,11 @@
 
       <!-- cos label on x-axis -->
       <line id="rot-cos-brace" class="svg-brace" x1="250" y1="262" x2="413" y2="262" stroke="var(--color-accent, #00A3E0)" opacity="0.9"/>
-      <text id="rot-cos-label" class="svg-text-sm" style="fill: var(--color-accent);" x="332" y="280">cos(α+θ)</text>
+      <text id="rot-cos-label" class="svg-halo svg-text-sm" style="fill: var(--color-accent);" x="332" y="280">cos(α+θ)</text>
 
       <!-- sin label on y-axis -->
       <line id="rot-sin-brace" class="svg-brace" x1="238" y1="250" x2="238" y2="174" stroke="var(--color-accent, #00A3E0)" opacity="0.9"/>
-      <text id="rot-sin-label" class="svg-text-sm" style="fill: var(--color-accent);" x="195" y="212" text-anchor="end">sin(α+θ)</text>
+      <text id="rot-sin-label" class="svg-halo svg-text-sm" style="fill: var(--color-accent);" x="195" y="212" text-anchor="end">sin(α+θ)</text>
 
       <!-- Original angle α arc -->
       <path class="svg-arc" d="M 300,250 A 50,50 0 0,0 295,229" stroke="var(--color-text-muted, #4A6A8A)" stroke-width="1.5"/>
@@ -44,14 +44,14 @@
 
       <!-- θ arc -->
       <path id="rot-drag-arc" class="svg-arc" d="M 313,220 A 70,70 0 0,0 280,187" stroke="var(--color-accent, #00A3E0)"/>
-      <text id="rot-drag-theta" class="svg-text" style="font-size: 16px; fill: var(--color-accent);" x="314" y="192">θ = 40°</text>
+      <text id="rot-drag-theta" class="svg-halo svg-text" style="font-size: 16px; fill: var(--color-accent);" x="314" y="192">θ = 40°</text>
 
-      <text id="rot-drag-label" class="svg-text" style="font-size: 14px; fill: var(--color-accent);" x="354" y="74">(x', y')</text>
+      <text id="rot-drag-label" class="svg-halo svg-text" style="font-size: 14px; fill: var(--color-accent);" x="354" y="74">(x', y')</text>
 
       <!-- Distance line between original and rotated point -->
       <line id="rot-dist-line" x1="413" y1="174" x2="326" y2="87" stroke="var(--color-accent-secondary, #6ECFF6)" stroke-width="2" stroke-dasharray="6 4" opacity="1"/>
-      <text id="rot-dist-label1" class="svg-text-sm" style="fill: var(--color-accent-secondary, #6ECFF6);" x="380" y="112">x' = x·cos(40°) − y·sin(40°)</text>
-      <text id="rot-dist-label2" class="svg-text-sm" style="fill: var(--color-accent-secondary, #6ECFF6);" x="380" y="130">y' = x·sin(40°) + y·cos(40°)</text>
+      <text id="rot-dist-label1" class="svg-halo svg-text-sm" style="fill: var(--color-accent-secondary, #6ECFF6);" x="380" y="112">x' = x·cos(40°) − y·sin(40°)</text>
+      <text id="rot-dist-label2" class="svg-halo svg-text-sm" style="fill: var(--color-accent-secondary, #6ECFF6);" x="380" y="130">y' = x·sin(40°) + y·cos(40°)</text>
 
       <!-- Visible dot + larger invisible hit target -->
       <circle id="rot-drag-dot" cx="326" cy="87" fill="var(--color-accent, #00A3E0)" style="cursor: grab; r: 10;"/>
@@ -69,9 +69,9 @@
 
       <!-- Fragment 2: Rotation formula box -->
       <g class="fragment">
-        <rect x="490" y="80" width="200" height="80" rx="8" fill="var(--color-bg-subtle, #F0F4F8)" stroke="var(--color-accent, #00A3E0)" stroke-width="2.5"/>
-        <text class="svg-text" style="font-size: 14px; fill: var(--color-accent);" x="590" y="108">x' = x·cos θ − y·sin θ</text>
-        <text class="svg-text" style="font-size: 14px; fill: var(--color-accent);" x="590" y="138">y' = x·sin θ + y·cos θ</text>
+        <rect x="494" y="80" width="230" height="80" rx="8" fill="var(--color-bg-subtle, #F0F4F8)" stroke="var(--color-accent, #00A3E0)" stroke-width="2.5"/>
+        <text class="svg-text" style="font-size: 14px; fill: var(--color-accent);" x="609" y="108">x' = x·cos θ − y·sin θ</text>
+        <text class="svg-text" style="font-size: 14px; fill: var(--color-accent);" x="609" y="138">y' = x·sin θ + y·cos θ</text>
       </g>
     </svg>
     </div>

@@ -58,7 +58,7 @@ private Matrix SingleHeadSelfAttention(int headDimension, int sequenceLength, Ma
          data-note="The punchline: the output is a blend of value vectors, mixed by attention. The future term is multiplied by zero"></span>
       <span class="vscode-step fragment" data-fragment-index="2"
          data-lines="29"
-         data-values="29: attentionOutput[1] = attended &mdash; one 64-wide row"
+         data-values="29: attentionOutput[1] = 1&#215;64"
          data-note="One blended row written back for this token. Then the outer loop moves to the next one"></span>
       <span class="vscode-step fragment" data-fragment-index="3"
          data-lines="30-32"

@@ -18,42 +18,54 @@
          below through :has(). Columns are 140 user units apart:
            the(0)->1 +140, cat(1)->0 -140, sat(2)->4 +280, on(3) stays, the(4)->2 -280. -->
     <div class="svg-fill">
-      <svg class="svg-diagram" viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
-        <text class="svg-muted" style="font-size:16px" x="450" y="24">how much does “mat” look at each word? (last word: the mask lets it see them all)</text>
+      <svg class="svg-diagram" viewBox="0 -34 900 534" xmlns="http://www.w3.org/2000/svg">
+        <text class="svg-muted" style="font-size:16px" x="450" y="-16">how much does “mat” look at each word? (last word: the mask lets it see them all)</text>
 
         <g class="awo-col awo-c0">
-          <rect class="svg-box" x="45" y="44" width="110" height="46"/>
-          <text class="svg-text" style="font-size:22px" x="100" y="67">the</text>
+          <g class="awo-word">
+            <rect class="svg-box" x="45" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="100" y="67">the</text>
+          </g>
           <rect class="awo-bar" x="70" y="240" width="60" height="50" rx="4"/>
           <text class="svg-num fill-accent" style="font-size:18px" x="100" y="226">10%</text>
         </g>
         <g class="awo-col awo-c1">
-          <rect class="svg-box" x="185" y="44" width="110" height="46"/>
-          <text class="svg-text" style="font-size:22px" x="240" y="67">cat</text>
+          <g class="awo-word">
+            <rect class="svg-box" x="185" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="240" y="67">cat</text>
+          </g>
           <rect class="awo-bar" x="210" y="190" width="60" height="100" rx="4"/>
           <text class="svg-num fill-accent" style="font-size:18px" x="240" y="176">20%</text>
         </g>
         <g class="awo-col awo-c2">
-          <rect class="svg-box" x="325" y="44" width="110" height="46"/>
-          <text class="svg-text" style="font-size:22px" x="380" y="67">sat</text>
+          <g class="awo-word">
+            <rect class="svg-box" x="325" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="380" y="67">sat</text>
+          </g>
           <rect class="awo-bar" x="350" y="215" width="60" height="75" rx="4"/>
           <text class="svg-num fill-accent" style="font-size:18px" x="380" y="201">15%</text>
         </g>
         <g class="awo-col awo-c3">
-          <rect class="svg-box" x="465" y="44" width="110" height="46"/>
-          <text class="svg-text" style="font-size:22px" x="520" y="67">on</text>
+          <g class="awo-word">
+            <rect class="svg-box" x="465" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="520" y="67">on</text>
+          </g>
           <rect class="awo-bar" x="490" y="215" width="60" height="75" rx="4"/>
           <text class="svg-num fill-accent" style="font-size:18px" x="520" y="201">15%</text>
         </g>
         <g class="awo-col awo-c4">
-          <rect class="svg-box" x="605" y="44" width="110" height="46"/>
-          <text class="svg-text" style="font-size:22px" x="660" y="67">the</text>
+          <g class="awo-word">
+            <rect class="svg-box" x="605" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="660" y="67">the</text>
+          </g>
           <rect class="awo-bar" x="630" y="240" width="60" height="50" rx="4"/>
           <text class="svg-num fill-accent" style="font-size:18px" x="660" y="226">10%</text>
         </g>
         <g class="awo-col awo-c5">
-          <rect class="svg-accent-box" x="745" y="44" width="110" height="46" style="stroke-width: 2.5;"/>
-          <text class="svg-text fill-accent" style="font-size:22px; font-weight:700" x="800" y="67">mat</text>
+          <g class="awo-word">
+            <rect class="svg-accent-box" x="745" y="44" width="110" height="46" style="stroke-width: 2.5;"/>
+            <text class="svg-text fill-accent" style="font-size:22px; font-weight:700" x="800" y="67">mat</text>
+          </g>
           <rect class="awo-bar" x="770" y="140" width="60" height="150" rx="4"/>
           <text class="svg-num fill-accent" style="font-size:18px" x="800" y="126">30%</text>
         </g>
@@ -110,5 +122,29 @@
     [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-c1 { transform: translateX(-140px); }
     [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-c2 { transform: translateX(280px); }
     [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-c4 { transform: translateX(-280px); }
+
+    /* Words that swap places would slide straight through each other (the(0) and
+       cat(1), sat(2) and the(4), both of those across on(3)). While the columns move,
+       each word box takes a lane: rightward movers arc over, leftward movers dip
+       under, on(3) holds the middle, and they land back in line. (The question line
+       sits above y=0 so the upper lane clears it.) Only the word box hops; the bars stay on the
+       baseline. Forward only -- stepping back just slides them home. */
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) :is(.awo-c0, .awo-c2) .awo-word {
+      animation: awo-hop-over 1s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) :is(.awo-c1, .awo-c4) .awo-word {
+      animation: awo-hop-under 1s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    @keyframes awo-hop-over {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-50px); }
+    }
+
+    @keyframes awo-hop-under {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(50px); }
+    }
   </style>
 </section>

@@ -1,10 +1,21 @@
-import { makeDraggable, el } from './interactions.js';
+import { makeDraggable, registerInteraction, el } from './interactions.js';
 
 /* ── Numeric table slide (rms-*) ──────────────────────── */
 (function () {
   const N = 4;
   const WEIGHTS = [1.0, 0.5, 2.0, 1.0];
-  const x = [2, 3, 1, 4];
+  const DEFAULTS = [2, 3, 1, 4];   // what the markup paints
+  let x = DEFAULTS.slice();
+
+  // Start each visit from the markup's numbers, so a value dragged on an earlier
+  // visit does not make the first drag jump. Once per entrance: the observer behind
+  // registerInteraction also fires on the label rewrites a drag makes.
+  registerInteraction('rms-svg', () => {
+    const svg = el('rms-svg');
+    if (!svg || svg.dataset.initialised) return;
+    svg.dataset.initialised = '1';
+    x = DEFAULTS.slice();
+  });
 
   let dragStartY = 0;
   let dragStartVal = 0;
@@ -71,8 +82,17 @@ import { makeDraggable, el } from './interactions.js';
 /* ── Bar-chart visual slide (rmsv-*) ──────────────────── */
 (function () {
   var N = 4;
-  var x = [2, 3, 1, 4];
+  var DEFAULTS = [2, 3, 1, 4];   // what the markup paints
+  var x = DEFAULTS.slice();
   var BASELINE = 540;
+
+  // Same once-per-entrance reset as the table slide above.
+  registerInteraction('rmsv-svg', function () {
+    var svg = el('rmsv-svg');
+    if (!svg || svg.dataset.initialised) return;
+    svg.dataset.initialised = '1';
+    x = DEFAULTS.slice();
+  });
   var MAX_H = 420;
   var IN_SCALE = MAX_H / 9;
   var OUT_SCALE = 200;

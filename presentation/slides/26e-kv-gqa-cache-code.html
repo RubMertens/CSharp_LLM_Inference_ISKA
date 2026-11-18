@@ -58,7 +58,7 @@ private Vector GroupedQueryAttentionWithCache(
          data-note="No causal mask here. On 16b and 25c we set -∞ for future positions. The cache only ever holds the past, so there is no future to mask."></span>
       <span class="vscode-step fragment" data-fragment-index="1"
          data-lines="1-4"
-         data-values="2: queryRow = 64 numbers (one token) | 3: cachedKeys = 4 rows | 4: cachedValues = 4 rows"
+         data-values="2: queryRow = 1 × 64 | 3: cachedKeys = 4 × 16 | 4: cachedValues = 4 × 16"
          data-note="One query row in. All of history comes in as two lists."></span>
       <span class="vscode-step fragment" data-fragment-index="2"
          data-text="int cacheLength = cachedKeys.Count"
@@ -73,12 +73,12 @@ private Vector GroupedQueryAttentionWithCache(
       <span class="vscode-step fragment" data-fragment-index="4"
          data-text="var queryForHead = queryRow"
          data-stopped
-         data-values="18: queryRow[40..48] — 8 numbers"
+         data-values="18: 1 × 64 → 1 × 8"
          data-note="The only thing computed fresh this step: the query for the one new token."></span>
       <span class="vscode-step fragment" data-fragment-index="5"
          data-lines="20-25"
          data-stopped="23"
-         data-values="20: scores = [0, 0, 0, 0] | 21: t = 0, 1, 2, 3 | 23: cachedKeys[0][8..16] — a list lookup | 24: 6.7 / 2.83 = 2.37"
+         data-values="20: scores = [0, 0, 0, 0] | 21: t = 0, 1, 2, 3 | 23: cachedKeys[0][8..16] → 1 × 8 | 24: 6.7 / 2.83 = 2.37"
          data-note="The payoff. This key used to be recomputed from the token embedding on every single step. Now it is an index into a list."></span>
       <span class="vscode-step fragment" data-fragment-index="6"
          data-text="var attentionWeights = Softmax(scores)"
@@ -88,17 +88,17 @@ private Vector GroupedQueryAttentionWithCache(
       <span class="vscode-step fragment" data-fragment-index="7"
          data-lines="29-34"
          data-stopped="32"
-         data-values="29: headOutput = 8 zeros | 30: t = 0, 1, 2, 3 | 32: cachedValues[0][8..16] — read, not recomputed | 33: += 0.50 × v0, 0.14 × v1, 0.07 × v2, 0.29 × v3"
+         data-values="29: headOutput = 8 zeros | 30: t = 0, 1, 2, 3 | 32: cachedValues[0][8..16] → 1 × 8 | 33: += 0.50 × v0, 0.14 × v1, 0.07 × v2, 0.29 × v3"
          data-note="Same again for the values. Loop over history, not over a freshly built matrix."></span>
       <span class="vscode-step fragment" data-fragment-index="8"
          data-lines="36-39"
          data-stopped="38"
-         data-values="38: output[40..48] = head 5's 8 numbers"
+         data-values="38: output[40..48] = 1 × 8"
          data-note="Each head writes its own slice — concatenation, in place."></span>
       <span class="vscode-step fragment" data-fragment-index="9"
          data-text="return output"
          data-stopped
-         data-values="42: output = 64 numbers, one token"
+         data-values="42: output = 1 × 64"
          data-note="One token in, one token out — and the cost of a step no longer grows by redoing the past. Price: memory. The cache is sequenceLength × layers × kvHeads × headDim, and on long contexts it becomes the biggest thing in RAM. Which is exactly what grouped-query attention shrinks."></span>
     </div>
   </div>

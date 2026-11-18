@@ -16,6 +16,8 @@
   --font-mono: "SF Mono", "Cascadia Code", "Fira Code", Consolas, "DejaVu Sans Mono", monospace;
   --slide-padding: clamp(0.5rem, 1.5vw, 1.5rem);
   --transition-speed: 0.4s;
+  /* Fast start, long settle: motion that reads as deliberate on a big screen. */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 *,
@@ -56,7 +58,7 @@ html, body {
   background: var(--color-bg);
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+  transition: opacity var(--transition-speed) var(--ease-out), transform var(--transition-speed) var(--ease-out);
 }
 
 .slide.slide-enter-right {
@@ -88,14 +90,24 @@ html, body {
   transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
 }
 
+/* The outgoing slide stays fully drawn underneath while the incoming one (z-index 1,
+   opaque background) fades in over it: a true dissolve. Hiding the outgoing slide at
+   once, as before, made every change dip to white for a frame or two, which reads as
+   a flash on a projector. The engine removes it once the incoming fade has finished. */
+.slide.slide-left,
+.slide.slide-right {
+  visibility: visible;
+  opacity: 1;
+  z-index: 0;
+  transition: transform var(--transition-speed) var(--ease-out);
+}
+
 .slide.slide-left {
   transform: translateX(-30px);
-  opacity: 0;
 }
 
 .slide.slide-right {
   transform: translateX(30px);
-  opacity: 0;
 }
 
 .slide.error,
@@ -144,6 +156,19 @@ html, body {
 
 .nav-hint:hover {
   opacity: 0.6;
+}
+
+/* On stage: once the mouse has been still for a moment, the key hint and the cursor
+   get out of the way (the engine sets .is-idle). Any mouse move brings both back, so
+   dragging an interactive diagram works as usual. */
+body.is-idle .nav-hint {
+  opacity: 0;
+  transition-duration: 0.8s;
+}
+
+body.is-idle,
+body.is-idle * {
+  cursor: none !important;
 }
 
 .nav-hint kbd {
@@ -377,7 +402,7 @@ pre code {
 .fragment-hidden {
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
 }
 
 .fragment.visible,
@@ -386,9 +411,16 @@ pre code {
   transform: translateY(0);
 }
 
+/* current-visible fragments swap in place (a highlight moving to the next row, the
+   next step of a walkthrough): cross-fade only. Sliding them 10px made a highlight
+   that stays on the same row jump down and back on every step. */
+.fragment.current-visible,
+.fragment.current-visible.fragment-hidden {
+  transform: none;
+}
+
 .fragment.current-visible.fragment-hidden {
   opacity: 0;
-  transform: translateY(10px);
 }
 
 .center {
