@@ -89,7 +89,7 @@ private Matrix GroupedQueryAttention(int sequenceLength, Matrix queries, Matrix 
       <span class="vscode-step fragment" data-fragment-index="5"
          data-lines="26-31"
          data-stopped="31"
-         data-values="26: queries[1][40..48] | 28: keys[0][8..16] | 31: 6.7 / 2.83 = 2.37"
+         data-values="26: queries[1][40..48] → 1 × 8 | 28: keys[0][8..16] → 1 × 8 | 31: 6.7 / 2.83 = 2.37"
          data-note="Same dot product as before — now on an 8-wide slice"></span>
       <span class="vscode-step fragment" data-fragment-index="6"
          data-text="var attentionWeights = Softmax(scores)"
@@ -99,12 +99,12 @@ private Matrix GroupedQueryAttention(int sequenceLength, Matrix queries, Matrix 
       <span class="vscode-step fragment" data-fragment-index="7"
          data-lines="36-42"
          data-stopped="41"
-         data-values="36: outputVector = 8 zeros | 39: values[0][8..16] | 41: += 0.78 × v0, then 0.22 × v1"
+         data-values="36: outputVector = 8 zeros | 39: values[0][8..16] → 1 × 8 | 41: += 0.78 × v0, then 0.22 × v1"
          data-note="Weighted sum of value slices — identical shape to single-head"></span>
       <span class="vscode-step fragment" data-fragment-index="8"
          data-lines="44-47"
          data-stopped="46"
-         data-values="46: output[1, 40..48] = head 5's 8 numbers"
+         data-values="46: output[1, 40..48] = 1 × 8"
          data-note="Each head writes into its own slice — concatenation, in place"></span>
       <span class="vscode-step fragment" data-fragment-index="9"
          data-text="return output"

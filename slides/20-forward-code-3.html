@@ -41,10 +41,9 @@ public Matrix Forward(int[] tokens)
       <!-- always on: the inputs, and the shape of the rest of the pass -->
       <span class="vscode-inline" data-line="1"
         data-value="tokens = [2, 2, 2]   HiddenDimension = 64   VocabularySize = 250"></span>
-      <span class="vscode-inline" data-line="18" data-value="queries, keys, values — 3 × 64 each"></span>
+      <span class="vscode-inline" data-line="18" data-value="Q, K, V: 3 × 64 · 64 × 64 → 3 × 64"></span>
       <span class="vscode-inline" data-line="20" data-value="3 × 64"></span>
       <span class="vscode-inline" data-line="22" data-value="3 × 64"></span>
-      <span class="vscode-inline" data-line="27" data-value="residual: what came in, plus what attention added"></span>
 
       <span class="vscode-step fragment" data-fragment-index="0"
         data-text="var attentionOutput = SingleHeadSelfAttention(" data-stopped
@@ -61,8 +60,13 @@ public Matrix Forward(int[] tokens)
 
       <span class="vscode-step fragment" data-fragment-index="3"
         data-text="hidden * weights.OutputEmbedding" data-stopped="29"
-        data-values="29: 3 × 64 · 64 × 250 → 3 × 250, then returned"
-        data-note="Out of 64 dimensions into the vocabulary — one score per possible token. That is one layer, one pass, done"></span>
+        data-values="29: 3 × 64 · 64 × 250 → 3 × 250"
+        data-note="Out of 64 dimensions into the vocabulary — one score per possible token"></span>
+
+      <span class="vscode-step fragment" data-fragment-index="4"
+        data-text="return logits;" data-stopped
+        data-values="30: logits = 3 × 250"
+        data-note="Handed back to the caller. The last row is the guess for the next token. That is one layer, one pass, done"></span>
     </div>
   </div>
 

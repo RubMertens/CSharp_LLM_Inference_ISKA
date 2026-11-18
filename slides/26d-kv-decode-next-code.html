@@ -61,12 +61,12 @@ public int DecodeNext(int token)
       </pre>
 
       <span class="vscode-inline" data-line="1"
-            data-value="token = 137 (one int)   hiddenDim = 64   layers = 2   cache already holds 3 rows"></span>
+            data-value="token = 137   hiddenDim = 64   layers = 2   cache = 3 rows"></span>
 
       <span class="vscode-step fragment" data-fragment-index="0"
          data-text="Vector embedding = weights.EmbeddedTokens[token];"
          data-stopped
-         data-values="1: one token in, not int[] | 3: Prefill: Matrix 3 × 64 for the whole prompt → here: Vector 64 for one token"
+         data-values="3: embedding = 1 × 64"
          data-note="One row out of the table. Prefill embedded the whole prompt: 3 × 64"></span>
 
       <span class="vscode-step fragment" data-fragment-index="1"
@@ -84,25 +84,24 @@ public int DecodeNext(int token)
       <span class="vscode-step fragment" data-fragment-index="3"
          data-lines="14-16"
          data-stopped="14"
-         data-values="14: 1×64 • 64×64 → query = 1 × 64 (8 heads × headDim 8) | 15: 1×64 • 64×16 → key = 1 × 16 | 16: 1×64 • 64×16 → value = 1 × 16"
+         data-values="14: 1 × 64 · 64 × 64 → 1 × 64 | 15: 1 × 64 · 64 × 16 → 1 × 16 | 16: 1 × 64 · 64 × 16 → 1 × 16"
          data-note="Read the comments: the left factor is 1 row. In Prefill it was 3"></span>
 
       <span class="vscode-step fragment" data-fragment-index="4"
          data-lines="18-19"
          data-stopped="18"
-         data-values="18: rotate query by position 3 | 19: rotate key by position 3"
          data-note="RoPE takes the position explicitly now — the cache told us what it is"></span>
 
       <span class="vscode-step fragment" data-fragment-index="5"
          data-lines="21-22"
          data-stopped="21"
-         data-values="21: _keyCache[0]: 3 rows → 4 | 22: _valueCache[0]: 3 rows → 4"
+         data-values="21: _keyCache[0]: 3 × 16 → 4 × 16 | 22: _valueCache[0]: 3 × 16 → 4 × 16"
          data-note="Append one vector per token. The cache grows by exactly one row per step"></span>
 
       <span class="vscode-step fragment" data-fragment-index="6"
          data-lines="24-27"
          data-stopped="24"
-         data-values="24: attentionOut = 1 × 64 | 26: 4 cached keys, 1 × 16 each | 27: 4 cached values"
+         data-values="24: attentionOut = 1 × 64 | 26: 4 × 16 | 27: 4 × 16"
          data-note="One query row against the whole cached history. Everything below is the same layer tail as Prefill, one row wide instead of three — and no 'take the last row' at the end, because there is only one row. That call is the next stretch of the talk"></span>
 
     </div>

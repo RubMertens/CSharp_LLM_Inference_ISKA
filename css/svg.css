@@ -269,6 +269,47 @@
   animation: svg-glow var(--svg-glow-duration, 2.5s) ease-in-out infinite;
 }
 
+/* ── Draggable diagrams ─────────────────────────────────
+   Hit targets are invisible rects/circles with an id containing "-hit"
+   (interactions.js tags the grabbed one .is-drag-target). On stage the audience
+   should see what is grabbable and what is being moved, so: a faint column wash on
+   hover/drag for bar charts, and a grown handle for the dot-on-a-vector diagrams. */
+
+.svg-diagram:has([id*="-hit"]) {
+  touch-action: none;       /* a finger drag moves the value, not the page */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.svg-diagram rect[id*="-hit"] {
+  transition: fill 0.2s ease;
+}
+
+.svg-diagram rect[id*="-hit"]:hover,
+.svg-diagram rect[id*="-hit"].is-drag-target {
+  fill: rgba(0, 163, 224, 0.07);
+}
+
+.svg-diagram [id$="-drag-dot"] {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.18s ease;
+}
+
+.svg-diagram:has([id$="-drag-hit"]:hover) [id$="-drag-dot"],
+.svg-diagram:has(.is-drag-target) [id$="-drag-dot"] {
+  transform: scale(1.35);
+}
+
+/* Labels that move with a drag cross lines and arcs. A background-coloured outline
+   painted under the glyphs keeps them readable wherever they land. */
+.svg-halo {
+  paint-order: stroke;
+  stroke: var(--color-bg, #fff);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+
 /* ── Utility fill / stroke ─────────────────────────────── */
 
 .fill-accent { fill: var(--color-accent, #00A3E0); }

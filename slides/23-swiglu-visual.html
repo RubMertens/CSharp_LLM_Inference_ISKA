@@ -2,7 +2,9 @@
   <div class="slide-content">
     <h2>The <span class="highlight">Gating</span> Effect</h2>
 
-    <svg id="silu-svg" class="svg-diagram" viewBox="0 0 1200 600" style="width: 100%; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+    <div class="svg-fill">
+
+    <svg id="silu-svg" class="svg-diagram" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
 
       <!-- ── SiLU graph (left column) ──────────────── -->
       <text class="svg-label" style="font-size:18px" x="150" y="35">SiLU</text>
@@ -12,7 +14,7 @@
         <line x1="30" y1="60" x2="30" y2="520" style="stroke: var(--color-border); stroke-width: 1.5; opacity: 0.5;"/>
         <line x1="150" y1="60" x2="150" y2="520" style="stroke: var(--color-border); stroke-width: 1; stroke-dasharray: 4,4; opacity: 0.25;"/>
         <line x1="30" y1="454" x2="270" y2="454" style="stroke: var(--color-border); stroke-width: 1.5; opacity: 0.35;"/>
-        <path id="sigmoid-curve" d="" style="fill: none; stroke: var(--color-accent); stroke-width: 2.5; opacity: 0.2;"/>
+        <path id="sigmoid-curve" d="" style="fill: none; stroke: var(--color-accent); stroke-width: 2.5; opacity: 0.3;"/>
         <path id="sigmoid-trace" d="" style="fill: none; stroke: var(--color-accent); stroke-width: 3; opacity: 0.9;"/>
         <line id="sigmoid-xline" x1="0" y1="0" x2="0" y2="0" style="stroke: var(--color-accent); stroke-width: 1; stroke-dasharray: 3,3; opacity: 0.5;"/>
         <line id="sigmoid-yline" x1="0" y1="0" x2="0" y2="0" style="stroke: var(--color-accent); stroke-width: 1; stroke-dasharray: 3,3; opacity: 0.5;"/>
@@ -55,12 +57,11 @@
         <!-- Arrow -->
         <line class="svg-connector" x1="695" y1="320" x2="785" y2="320" style="stroke-width: 2; opacity: 0.5;"/>
         <polygon class="fill-accent" style="opacity:0.4" points="779,312 795,320 779,328"/>
-        <text class="svg-muted" style="font-size:16px" x="740" y="300">Swish gate</text>
-        <text class="svg-muted" style="font-size:13px" x="740" y="345">x · sigmoid(x)</text>
+        <text class="svg-muted" style="font-size:16px" x="740" y="276">Swish gate</text>
+        <text class="svg-muted" style="font-size:13px" x="740" y="300">x · sigmoid(x)</text>
 
         <!-- Output zero line -->
-        <line x1="770" y1="320" x2="1150" y2="320" style="stroke: var(--color-border); stroke-width: 1.5;"/>
-        <text class="svg-text-sm" style="fill: var(--color-text-muted); text-anchor: end;" x="765" y="320">0</text>
+        <line x1="797" y1="320" x2="1150" y2="320" style="stroke: var(--color-border); stroke-width: 1.5;"/>
 
         <!-- Output section label -->
         <text class="svg-label" style="font-size:18px" x="970" y="35">after gating</text>
@@ -90,5 +91,6 @@
         <text class="svg-text-sm" style="font-size:14px; fill: var(--color-accent);" x="970" y="537">negative → crushed to zero</text>
       </g>
     </svg>
+    </div>
   </div>
 </section>

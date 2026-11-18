@@ -41,11 +41,10 @@ public Matrix Forward(int[] tokens)
       <!-- always on: the inputs, and the shape of the rest of the pass -->
       <span class="vscode-inline" data-line="1"
         data-value="tokens = [2, 2, 2]   HiddenDimension = 64   VocabularySize = 250"></span>
-      <span class="vscode-inline" data-line="18" data-value="queries, keys, values — 3 × 64 each"></span>
+      <span class="vscode-inline" data-line="18" data-value="Q, K, V: 3 × 64 · 64 × 64 → 3 × 64"></span>
       <span class="vscode-inline" data-line="20" data-value="3 × 64"></span>
       <span class="vscode-inline" data-line="22" data-value="3 × 64"></span>
-      <span class="vscode-inline" data-line="27" data-value="residual: what came in, plus what attention added"></span>
-      <span class="vscode-inline" data-line="29" data-value="logits = 3 × 250 — one score per vocab entry"></span>
+      <span class="vscode-inline" data-line="29" data-value="3 × 64 · 64 × 250 → 3 × 250"></span>
 
       <span class="vscode-step fragment" data-fragment-index="0" data-text="RootMeanSquareNormalisation(embeddings[row]"
         data-stopped></span>

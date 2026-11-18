@@ -33,6 +33,7 @@ class PresentationEngine {
     this.#bindWheel();
     this.#bindTouch();
     this.#bindHash();
+    this.#bindIdle();
 
     const hash = location.hash.slice(1);
     const startIndex = hash
@@ -85,10 +86,19 @@ class PresentationEngine {
     }
 
     if (prev) {
+      // The outgoing slide stays drawn underneath (see .slide-left/.slide-right) until
+      // the incoming one has faded in over it. Listen on the incoming slide itself and
+      // check the target: fragment transitions bubble transitionend too, and one of
+      // those must not cut the dissolve short.
       prev.classList.remove('active');
       prev.classList.add(`slide-${direction === 'right' ? 'left' : 'right'}`);
-      prev.addEventListener('transitionend', () => prev.remove(), { once: true });
-      setTimeout(() => prev.remove(), 600);
+      const done = (e) => {
+        if (e.target !== el || e.propertyName !== 'opacity') return;
+        el.removeEventListener('transitionend', done);
+        prev.remove();
+      };
+      el.addEventListener('transitionend', done);
+      setTimeout(() => prev.remove(), 700);
     }
 
     this.#container.appendChild(el);
@@ -288,6 +298,21 @@ class PresentationEngine {
       if (dx < 0) this.next();  // swipe left → forward
       else this.prev();         // swipe right → back
     }, { passive: true });
+  }
+
+  // Hide the key hint and the cursor while the mouse is still, so neither sits on
+  // top of a diagram on the projector. Moving the mouse brings both straight back.
+  #bindIdle() {
+    const IDLE_MS = 2000;
+    let timer = 0;
+    const wake = () => {
+      document.body.classList.remove('is-idle');
+      clearTimeout(timer);
+      timer = setTimeout(() => document.body.classList.add('is-idle'), IDLE_MS);
+    };
+    document.addEventListener('pointermove', wake, { passive: true });
+    document.addEventListener('pointerdown', wake, { passive: true });
+    wake();
   }
 
   #bindHash() {

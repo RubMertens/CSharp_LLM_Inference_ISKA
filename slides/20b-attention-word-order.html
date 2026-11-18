@@ -1,0 +1,150 @@
+<section data-id="attention-word-order" data-title="Attention Has No Sense of Order">
+  <div class="slide-content">
+    <h2>Attention Has <span class="highlight">No Sense of Order</span></h2>
+
+    <!-- Both sentences sit in one grid cell, so the swap is a pure opacity cross-fade. -->
+    <p class="awo-sentence">
+      <span class="awo-s-in-order">"the cat sat on the mat"</span>
+      <span class="awo-s-shuffled">"cat the the on sat mat"</span>
+    </p>
+
+    <!-- "mat" is the word doing the looking: it is last, so the causal mask lets it see
+         every word (and it is the row that predicts the next token). Only the five words
+         before it shuffle; mat stays last, so the set of visible words is unchanged and
+         the claim "same weights, same result" holds with the mask on.
+
+         Each word column (box + weight bar + label) is one <g>. Shuffling is a
+         translateX per column -- transform only, driven by the .awo-shuffle marker
+         below through :has(). Columns are 140 user units apart:
+           the(0)->1 +140, cat(1)->0 -140, sat(2)->4 +280, on(3) stays, the(4)->2 -280. -->
+    <div class="svg-fill">
+      <svg class="svg-diagram" viewBox="0 -34 900 534" xmlns="http://www.w3.org/2000/svg">
+        <text class="svg-muted" style="font-size:16px" x="450" y="-16">how much does “mat” look at each word? (last word: the mask lets it see them all)</text>
+
+        <g class="awo-col awo-c0">
+          <g class="awo-word">
+            <rect class="svg-box" x="45" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="100" y="67">the</text>
+          </g>
+          <rect class="awo-bar" x="70" y="240" width="60" height="50" rx="4"/>
+          <text class="svg-num fill-accent" style="font-size:18px" x="100" y="226">10%</text>
+        </g>
+        <g class="awo-col awo-c1">
+          <g class="awo-word">
+            <rect class="svg-box" x="185" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="240" y="67">cat</text>
+          </g>
+          <rect class="awo-bar" x="210" y="190" width="60" height="100" rx="4"/>
+          <text class="svg-num fill-accent" style="font-size:18px" x="240" y="176">20%</text>
+        </g>
+        <g class="awo-col awo-c2">
+          <g class="awo-word">
+            <rect class="svg-box" x="325" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="380" y="67">sat</text>
+          </g>
+          <rect class="awo-bar" x="350" y="215" width="60" height="75" rx="4"/>
+          <text class="svg-num fill-accent" style="font-size:18px" x="380" y="201">15%</text>
+        </g>
+        <g class="awo-col awo-c3">
+          <g class="awo-word">
+            <rect class="svg-box" x="465" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="520" y="67">on</text>
+          </g>
+          <rect class="awo-bar" x="490" y="215" width="60" height="75" rx="4"/>
+          <text class="svg-num fill-accent" style="font-size:18px" x="520" y="201">15%</text>
+        </g>
+        <g class="awo-col awo-c4">
+          <g class="awo-word">
+            <rect class="svg-box" x="605" y="44" width="110" height="46"/>
+            <text class="svg-text" style="font-size:22px" x="660" y="67">the</text>
+          </g>
+          <rect class="awo-bar" x="630" y="240" width="60" height="50" rx="4"/>
+          <text class="svg-num fill-accent" style="font-size:18px" x="660" y="226">10%</text>
+        </g>
+        <g class="awo-col awo-c5">
+          <g class="awo-word">
+            <rect class="svg-accent-box" x="745" y="44" width="110" height="46" style="stroke-width: 2.5;"/>
+            <text class="svg-text fill-accent" style="font-size:22px; font-weight:700" x="800" y="67">mat</text>
+          </g>
+          <rect class="awo-bar" x="770" y="140" width="60" height="150" rx="4"/>
+          <text class="svg-num fill-accent" style="font-size:18px" x="800" y="126">30%</text>
+        </g>
+
+        <!-- Baseline + bracket: spans every column, whatever the order -->
+        <line x1="45" y1="290" x2="855" y2="290" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+        <path class="svg-bracket" d="M 45 306 L 45 316 L 855 316 L 855 306 M 450 316 L 450 330" fill="none"/>
+        <text class="svg-muted" style="font-size:15px" x="450" y="344">weighted sum</text>
+
+        <rect class="svg-result-box" x="160" y="362" width="580" height="52"/>
+        <text class="svg-text" style="font-size:19px" x="450" y="388">“mat” after attention = [0.42, −1.31, 0.77, …]</text>
+
+        <g class="fragment" data-fragment-index="1">
+          <text class="svg-text fill-accent" style="font-size:19px; font-weight:700" x="450" y="448">✓ same weights, same result</text>
+          <text class="svg-text" style="font-size:17px" x="450" y="480">to attention it is a bag of words — order has to be added</text>
+        </g>
+      </svg>
+    </div>
+
+    <span class="fragment awo-shuffle" data-fragment-index="0" aria-hidden="true"></span>
+  </div>
+
+  <style>
+    [data-id="attention-word-order"] .awo-sentence {
+      display: grid;
+      justify-items: center;
+      margin: 0 0 0.6rem;
+      font-family: var(--font-mono);
+      font-size: clamp(1rem, 2.2vw, 1.5em);
+      color: var(--color-accent);
+    }
+
+    [data-id="attention-word-order"] .awo-sentence > span {
+      grid-area: 1 / 1;
+      transition: opacity 0.5s ease;
+    }
+
+    [data-id="attention-word-order"] .awo-s-shuffled { opacity: 0; }
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-s-in-order { opacity: 0; }
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-s-shuffled { opacity: 1; }
+
+    [data-id="attention-word-order"] .awo-bar {
+      fill: rgba(0, 163, 224, 0.25);
+      stroke: var(--color-accent);
+      stroke-width: 1.5;
+    }
+
+    /* Only transform moves. mat (c5) stays put: it is last, so the mask lets it see all. */
+    [data-id="attention-word-order"] .awo-col {
+      transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-c0 { transform: translateX(140px); }
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-c1 { transform: translateX(-140px); }
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-c2 { transform: translateX(280px); }
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) .awo-c4 { transform: translateX(-280px); }
+
+    /* Words that swap places would slide straight through each other (the(0) and
+       cat(1), sat(2) and the(4), both of those across on(3)). While the columns move,
+       each word box takes a lane: rightward movers arc over, leftward movers dip
+       under, on(3) holds the middle, and they land back in line. (The question line
+       sits above y=0 so the upper lane clears it.) Only the word box hops; the bars stay on the
+       baseline. Forward only -- stepping back just slides them home. */
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) :is(.awo-c0, .awo-c2) .awo-word {
+      animation: awo-hop-over 1s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    [data-id="attention-word-order"]:has(.awo-shuffle.fragment-visible) :is(.awo-c1, .awo-c4) .awo-word {
+      animation: awo-hop-under 1s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    @keyframes awo-hop-over {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-50px); }
+    }
+
+    @keyframes awo-hop-under {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(50px); }
+    }
+  </style>
+</section>

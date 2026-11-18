@@ -20,20 +20,28 @@ export function svgPoint(svg, clientX, clientY) {
   return pt.matrixTransform(svg.getScreenCTM().inverse());
 }
 
-// makeDraggable({ hit, cursor, onStart, onDrag })
+// makeDraggable({ hit, cursor, onStart, onDrag, onEnd })
 //
 //   hit    — element id (string) for a single target, or RegExp matched against
 //            e.target.id; first capture group (if any) is parsed as an integer
 //            index and passed through.
 //   cursor — body cursor while dragging ('grabbing', 'ns-resize', …).
 //   onStart({ svg, index, point }) — optional; point is the SVG-space pointer.
-//   onDrag({ svg, index, point })  — called on every move with current pointer.
+//   onDrag({ svg, index, point })  — called at most once per animation frame with
+//                                    the latest pointer position.
+//   onEnd({ svg, index })          — optional; drag released or cancelled.
+//
+// While a drag is live the <svg> carries .is-dragging and data-drag-index, and the
+// hit target carries .is-drag-target, so the grabbed element can be styled (svg.css).
 //
 // Returns nothing; registers document-level listeners immediately.
-export function makeDraggable({ hit, cursor = 'grabbing', onStart, onDrag }) {
+export function makeDraggable({ hit, cursor = 'grabbing', onStart, onDrag, onEnd }) {
   let dragging = false;
   let index = -1;
   let svg = null;
+  let target = null;
+  let frame = 0;
+  let latest = null;
 
   const match = (target) => {
     if (!target || !target.id) return null;
@@ -45,6 +53,32 @@ export function makeDraggable({ hit, cursor = 'grabbing', onStart, onDrag }) {
     return { index: m[1] !== undefined ? parseInt(m[1], 10) : -1 };
   };
 
+  // Pointer events can arrive several times per frame (high-rate mice, pens).
+  // Keep only the newest position and redraw once per frame: same result, no
+  // wasted layout work, no visible lag.
+  const flush = () => {
+    frame = 0;
+    if (!dragging || !svg || !latest) return;
+    onDrag({ svg, index, point: svgPoint(svg, latest.x, latest.y) });
+  };
+
+  const end = () => {
+    if (!dragging) return;
+    if (frame) { cancelAnimationFrame(frame); flush(); }
+    if (target) target.classList.remove('is-drag-target');
+    if (svg) {
+      svg.classList.remove('is-dragging');
+      delete svg.dataset.dragIndex;
+    }
+    if (onEnd) onEnd({ svg, index });
+    dragging = false;
+    index = -1;
+    svg = null;
+    target = null;
+    latest = null;
+    document.body.style.cursor = '';
+  };
+
   document.addEventListener('pointerdown', (e) => {
     const hitInfo = match(e.target);
     if (!hitInfo) return;
@@ -53,6 +87,10 @@ export function makeDraggable({ hit, cursor = 'grabbing', onStart, onDrag }) {
     dragging = true;
     index = hitInfo.index;
     svg = e.target.closest('svg');
+    target = e.target;
+    target.classList.add('is-drag-target');
+    svg.classList.add('is-dragging');
+    svg.dataset.dragIndex = String(index);
     document.body.style.cursor = cursor;
     if (onStart) onStart({ svg, index, point: svgPoint(svg, e.clientX, e.clientY) });
   });
@@ -60,16 +98,12 @@ export function makeDraggable({ hit, cursor = 'grabbing', onStart, onDrag }) {
   document.addEventListener('pointermove', (e) => {
     if (!dragging || !svg) return;
     e.preventDefault();
-    onDrag({ svg, index, point: svgPoint(svg, e.clientX, e.clientY) });
+    latest = { x: e.clientX, y: e.clientY };
+    if (!frame) frame = requestAnimationFrame(flush);
   });
 
-  document.addEventListener('pointerup', () => {
-    if (!dragging) return;
-    dragging = false;
-    index = -1;
-    svg = null;
-    document.body.style.cursor = '';
-  });
+  document.addEventListener('pointerup', end);
+  document.addEventListener('pointercancel', end);
 }
 
 // Registry: run initFn once per slide entrance when #sentinelId is present.

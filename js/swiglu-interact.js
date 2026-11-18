@@ -2,7 +2,11 @@ import { makeDraggable, registerInteraction, el } from './interactions.js';
 
 (function () {
   var N = 4;
-  var x = [-3, 4, -1, 2];
+  var DEFAULTS = [-3, 4, -1, 2];   // what the markup paints
+  var x = DEFAULTS.slice();
+  // The SiLU graph tracks whichever bar was grabbed last, so dragging any bar shows
+  // where it lands on the curve (it used to follow bar 0 only).
+  var active = 0;
   var ZERO = 320;
   var SCALE = 35;
 
@@ -48,9 +52,17 @@ import { makeDraggable, registerInteraction, el } from './interactions.js';
     updateSigmoidDot();
   }
 
+  // Runs on every childList mutation while the slide is up (registerInteraction), and
+  // a drag rewrites labels, which is one. So reset only once per entrance -- the
+  // engine builds fresh DOM each time, so the flag starts clean. Resetting means the
+  // numbers behind the bars always match the markup the slide arrives with; before,
+  // a value dragged on an earlier visit made the first drag jump.
   function initSigmoidGraph() {
     var curve = el('sigmoid-curve');
-    if (!curve) return;
+    if (!curve || curve.dataset.initialised) return;
+    curve.dataset.initialised = '1';
+    x = DEFAULTS.slice();
+    active = 0;
     var d = '';
     for (var v = -6; v <= 6; v += 0.1) {
       d += (d ? 'L' : 'M') + gx(v).toFixed(1) + ',' + gy(swish(v)).toFixed(1);
@@ -60,7 +72,7 @@ import { makeDraggable, registerInteraction, el } from './interactions.js';
   }
 
   function updateSigmoidDot() {
-    var val = x[0], s = swish(val);
+    var val = x[active], s = swish(val);
     var sx = gx(val), sy = gy(s);
     var dot = el('sigmoid-dot');
     if (dot) { dot.setAttribute('cx', sx); dot.setAttribute('cy', sy); }
@@ -84,6 +96,7 @@ import { makeDraggable, registerInteraction, el } from './interactions.js';
     hit: /^silu-hit(\d)$/,
     cursor: 'ns-resize',
     onStart: function (ctx) {
+      active = ctx.index;
       dragStartY = ctx.point.y;
       dragStartVal = x[ctx.index];
     },

@@ -45,46 +45,46 @@
 }
       </pre>
 
-      <span class="vscode-inline" data-line="1" data-value="embeddings = 3&#215;64 &mdash; first residual add, where the old version stopped"></span>
+      <span class="vscode-inline" data-line="1" data-value="embeddings = 3&#215;64"></span>
 
       <span class="vscode-step fragment" data-fragment-index="2"
             data-text="residual = embeddings;"
             data-stopped
-            data-values="2: residual = 3&#215;64 &mdash; re-captured, this time after attention"
+            data-values="2: residual = 3&#215;64"
             data-note="A second residual checkpoint. The feed-forward block gets its own skip connection"></span>
       <span class="vscode-step fragment" data-fragment-index="3"
             data-text="RMSNorm(embeddings, layer.FeedForwardNormWeight)"
             data-stopped
-            data-values="3: normalizedEmbeddings = 3&#215;64 &mdash; its own norm weight, not the attention one"
+            data-values="3: normalizedEmbeddings = 3&#215;64"
             data-note="Normalise again before the block. Every sub-layer in a transformer is norm, then work, then add"></span>
       <span class="vscode-step fragment" data-fragment-index="4"
             data-text="Matrix gate="
-            data-values="5: gate = 3&#215;128 &mdash; projected UP, 64 &#8594; 128"
+            data-values="5: 3&#215;64 · 64&#215;128 &#8594; 3&#215;128"
             data-note="Project UP, wider than hiddenDim. The comment says why: room for more complex interactions"></span>
       <span class="vscode-step fragment" data-fragment-index="5"
             data-text="Matrix up ="
-            data-values="6: up = 3&#215;128 &mdash; same input, a second projection"
+            data-values="6: 3&#215;64 · 64&#215;128 &#8594; 3&#215;128"
             data-note="A second, separate up-projection from the same input. Two views of the same normalized embeddings"></span>
       <span class="vscode-step fragment" data-fragment-index="6"
             data-text="SigmoidLinearUnit(gate)"
             data-stopped
-            data-values="7: activated = 3&#215;128 &mdash; x &#183; &#963;(x), gate branch only"
+            data-values="7: activated = 3&#215;128"
             data-note="The nonlinearity. Without it the whole stack collapses to one big matrix multiply"></span>
       <span class="vscode-step fragment" data-fragment-index="7"
             data-stopped
             data-text="ElementwiseMultiply"
-            data-values="8: gated = 3&#215;128 &mdash; activated &#8857; up, element by element"
+            data-values="8: 3&#215;128 &#8857; 3&#215;128 &#8594; 3&#215;128"
             data-note="This product IS the gated linear unit: the gate decides, per element, how much of up survives"></span>
       <span class="vscode-step fragment" data-fragment-index="8"
             data-stopped
             data-text="gated * layer.DownProjection"
-            data-values="9: feedForwardOutput = 3&#215;64 &mdash; back DOWN, 128 &#8594; 64"
+            data-values="9: 3&#215;128 · 128&#215;64 &#8594; 3&#215;64"
             data-note="Down-project to hiddenDim so it can rejoin the residual stream"></span>
       <span class="vscode-step fragment" data-fragment-index="9"
             data-lines="2"
             data-text="residual + feedForwardOutput"
             data-stopped="11"
-            data-values="2: residual = 3&#215;64 &mdash; re-captured after attention | 11: embeddings = 3&#215;64 &mdash; second residual add"
+            data-values="2: residual = 3&#215;64 | 11: embeddings = 3&#215;64"
             data-note="Two residual adds per layer now: one after attention, one after feed-forward. That is what every real transformer block looks like"></span>
     </div>
   </div>

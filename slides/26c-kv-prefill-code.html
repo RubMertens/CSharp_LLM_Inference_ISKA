@@ -59,7 +59,7 @@ public int Prefill(int[] promptTokens)
       <span class="vscode-step fragment" data-fragment-index="0"
          data-lines="3-4"
          data-stopped="4"
-         data-values="3: promptTokens.Length = 3 → sequenceLength = 3 | 4: embeddings = 3 × 64 — one row per prompt token"
+         data-values="3: sequenceLength = 3 | 4: embeddings = 3 × 64"
          data-note="Whole prompt goes in at once, as a matrix — not one token at a time"></span>
 
       <span class="vscode-step fragment" data-fragment-index="1"
@@ -69,13 +69,13 @@ public int Prefill(int[] promptTokens)
 
       <span class="vscode-step fragment" data-fragment-index="2"
          data-lines="14-16"
-         data-values="14: queries = 3 × 64 (8 query heads × 8) | 15: keys = 3 × 16 (2 kv heads × 8) | 16: values = 3 × 16 — no RoPE"
+         data-values="14: 3 × 64 · 64 × 64 → 3 × 64 | 15: 3 × 64 · 64 × 16 → 3 × 16 | 16: 3 × 64 · 64 × 16 → 3 × 16"
          data-note="RoPE on queries and keys. Not on values — position belongs to the match, not the payload"></span>
 
       <span class="vscode-step fragment" data-fragment-index="3"
          data-lines="18-19"
          data-stopped
-         data-values="18: _keyCache[0] = 3 rows × 16 | 19: _valueCache[0] = 3 rows × 16"
+         data-values="18: _keyCache[0] = 3 × 16 | 19: _valueCache[0] = 3 × 16"
          data-note="THE new lines. Keys and values for every prompt token, kept per layer"></span>
 
       <span class="vscode-step fragment" data-fragment-index="4"
@@ -85,13 +85,13 @@ public int Prefill(int[] promptTokens)
 
       <span class="vscode-step fragment" data-fragment-index="5"
          data-lines="26-35"
-         data-values="29: gate = 3 × 128 | 33: feedForwardOutput = 3 × 64 | 35: embeddings = 3 × 64"
+         data-values="29: 3 × 64 · 64 × 128 → 3 × 128 | 33: 3 × 128 · 128 × 64 → 3 × 64 | 35: embeddings = 3 × 64"
          data-note="SwiGLU feed-forward and the second residual — already covered"></span>
 
       <span class="vscode-step fragment" data-fragment-index="6"
          data-lines="38-43"
          data-stopped="43"
-         data-values="39: logits = 3 × 250 | 41: logits[2] — last row only, rows 0 and 1 discarded | 43: → token 137"
+         data-values="39: 3 × 64 · 64 × 250 → 3 × 250 | 41: 3 × 250 → 1 × 250 | 43: → token 137"
          data-note="Same greedy argmax as the very first code slide. Prefill returns the FIRST generated token"></span>
     </div>
 

@@ -1,0 +1,72 @@
+<section data-id="softmax-visual" data-title="Softmax — Visual">
+  <div class="slide-content">
+    <h2>What <span class="highlight">Softmax</span> Looks Like</h2>
+
+    <!-- Scores are any number, up or down; the weights are always positive and always
+         sum to 100%. Both charts share one baseline (y=500) and one top (y=100): a
+         score of 4 is as tall as 100%. Defaults [2, 1, 0.5, -1] -> 61/22/14/3.0%;
+         softmax-interact.js redraws from the same numbers on entry. -->
+    <div class="svg-fill">
+    <svg id="smv-svg" class="svg-diagram" viewBox="0 0 1200 650" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- ── Input: raw scores ── -->
+      <text class="svg-label" style="font-size:18px" x="252" y="30">attention scores</text>
+      <text class="svg-muted" style="font-size:13px" x="252" y="55">↕ drag to change</text>
+
+      <line x1="75" y1="500" x2="430" y2="500" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+      <text class="svg-text-sm" style="font-size:14px; fill: var(--color-text-muted); text-anchor: end;" x="68" y="500">0</text>
+
+      <rect id="smv-ib0" x="95" y="300" width="65" height="200" rx="4"
+            style="fill: rgba(0,163,224,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="smv-ib1" x="180" y="400" width="65" height="100" rx="4"
+            style="fill: rgba(0,163,224,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="smv-ib2" x="265" y="450" width="65" height="50" rx="4"
+            style="fill: rgba(0,163,224,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+      <rect id="smv-ib3" x="350" y="500" width="65" height="100" rx="4"
+            style="fill: rgba(0,163,224,0.5); stroke: var(--color-accent); stroke-width: 1;"/>
+
+      <text id="smv-iv0" class="svg-num" style="font-size:20px" x="127" y="290">2</text>
+      <text id="smv-iv1" class="svg-num" style="font-size:20px" x="212" y="390">1</text>
+      <text id="smv-iv2" class="svg-num" style="font-size:20px" x="297" y="440">0.5</text>
+      <text id="smv-iv3" class="svg-num" style="font-size:20px" x="382" y="620">-1</text>
+
+      <!-- Invisible drag targets -->
+      <rect id="smv-hit0" x="80" y="75" width="95" height="570" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="smv-hit1" x="165" y="75" width="95" height="570" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="smv-hit2" x="250" y="75" width="95" height="570" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+      <rect id="smv-hit3" x="335" y="75" width="95" height="570" fill="transparent" style="cursor: ns-resize; pointer-events: all;"/>
+
+      <!-- ── Fragment: arrow + weights ── -->
+      <g class="fragment">
+        <line class="svg-connector" x1="460" y1="300" x2="650" y2="300" style="stroke-width: 2; opacity: 0.5;"/>
+        <polygon class="fill-accent" style="opacity:0.5" points="644,292 660,300 644,308"/>
+        <text class="svg-muted" style="font-size:16px" x="558" y="280">softmax</text>
+
+        <text class="svg-label" style="font-size:18px" x="860" y="30">attention weights</text>
+        <text class="svg-text-sm" style="font-size:14px; fill: var(--color-accent);" x="860" y="55">always positive · always add up to 100%</text>
+
+        <line x1="685" y1="500" x2="1035" y2="500" style="stroke: var(--color-border); stroke-width: 1.5;"/>
+
+        <!-- 100% reference, level with a score of 4 on the left -->
+        <line x1="685" y1="100" x2="1035" y2="100"
+              style="stroke: var(--color-accent); stroke-width: 1.5; stroke-dasharray: 6 4; opacity: 0.4;"/>
+        <text class="svg-text-sm" style="font-size:14px; fill: var(--color-accent); text-anchor: start; opacity: 0.6;" x="1042" y="100">100%</text>
+
+        <rect id="smv-ob0" x="700" y="256" width="65" height="244" rx="4"
+              style="fill: rgba(0,163,224,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="smv-ob1" x="785" y="410" width="65" height="90" rx="4"
+              style="fill: rgba(0,163,224,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="smv-ob2" x="870" y="446" width="65" height="54" rx="4"
+              style="fill: rgba(0,163,224,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+        <rect id="smv-ob3" x="955" y="488" width="65" height="12" rx="4"
+              style="fill: rgba(0,163,224,0.15); stroke: var(--color-accent); stroke-width: 1.5;"/>
+
+        <text id="smv-ov0" class="svg-num fill-accent" style="font-size:20px" x="732" y="240">61%</text>
+        <text id="smv-ov1" class="svg-num fill-accent" style="font-size:20px" x="817" y="394">22%</text>
+        <text id="smv-ov2" class="svg-num fill-accent" style="font-size:20px" x="902" y="430">14%</text>
+        <text id="smv-ov3" class="svg-num fill-accent" style="font-size:20px" x="987" y="472">3.0%</text>
+      </g>
+    </svg>
+    </div>
+  </div>
+</section>

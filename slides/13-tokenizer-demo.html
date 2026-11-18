@@ -96,6 +96,16 @@
       align-items: center;
       justify-content: center;
       font-size: clamp(1.4rem, 2.8vw, 2.4em);
+    }
+
+    /* The arrows are fragments, but the theme's `.pipeline .arrow { opacity: 0.6 }`
+       outranks `.fragment`, so they would show from the start. Spell out both states
+       so each arrow fades in with the stage it shares a data-fragment-index with. */
+    [data-id="tokenizer-demo"] .tok-flow .arrow.fragment-hidden {
+      opacity: 0;
+    }
+
+    [data-id="tokenizer-demo"] .tok-flow .arrow.fragment-visible {
       opacity: 1;
     }
 
