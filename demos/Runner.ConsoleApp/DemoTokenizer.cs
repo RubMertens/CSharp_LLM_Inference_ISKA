@@ -12,18 +12,18 @@ public class DemoTokenizer
     {"<eos>", 1}, // end of sequence
     {"<unk>", 2}, // unknown token (for out of vocabulary words)
 
-    {"hello", 3},
-    {"world", 4},
-    {"this", 5},
-    {"is", 6},
-    {"a", 7},
-    {"test", 8},
-    {"tiny", 9},
-    {"llm", 10},
-    {"replies", 11},
-    {"to", 12},
-    {"input", 13},
-    {"tokens", 14}
+    {"tiny", 3},
+    {"hello", 4},
+    {"replies", 5},
+    {"to", 6},
+    {"world", 7},
+    {"llm", 8},
+    {"this", 9},
+    {"input", 10},
+    {"is", 11},
+    {"a", 12},
+    {"tokens", 13},
+    {"test", 14}
 };
 
     public DemoTokenizer()

@@ -24,7 +24,7 @@
 
       <div class="stage fragment" data-fragment-index="2">
         <span class="stage-label">Turned into ids</span>
-        <span class="stage-name tok-ids">[3, 4, 5, 6, 7, 8]</span>
+        <span class="stage-name tok-ids">[4, 7, 9, 11, 12, 14]</span>
       </div>
     </div>
 
@@ -35,25 +35,28 @@
         <div class="tok-chip is-special"><span class="tok-chip-tok">&lt;bos&gt;</span><span class="tok-chip-id">0</span></div>
         <div class="tok-chip is-special"><span class="tok-chip-tok">&lt;eos&gt;</span><span class="tok-chip-id">1</span></div>
         <div class="tok-chip is-special"><span class="tok-chip-tok">&lt;unk&gt;</span><span class="tok-chip-id">2</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">hello</span><span class="tok-chip-id">3</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">world</span><span class="tok-chip-id">4</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">this</span><span class="tok-chip-id">5</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">is</span><span class="tok-chip-id">6</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">a</span><span class="tok-chip-id">7</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">test</span><span class="tok-chip-id">8</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">tiny</span><span class="tok-chip-id">9</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">llm</span><span class="tok-chip-id">10</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">replies</span><span class="tok-chip-id">11</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">to</span><span class="tok-chip-id">12</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">input</span><span class="tok-chip-id">13</span></div>
-        <div class="tok-chip"><span class="tok-chip-tok">tokens</span><span class="tok-chip-id">14</span></div>
-        <div class="tok-chip is-pad"><span class="tok-chip-tok">&lt;unused…&gt;</span><span class="tok-chip-id">15&ndash;249</span></div>
+        <div class="tok-chip"><span class="tok-chip-tok">tiny</span><span class="tok-chip-id">3</span></div>
+        <div class="tok-chip is-used"><span class="tok-chip-tok">hello</span><span class="tok-chip-id">4</span></div>
+        <div class="tok-chip"><span class="tok-chip-tok">replies</span><span class="tok-chip-id">5</span></div>
+        <div class="tok-chip"><span class="tok-chip-tok">to</span><span class="tok-chip-id">6</span></div>
+        <div class="tok-chip is-used"><span class="tok-chip-tok">world</span><span class="tok-chip-id">7</span></div>
+        <div class="tok-chip"><span class="tok-chip-tok">llm</span><span class="tok-chip-id">8</span></div>
+        <div class="tok-chip is-used"><span class="tok-chip-tok">this</span><span class="tok-chip-id">9</span></div>
+        <div class="tok-chip"><span class="tok-chip-tok">input</span><span class="tok-chip-id">10</span></div>
+        <div class="tok-chip is-used"><span class="tok-chip-tok">is</span><span class="tok-chip-id">11</span></div>
+        <div class="tok-chip is-used"><span class="tok-chip-tok">a</span><span class="tok-chip-id">12</span></div>
+        <div class="tok-chip"><span class="tok-chip-tok">tokens</span><span class="tok-chip-id">13</span></div>
+        <div class="tok-chip is-used"><span class="tok-chip-tok">test</span><span class="tok-chip-id">14</span></div>
+        <div class="tok-chip is-pad"><span class="tok-chip-tok">… more tokens</span><span class="tok-chip-id">15&ndash;249</span></div>
       </div>
+      <!-- Invisible step marker: revealing it lights up the six entries the sentence
+           used, one click before the special tokens get their turn. -->
+      <span class="fragment tok-used-step" data-fragment-index="4" aria-hidden="true"></span>
     </div>
 
     <!-- Revealing this lights up the three special chips above (the :has() rule in the
          scoped style block), so the highlight is a click, not an always-on colour. -->
-    <p class="fragment tok-flag tok-special-line" data-fragment-index="4">
+    <p class="fragment tok-flag tok-special-line" data-fragment-index="5">
       The first three are <span class="highlight">not text</span> &mdash;
       <span class="tok-mono">&lt;bos&gt;</span> starts,
       <span class="tok-mono">&lt;eos&gt;</span> ends,
@@ -206,6 +209,32 @@
     /* The highlight step: when the closing line is revealed, the three special entries
        light up. Driven by the fragment class the engine sets, so it lands under the
        presenter's control. */
+    [data-id="tokenizer-demo"] .tok-used-step {
+      display: none;
+    }
+
+    /* First highlight step: the words the sentence was split into. Switched off again
+       once the special-token line takes over. */
+    [data-id="tokenizer-demo"]:has(.tok-used-step.fragment-visible):not(:has(.tok-flag.fragment-visible)) .tok-chip.is-used {
+      background: rgba(0, 163, 224, 0.14);
+      border-color: var(--color-accent);
+      border-width: 2px;
+      padding: calc(0.22em - 1px) calc(0.5em - 1px);
+    }
+
+    [data-id="tokenizer-demo"]:has(.tok-used-step.fragment-visible):not(:has(.tok-flag.fragment-visible)) .tok-chip.is-used .tok-chip-tok {
+      color: var(--color-accent);
+      font-weight: 700;
+    }
+
+    [data-id="tokenizer-demo"]:has(.tok-used-step.fragment-visible):not(:has(.tok-flag.fragment-visible)) .tok-chip:not(.is-used) {
+      opacity: 0.42;
+    }
+
+    [data-id="tokenizer-demo"]:has(.tok-used-step.fragment-visible):not(:has(.tok-flag.fragment-visible)) .tok-chip.is-pad {
+      opacity: 0.28;
+    }
+
     [data-id="tokenizer-demo"]:has(.tok-flag.fragment-visible) .tok-chip.is-special {
       background: rgba(0, 163, 224, 0.14);
       border-color: var(--color-accent);
